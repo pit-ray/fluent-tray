@@ -6,10 +6,28 @@
 int main()
 {
     using namespace fluent_tray ;
-    FluentTray tray("demo", "demo/sample_icon.ico") ;
+    FluentTray tray("demo", "demo/sample_icon.ico", 20, 500, "Consolas") ;
+    if(!tray.create_tray()) {
+        std::cout << "Failed Tray Initialization\n" ;
+        return 1 ;
+    }
 
-    tray.add_menu("TextTest 1", "demo/sample_icon.ico") ;
-    tray.add_menu("日本語テスト", "demo/sample_icon.ico") ;
+    if(!tray.add_menu("TextTest 1", "demo/sample_icon.ico")) {
+        std::cout << "Failed Menu 1\n" ;
+        return 1 ;
+    }
+    if(!tray.add_menu("日本語テスト", "demo/sample_icon.ico")) {
+        std::cout << "Failed Menu 2\n" ;
+        return 1 ;
+    }
+    if(!tray.add_menu("aaaaaa", "demo/sample_icon.ico")) {
+        std::cout << "Failed Menu 3\n" ;
+        return 1 ;
+    }
+    if(!tray.add_menu("bbbbb", "demo/sample_icon.ico")) {
+        std::cout << "Failed Menu 4\n" ;
+        return 1 ;
+    }
 
     tray.update_parallel() ;
 

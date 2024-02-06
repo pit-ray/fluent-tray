@@ -64,13 +64,6 @@ namespace fluent_tray
 
     public:
         explicit FluentMenu(
-            HINSTANCE hinstance,
-            HWND parent_hwnd,
-            int left,
-            int top,
-            int width,
-            int height,
-            std::size_t id,
             const std::string& label_text="",
             const std::filesystem::path& icon_path="",
             bool toggle=false)
@@ -78,20 +71,7 @@ namespace fluent_tray
           toggle_(toggle),
           icon_path_(icon_path),
           hwnd_(NULL)
-        {
-            std::wstring label_text_wide ;
-            util::string2wstring(label_text, label_text_wide) ;
-
-            hwnd_ = CreateWindowW(
-                TEXT("BUTTON"), label_text_wide.c_str(),
-                WS_CHILD | WS_VISIBLE,
-                left, top, width, height,
-                parent_hwnd, reinterpret_cast<HMENU>(id),
-                hinstance, NULL) ;
-            if(!hwnd_) {
-                return ;
-            }
-        }
+        {}
 
         // Copy
         FluentMenu(const FluentMenu&) = default ;
@@ -102,6 +82,23 @@ namespace fluent_tray
         FluentMenu& operator=(FluentMenu&&) = default ;
 
         ~FluentMenu() noexcept = default ;
+
+        bool create_menu(
+                HINSTANCE hinstance,
+                HWND parent_hwnd,
+                std::size_t id) {
+
+            std::wstring label_text_wide ;
+            util::string2wstring(label_, label_text_wide) ;
+
+            hwnd_ = CreateWindowW(
+                TEXT("BUTTON"), label_text_wide.c_str(),
+                WS_CHILD | WS_VISIBLE,
+                0, 0, 100, 100,
+                parent_hwnd, reinterpret_cast<HMENU>(id),
+                hinstance, NULL) ;
+            return hwnd_ != NULL ;
+        }
 
         HWND window_handle() const noexcept {
             return hwnd_ ;
@@ -117,7 +114,8 @@ namespace fluent_tray
     private:
         std::vector<FluentMenu> menus_ ;
 
-        std::wstring tooltip_text_ ;
+        std::string app_name_ ;
+        std::filesystem::path icon_path_ ;
 
         HWND hwnd_ ;
         HINSTANCE hinstance_ ;
@@ -129,6 +127,9 @@ namespace fluent_tray
 
         std::size_t next_menu_id_ ;
 
+        LONG menu_font_width_ ;
+        LONG menu_font_height_ ;
+
         LONG menu_x_offset_ ;
         LONG menu_y_offset_ ;
 
@@ -138,13 +139,19 @@ namespace fluent_tray
         COLORREF menu_text_color_ ;
         COLORREF menu_back_color_ ;
 
+        const std::string font_name_ ;
+        LOGFONTW logfont_ ;
+
     public:
         explicit FluentTray(
             const std::string& app_name,
             const std::filesystem::path& icon_path="",
-            const std::string& tooltip_text="")
+            LONG font_size=12,
+            LONG font_weight=FW_NORMAL,
+            const std::string& font_name="Segoe UI")
         : menus_(),
-          tooltip_text_(),
+          app_name_(app_name),
+          icon_path_(icon_path),
           hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
           hwnd_(NULL),
           icon_data_(),
@@ -152,61 +159,19 @@ namespace fluent_tray
           popup_height_(100),
           status_(Status::STOPPED),
           next_menu_id_(1),
-          menu_x_offset_(10),
-          menu_y_offset_(10),
-          menu_x_pad_(5),
-          menu_y_pad_(5),
-          menu_text_color_(RGB(222, 222, 222)),
-          menu_back_color_(RGB(30, 30, 30))
+          menu_font_width_(font_size / 2),
+          menu_font_height_(font_size),
+          menu_x_offset_(5),
+          menu_y_offset_(5),
+          menu_x_pad_(20),
+          menu_y_pad_(20),
+          menu_text_color_(RGB(30, 30, 30)),
+          menu_back_color_(RGB(222, 222, 222)),
+          logfont_(),
+          font_name_(font_name)
         {
-            std::wstring app_name_wide ;
-            util::string2wstring(app_name, app_name_wide) ;
-
-            util::string2wstring(tooltip_text, tooltip_text_) ;
-
-            WNDCLASSW winc ;
-            winc.style = CS_HREDRAW | CS_VREDRAW ;
-            winc.lpfnWndProc = &FluentTray::callback ;
-            winc.cbClsExtra = 0 ;
-            winc.cbWndExtra = sizeof(LONG) * 2 ;  // To store two-part address.
-            winc.hInstance = hinstance_ ;
-            winc.hIcon = LoadIcon(NULL, IDI_APPLICATION) ;
-            winc.hCursor = LoadCursor(NULL, IDC_ARROW) ;
-            winc.hbrBackground = NULL ;
-            winc.lpszMenuName = NULL ;
-            winc.lpszClassName = app_name_wide.c_str() ;
-
-            if(!RegisterClassW(&winc)) {
-                return ;
-            }
-
-            hwnd_ = CreateWindowExW(
-                WS_EX_TOOLWINDOW | WS_EX_LAYERED,
-                app_name_wide.c_str(),
-                app_name_wide.c_str(),
-                WS_POPUPWINDOW,
-                0, 0, popup_width_, popup_height_,
-                NULL, NULL,
-                hinstance_, NULL
-            ) ;
-            if(!hwnd_) {
-                return ;
-            }
-
-            // To access the this pointer inside the callback function,
-            // the address divide into the two part address.
-            constexpr auto long_bits = static_cast<int>(sizeof(LONG) * CHAR_BIT) ;
-            auto addr = reinterpret_cast<std::size_t>(this) ;
-            auto addr1 = static_cast<LONG>(addr >> long_bits) ;
-            auto addr2 = static_cast<LONG>(addr & ((static_cast<std::size_t>(1) << long_bits) - 1)) ;
-            SetWindowLongW(hwnd_, 0, addr1) ;
-            SetWindowLongW(hwnd_, sizeof(LONG), addr2) ;
-
-            if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
-                return ;
-            }
-
-            change_icon(icon_path) ;
+            logfont_.lfHeight = font_size ;
+            logfont_.lfWeight = font_weight ;
         }
 
         // Copy
@@ -219,15 +184,86 @@ namespace fluent_tray
 
         ~FluentTray() noexcept = default ;
 
-        void add_menu(
+        bool create_tray() {
+            std::wstring app_name_wide ;
+            if(!util::string2wstring(app_name_, app_name_wide)) {
+                return false ;
+            }
+
+            WNDCLASSW winc ;
+            winc.style = CS_HREDRAW | CS_VREDRAW ;
+            winc.lpfnWndProc = &FluentTray::callback ;
+            winc.cbClsExtra = 0 ;
+            winc.cbWndExtra = sizeof(LONG) * 2 ;  // To store two-part address.
+            winc.hInstance = hinstance_ ;
+            winc.hIcon = LoadIcon(NULL, IDI_APPLICATION) ;
+            winc.hCursor = LoadCursor(NULL, IDC_ARROW) ;
+            winc.hbrBackground = GetSysColorBrush(COLOR_WINDOW) ;
+            winc.lpszMenuName = NULL ;
+            winc.lpszClassName = app_name_wide.c_str() ;
+
+            if(!RegisterClassW(&winc)) {
+                return false ;
+            }
+
+            hwnd_ = CreateWindowExW(
+                WS_EX_TOOLWINDOW | WS_EX_LAYERED,
+                app_name_wide.c_str(),
+                app_name_wide.c_str(),
+                WS_POPUPWINDOW,
+                0, 0, popup_width_, popup_height_,
+                NULL, NULL,
+                hinstance_, NULL
+            ) ;
+            if(!hwnd_) {
+                return false ;
+            }
+
+            // To access the this pointer inside the callback function,
+            // the address divide into the two part address.
+            constexpr auto long_bits = static_cast<int>(sizeof(LONG) * CHAR_BIT) ;
+            auto addr = reinterpret_cast<std::size_t>(this) ;
+            auto addr1 = static_cast<LONG>(addr >> long_bits) ;
+            auto addr2 = static_cast<LONG>(addr & ((static_cast<std::size_t>(1) << long_bits) - 1)) ;
+            SetWindowLongW(hwnd_, 0, addr1) ;
+            SetWindowLongW(hwnd_, sizeof(LONG), addr2) ;
+
+            if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
+                return false ;
+            }
+
+            change_icon(icon_path_) ;
+
+            /*
+            if(!set_font()) {
+                return false ;
+            }
+            if(!set_paint_settings(hwnd_)) {
+                return 0 ;
+            }
+            static auto hfont = CreateFontIndirectW(&logfont_) ;
+            if(!hfont) {
+                return false ;
+            }
+            // static auto hfont = reinterpret_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)) ;
+            SendMessage(hwnd_, WM_SETFONT, WPARAM(hfont), MAKELPARAM(FALSE, 0));
+            */
+
+            return true ;
+        }
+
+        bool add_menu(
                 const std::string& label_text="",
                 const std::filesystem::path& icon_path="",
                 bool toggle=false) {
-            menus_.emplace_back(
-                hinstance_, hwnd_,
-                0, 0, 10, 10, next_menu_id_,
-                label_text, icon_path, toggle) ;
+            FluentMenu menu(label_text, icon_path, toggle) ;
+            if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_)) {
+                return false ;
+            }
+
+            menus_.push_back(std::move(menu)) ;
             next_menu_id_ ++ ;
+            return true ;
         }
 
         bool update() {
@@ -242,19 +278,19 @@ namespace fluent_tray
         }
 
         bool update_parallel(
-            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(5)) {
+            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(50)) {
 
             // TODO: launch async
             MSG msg ;
             while(true) {
-                get_message(msg) ;
-
-                Sleep(static_cast<int>(sleep_time.count())) ;
-
                 if(status_ == Status::SHOULD_STOP) {
                     status_ = Status::STOPPED ;
                     break ;
                 }
+
+                get_message(msg) ;
+
+                Sleep(static_cast<int>(sleep_time.count())) ;
             }
 
             if(!check_if_foreground()) {
@@ -299,6 +335,11 @@ namespace fluent_tray
                 return false ;
             }
 
+            std::wstring app_name_wide ;
+            if(!util::string2wstring(app_name_, app_name_wide)) {
+                return false ;
+            }
+
             icon_data_.cbSize = sizeof(icon_data_) ;
             icon_data_.hWnd = hwnd_ ;
             icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;
@@ -307,7 +348,7 @@ namespace fluent_tray
                 LoadImageW(
                     0, icon_path_wide.c_str(),
                     IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
-            wcscpy_s(icon_data_.szTip, tooltip_text_.c_str()) ;
+            wcscpy_s(icon_data_.szTip, app_name_wide.c_str()) ;
             icon_data_.dwState = NIS_SHAREDICON ;
             icon_data_.dwStateMask = NIS_SHAREDICON ;
 
@@ -336,7 +377,10 @@ namespace fluent_tray
             //massage process
             switch(msg) {
                 case WM_CREATE: {
-                    return 0 ;
+                    break ;
+                }
+                case WM_PAINT: {
+                    break ;
                 }
                 case WM_DESTROY: {
                     self->status_ = Status::SHOULD_STOP ;
@@ -414,17 +458,96 @@ namespace fluent_tray
             return true ;
         }
 
+        bool set_font() {
+            //default setting
+            logfont_.lfWidth = 0 ;
+            logfont_.lfEscapement = 0 ;
+            logfont_.lfOrientation = 0 ;
+            logfont_.lfWeight = FW_LIGHT ;
+            logfont_.lfItalic = FALSE ;
+            logfont_.lfUnderline = FALSE ;
+            logfont_.lfStrikeOut = FALSE ;
+            logfont_.lfCharSet = ANSI_CHARSET ;
+            logfont_.lfOutPrecision = OUT_TT_ONLY_PRECIS ;
+            logfont_.lfClipPrecision = CLIP_DEFAULT_PRECIS ;
+            logfont_.lfQuality = ANTIALIASED_QUALITY ;
+            logfont_.lfPitchAndFamily = 0 ;
+
+            if(font_name_.empty()) {
+                logfont_.lfFaceName[0] = '\0' ;
+            }
+            else {
+                std::wstring font_name_wide ;
+                if(!util::string2wstring(font_name_, font_name_wide)) {
+                    return false ;
+                }
+                auto dst = logfont_.lfFaceName ;
+
+                if(font_name_wide.size() < LF_FACESIZE) {
+                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
+                    dst[font_name_wide.size()] = L'\0' ;
+                }
+                else {
+                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
+                    dst[LF_FACESIZE - 1] = L'\0' ;
+                }
+            }
+
+            return true;
+        }
+
+        bool set_paint_settings(HWND hwnd) {
+            PAINTSTRUCT ps ;
+            auto hdc = BeginPaint(hwnd, &ps) ;
+            if(!hdc) {
+                return false ;
+            }
+
+            auto font = CreateFontIndirectW(&logfont_) ;
+            if(!font) {
+                return false ;
+            }
+
+            if(!SelectObject(hdc, font)) {
+                EndPaint(hwnd, &ps) ;
+                return false ;
+            }
+
+            if(SetBkColor(hdc, menu_back_color_) == CLR_INVALID) {
+                EndPaint(hwnd, &ps) ;
+                return false ;
+            }
+
+            if(SetTextColor(hdc, menu_text_color_) == CLR_INVALID) {
+                EndPaint(hwnd, &ps) ;
+                return false ;
+            }
+
+            SendMessage(hwnd, WM_SETFONT, WPARAM(font), TRUE);
+
+            if(!EndPaint(hwnd, &ps)) {
+                return false ;
+            }
+            if(!DeleteObject(font)) {
+                return false ;
+            }
+
+            return true ;
+        }
+
         bool show_popup_window() {
-            LONG char_width = 10 ;
-            LONG char_height = 20 ;
+            if(menus_.empty()) {
+                return true ;
+            }
+
             LONG max_label_length = 0 ;
             for(auto& menu : menus_) {
                 if(max_label_length < menu.label().length()) {
                     max_label_length = static_cast<LONG>(menu.label().length()) ;
                 }
             }
-            auto menu_width = max_label_length * char_width + menu_x_pad_ ;
-            auto menu_height = char_height + menu_y_pad_ ;
+            auto menu_width = max_label_length * menu_font_width_ + menu_x_pad_ ;
+            auto menu_height = menu_font_height_ + menu_y_pad_ ;
             auto popup_width = 2 * menu_x_offset_ + menu_width ;
             auto popup_height = static_cast<LONG>(
                 menus_.size() * (menu_y_offset_ + menu_height) + menu_y_offset_) ;
