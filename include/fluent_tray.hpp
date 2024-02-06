@@ -60,16 +60,37 @@ namespace fluent_tray
         std::filesystem::path icon_path_ ;
         bool toggle_ ;
 
+        HWND hwnd_ ;
+
     public:
         explicit FluentMenu(
+            HINSTANCE hinstance,
+            HWND parent_hwnd,
+            int left,
+            int top,
+            int width,
+            int height,
+            std::size_t id,
             const std::string& label_text="",
             const std::filesystem::path& icon_path="",
             bool toggle=false)
         : label_(label_text),
           toggle_(toggle),
-          icon_path_(icon_path)
+          icon_path_(icon_path),
+          hwnd_(NULL)
         {
+            std::wstring label_text_wide ;
+            util::string2wstring(label_text, label_text_wide) ;
 
+            hwnd_ = CreateWindowW(
+                TEXT("BUTTON"), label_text_wide.c_str(),
+                WS_CHILD | WS_VISIBLE,
+                left, top, width, height,
+                parent_hwnd, reinterpret_cast<HMENU>(id),
+                hinstance, NULL) ;
+            if(!hwnd_) {
+                return ;
+            }
         }
 
         // Copy
@@ -81,6 +102,14 @@ namespace fluent_tray
         FluentMenu& operator=(FluentMenu&&) = default ;
 
         ~FluentMenu() noexcept = default ;
+
+        HWND window_handle() const noexcept {
+            return hwnd_ ;
+        }
+
+        const std::string& label() const noexcept {
+            return label_ ;
+        }
     } ;
 
 
@@ -91,144 +120,23 @@ namespace fluent_tray
         std::wstring tooltip_text_ ;
 
         HWND hwnd_ ;
+        HINSTANCE hinstance_ ;
         NOTIFYICONDATAW icon_data_ ;
 
         LONG popup_width_ ;
         LONG popup_height_ ;
         Status status_ ;
 
-        static LRESULT CALLBACK callback(
-                HWND hwnd,
-                UINT msg,
-                WPARAM wparam,
-                LPARAM lparam) {
+        std::size_t next_menu_id_ ;
 
-            auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
-            auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
-            auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
-            if(!self) {
-                return DefWindowProc(hwnd, msg, wparam, lparam) ;
-            }
+        LONG menu_x_offset_ ;
+        LONG menu_y_offset_ ;
 
-            //massage process
-            switch(msg) {
-                case WM_CREATE: {
-                    return 0 ;
-                }
-                case WM_DESTROY: {
-                    self->status_ = Status::SHOULD_STOP ;
-                    return 0 ;
-                }
+        LONG menu_x_pad_ ;
+        LONG menu_y_pad_ ;
 
-                case WM_QUIT: {
-                    self->status_ = Status::SHOULD_STOP ;
-                    return 0 ;
-                }
-
-                case WM_CLOSE: {
-                    self->status_ = Status::SHOULD_STOP ;
-                    return 0 ;
-                }
-
-                case WM_CTLCOLORSTATIC: {
-                    break ;
-                }
-
-                case WM_SHOWWINDOW: {
-                    if(!wparam) {
-                        break ;
-                    }
-
-                    return 0 ;
-                }
-
-                case MESSAGE_ID: {
-                    //On NotifyIcon
-                    switch(lparam) {
-                        case WM_RBUTTONUP: {
-                            if(!self->show_popup_window()) {
-                                return 0 ;
-                            }
-                            break ;
-                        }
-                    }
-                    return 0 ;
-                }
-            }
-
-            return DefWindowProc(hwnd, msg, wparam, lparam) ;
-        }
-
-        bool show_popup_window() {
-            POINT cursor_pos ;
-            if(!GetCursorPos(&cursor_pos)) {
-                return false ;
-            }
-
-            RECT work_rect ;
-            if(!SystemParametersInfo(
-                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
-                return false ;
-            }
-
-            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
-            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
-
-            auto work_width = work_rect.right - work_rect.left ;
-            auto work_height = work_rect.bottom - work_rect.top ;
-
-            auto taskbar_width = screen_width - work_width ;
-            auto taskbar_height = screen_height - work_height ;
-
-            auto pos = cursor_pos ;
-            if(taskbar_width == 0) {  // horizontal taskbar
-                if(cursor_pos.y <= taskbar_height) {
-                    //top
-                    pos.y = taskbar_height ;
-                }
-                else {
-                    //bottom
-                    // add 10% offset
-                    pos.y = screen_height - (popup_height_ + 11 * taskbar_height / 10) ;
-                }
-                pos.x = cursor_pos.x - popup_width_ / 2 ;
-            }
-            else {  // vertical taskbar
-                if(pos.x <= taskbar_width) {
-                    //left
-                    pos.x = taskbar_width ;
-                }
-                else {
-                    //right
-                    // add 10% offset
-                    pos.x = popup_width_ + 11 * taskbar_width / 10 ;
-                }
-
-                pos.y = cursor_pos.y - popup_height_ / 2 ;
-            }
-
-            if(!SetWindowPos(
-                    hwnd_, HWND_TOP, pos.x, pos.y,
-                    0, 0, SWP_NOSIZE | SWP_SHOWWINDOW)) {
-                return false ;
-            }
-
-            if(!SetForegroundWindow(hwnd_)) {
-                return false ;
-            }
-
-            return true ;
-        }
-
-        void get_message(MSG& message) {
-            if(PeekMessage(&message, hwnd_, 0, 0, PM_REMOVE)) {
-                DispatchMessage(&message) ;
-            }
-        }
-
-        bool check_if_foreground() {
-            return GetForegroundWindow() == hwnd_ ;
-        }
+        COLORREF menu_text_color_ ;
+        COLORREF menu_back_color_ ;
 
     public:
         explicit FluentTray(
@@ -237,25 +145,31 @@ namespace fluent_tray
             const std::string& tooltip_text="")
         : menus_(),
           tooltip_text_(),
+          hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
           hwnd_(NULL),
           icon_data_(),
-          popup_width_(100),
+          popup_width_(200),
           popup_height_(100),
-          status_(Status::STOPPED)
+          status_(Status::STOPPED),
+          next_menu_id_(1),
+          menu_x_offset_(10),
+          menu_y_offset_(10),
+          menu_x_pad_(5),
+          menu_y_pad_(5),
+          menu_text_color_(RGB(222, 222, 222)),
+          menu_back_color_(RGB(30, 30, 30))
         {
             std::wstring app_name_wide ;
             util::string2wstring(app_name, app_name_wide) ;
 
             util::string2wstring(tooltip_text, tooltip_text_) ;
 
-            auto hinstance = reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL)) ;
-
             WNDCLASSW winc ;
             winc.style = CS_HREDRAW | CS_VREDRAW ;
             winc.lpfnWndProc = &FluentTray::callback ;
             winc.cbClsExtra = 0 ;
             winc.cbWndExtra = sizeof(LONG) * 2 ;  // To store two-part address.
-            winc.hInstance = hinstance,
+            winc.hInstance = hinstance_ ;
             winc.hIcon = LoadIcon(NULL, IDI_APPLICATION) ;
             winc.hCursor = LoadCursor(NULL, IDC_ARROW) ;
             winc.hbrBackground = NULL ;
@@ -273,7 +187,7 @@ namespace fluent_tray
                 WS_POPUPWINDOW,
                 0, 0, popup_width_, popup_height_,
                 NULL, NULL,
-                hinstance, NULL
+                hinstance_, NULL
             ) ;
             if(!hwnd_) {
                 return ;
@@ -305,16 +219,15 @@ namespace fluent_tray
 
         ~FluentTray() noexcept = default ;
 
-        void append_menu(const FluentMenu& menu) {
-            menus_.push_back(menu) ;
-        }
-        void append_menu(FluentMenu&& menu) {
-            menus_.push_back(std::move(menu)) ;
-        }
-
-        template <typename ...Args>
-        void emplace_menu(Args&&... args) {
-            menus_.emplace_back(std::forward<Args>(args)...) ;
+        void add_menu(
+                const std::string& label_text="",
+                const std::filesystem::path& icon_path="",
+                bool toggle=false) {
+            menus_.emplace_back(
+                hinstance_, hwnd_,
+                0, 0, 10, 10, next_menu_id_,
+                label_text, icon_path, toggle) ;
+            next_menu_id_ ++ ;
         }
 
         bool update() {
@@ -348,6 +261,23 @@ namespace fluent_tray
                 hide_popup() ;
             }
             return true ;
+        }
+
+        bool show_popup() {
+            return SetForegroundWindow(hwnd_) != 0 ;
+        }
+
+        bool hide_popup() {
+            ShowWindow(hwnd_, SW_HIDE) ;
+            return true ;
+        }
+
+        Status get_status() const noexcept {
+            return status_ ;
+        }
+
+        HWND window_handle() const noexcept {
+            return hwnd_ ;
         }
 
         bool change_icon(const std::filesystem::path& icon_path) {
@@ -389,17 +319,196 @@ namespace fluent_tray
             return true ;
         }
 
-        bool show_popup() {
-            return SetForegroundWindow(hwnd_) != 0 ;
+    private:
+        static LRESULT CALLBACK callback(
+                HWND hwnd,
+                UINT msg,
+                WPARAM wparam,
+                LPARAM lparam) {
+
+            auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
+            auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
+            auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
+            if(!self) {
+                return DefWindowProc(hwnd, msg, wparam, lparam) ;
+            }
+
+            //massage process
+            switch(msg) {
+                case WM_CREATE: {
+                    return 0 ;
+                }
+                case WM_DESTROY: {
+                    self->status_ = Status::SHOULD_STOP ;
+                    return 0 ;
+                }
+
+                case WM_QUIT: {
+                    self->status_ = Status::SHOULD_STOP ;
+                    return 0 ;
+                }
+
+                case WM_CLOSE: {
+                    self->status_ = Status::SHOULD_STOP ;
+                    return 0 ;
+                }
+
+                case WM_CTLCOLORSTATIC: {
+                    auto received_hwnd = reinterpret_cast<HWND>(lparam) ;
+                    auto hdc = reinterpret_cast<HDC>(wparam) ;
+                    if(!self->set_color_settings(received_hwnd, hdc)) {
+                        return 0 ;
+                    }
+                    break ;
+                }
+
+                case WM_SHOWWINDOW: {
+                    if(!wparam) {
+                        break ;
+                    }
+
+                    return 0 ;
+                }
+
+                case WM_ACTIVATE: {
+                    if(wparam == WA_INACTIVE) {
+                        if(!self->hide_popup()) {
+                            return 0 ;
+
+                        }
+                        break ;
+                    }
+                }
+
+                case MESSAGE_ID: {
+                    //On NotifyIcon
+                    switch(lparam) {
+                        case WM_LBUTTONUP: 
+                        case WM_RBUTTONUP: {
+                            if(!self->show_popup_window()) {
+                                return 0 ;
+                            }
+                            break ;
+                        }
+                    }
+                    return 0 ;
+                }
+            }
+
+            return DefWindowProc(hwnd, msg, wparam, lparam) ;
         }
 
-        bool hide_popup() {
-            ShowWindow(hwnd_, SW_HIDE) ;
+        bool set_color_settings(HWND received_hwnd, HDC hdc) {
+            for(auto& menu : menus_) {
+                //Color Setting of Popup window
+                if(received_hwnd == menu.window_handle()) {
+                    if(SetTextColor(hdc, menu_text_color_) == CLR_INVALID) {
+                        return false ;
+                    }
+                    if(SetBkColor(hdc, menu_back_color_) == CLR_INVALID) {
+                        return false ;
+                    }
+                    return true ;
+                }
+            }
             return true ;
         }
 
-        Status get_status() const noexcept {
-            return status_ ;
+        bool show_popup_window() {
+            LONG char_width = 10 ;
+            LONG char_height = 20 ;
+            LONG max_label_length = 0 ;
+            for(auto& menu : menus_) {
+                if(max_label_length < menu.label().length()) {
+                    max_label_length = static_cast<LONG>(menu.label().length()) ;
+                }
+            }
+            auto menu_width = max_label_length * char_width + menu_x_pad_ ;
+            auto menu_height = char_height + menu_y_pad_ ;
+            auto popup_width = 2 * menu_x_offset_ + menu_width ;
+            auto popup_height = static_cast<LONG>(
+                menus_.size() * (menu_y_offset_ + menu_height) + menu_y_offset_) ;
+
+            POINT cursor_pos ;
+            if(!GetCursorPos(&cursor_pos)) {
+                return false ;
+            }
+
+            RECT work_rect ;
+            if(!SystemParametersInfo(
+                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
+                return false ;
+            }
+
+            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
+            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
+
+            auto work_width = work_rect.right - work_rect.left ;
+            auto work_height = work_rect.bottom - work_rect.top ;
+
+            auto taskbar_width = screen_width - work_width ;
+            auto taskbar_height = screen_height - work_height ;
+
+            auto pos = cursor_pos ;
+            if(taskbar_width == 0) {  // horizontal taskbar
+                if(cursor_pos.y <= taskbar_height) {
+                    //top
+                    pos.y = taskbar_height ;
+                }
+                else {
+                    //bottom
+                    // add 10% offset
+                    pos.y = screen_height - (popup_height + 11 * taskbar_height / 10) ;
+                }
+                pos.x = cursor_pos.x - popup_width / 2 ;
+            }
+            else {  // vertical taskbar
+                if(pos.x <= taskbar_width) {
+                    //left
+                    pos.x = taskbar_width ;
+                }
+                else {
+                    //right
+                    // add 10% offset
+                    pos.x = popup_width + 11 * taskbar_width / 10 ;
+                }
+
+                pos.y = cursor_pos.y - popup_height / 2 ;
+            }
+
+            if(!SetWindowPos(
+                    hwnd_, HWND_TOP,
+                    pos.x, pos.y, popup_width, popup_height,
+                    SWP_SHOWWINDOW)) {
+                return false ;
+            }
+
+            auto menu_top = menu_y_offset_ ;
+            for(auto& menu : menus_) {
+                if(!SetWindowPos(
+                        menu.window_handle(), HWND_TOP,
+                        menu_x_offset_, menu_top, menu_width, menu_height,
+                        SWP_SHOWWINDOW)) {
+                    return false ;
+                }
+                menu_top += menu_height + menu_y_offset_ ;
+            }
+
+            if(!SetForegroundWindow(hwnd_)) {
+                return false ;
+            }
+
+            return true ;
+        }
+
+        void get_message(MSG& message) {
+            if(PeekMessage(&message, hwnd_, 0, 0, PM_REMOVE)) {
+                DispatchMessage(&message) ;
+            }
+        }
+
+        bool check_if_foreground() {
+            return GetForegroundWindow() == hwnd_ ;
         }
     } ;
 }
