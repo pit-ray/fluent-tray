@@ -2,6 +2,7 @@
 #define _FLUENT_TRAY_HPP
 
 #include <chrono>
+#include <cmath>
 #include <filesystem>
 #include <initializer_list>
 #include <memory>
@@ -15,11 +16,10 @@
 #include <windows.h>
 
 
-#define MESSAGE_ID (WM_APP + 25)
-
-
 namespace fluent_tray
 {
+    static constexpr int MESSAGE_ID = WM_APP + 25 ;
+
     namespace util
     {
         bool string2wstring(const std::string& str, std::wstring& wstr) {
@@ -79,6 +79,8 @@ namespace fluent_tray
         // Move
         FluentMenu(FluentMenu&&) = default ;
         FluentMenu& operator=(FluentMenu&&) = default ;
+
+        ~FluentMenu() noexcept = default ;
     } ;
 
 
@@ -91,10 +93,9 @@ namespace fluent_tray
         HWND hwnd_ ;
         NOTIFYICONDATAW icon_data_ ;
 
-        static LONG popup_height_ ;
-        static LONG popup_width_ ;
-        static LONG popup_offset_ ;
-        static Status status_ ;
+        LONG popup_width_ ;
+        LONG popup_height_ ;
+        Status status_ ;
 
         static LRESULT CALLBACK callback(
                 HWND hwnd,
@@ -102,23 +103,30 @@ namespace fluent_tray
                 WPARAM wparam,
                 LPARAM lparam) {
 
+            auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
+            auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
+            auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
+            if(!self) {
+                return DefWindowProc(hwnd, msg, wparam, lparam) ;
+            }
+
             //massage process
             switch(msg) {
                 case WM_CREATE: {
                     return 0 ;
                 }
                 case WM_DESTROY: {
-                    status_ = Status::SHOULD_STOP ;
+                    self->status_ = Status::SHOULD_STOP ;
                     return 0 ;
                 }
 
                 case WM_QUIT: {
-                    status_ = Status::SHOULD_STOP ;
+                    self->status_ = Status::SHOULD_STOP ;
                     return 0 ;
                 }
 
                 case WM_CLOSE: {
-                    status_ = Status::SHOULD_STOP ;
+                    self->status_ = Status::SHOULD_STOP ;
                     return 0 ;
                 }
 
@@ -138,63 +146,9 @@ namespace fluent_tray
                     //On NotifyIcon
                     switch(lparam) {
                         case WM_RBUTTONUP: {
-                            POINT cursor_pos ;
-                            if(!GetCursorPos(&cursor_pos)) {
+                            if(!self->show_popup_window()) {
                                 return 0 ;
                             }
-
-                            RECT work_rect ;
-                            if(!SystemParametersInfo(
-                                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
-                                return 0 ;
-                            }
-
-                            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
-                            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
-
-                            auto work_width = work_rect.right - work_rect.left ;
-                            auto work_height = work_rect.bottom - work_rect.top ;
-
-                            auto taskbar_width = screen_width - work_width ;
-                            auto taskbar_height = screen_height - work_height ;
-
-                            auto pos = cursor_pos ;
-                            if(taskbar_width == 0) {  // horizontal taskbar
-                                if(cursor_pos.y <= taskbar_height) {
-                                    //top
-                                    pos.y = taskbar_height ;
-                                }
-                                else {
-                                    //bottom
-                                    // add 10% offset
-                                    pos.y = screen_height - (popup_height_ + 11 * taskbar_height / 10) ;
-                                }
-                                pos.x = cursor_pos.x - popup_width_ / 2 ;
-                            }
-                            else {  // vertical taskbar
-                                if(pos.x <= taskbar_width) {
-                                    //left
-                                    pos.x = taskbar_width ;
-                                }
-                                else {
-                                    //right
-                                    // add 10% offset
-                                    pos.x = popup_width_ + 11 * taskbar_width / 10 ;
-                                }
-
-                                pos.y = cursor_pos.y - popup_height_ / 2 ;
-                            }
-
-                            if(!SetWindowPos(
-                                    hwnd, HWND_TOP, pos.x, pos.y,
-                                    0, 0, SWP_NOSIZE | SWP_SHOWWINDOW)) {
-                                return 0 ;
-                            }
-
-                            if(!SetForegroundWindow(hwnd)) {
-                                return 0 ;
-                            }
-
                             break ;
                         }
                     }
@@ -205,10 +159,75 @@ namespace fluent_tray
             return DefWindowProc(hwnd, msg, wparam, lparam) ;
         }
 
+        bool show_popup_window() {
+            POINT cursor_pos ;
+            if(!GetCursorPos(&cursor_pos)) {
+                return false ;
+            }
+
+            RECT work_rect ;
+            if(!SystemParametersInfo(
+                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
+                return false ;
+            }
+
+            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
+            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
+
+            auto work_width = work_rect.right - work_rect.left ;
+            auto work_height = work_rect.bottom - work_rect.top ;
+
+            auto taskbar_width = screen_width - work_width ;
+            auto taskbar_height = screen_height - work_height ;
+
+            auto pos = cursor_pos ;
+            if(taskbar_width == 0) {  // horizontal taskbar
+                if(cursor_pos.y <= taskbar_height) {
+                    //top
+                    pos.y = taskbar_height ;
+                }
+                else {
+                    //bottom
+                    // add 10% offset
+                    pos.y = screen_height - (popup_height_ + 11 * taskbar_height / 10) ;
+                }
+                pos.x = cursor_pos.x - popup_width_ / 2 ;
+            }
+            else {  // vertical taskbar
+                if(pos.x <= taskbar_width) {
+                    //left
+                    pos.x = taskbar_width ;
+                }
+                else {
+                    //right
+                    // add 10% offset
+                    pos.x = popup_width_ + 11 * taskbar_width / 10 ;
+                }
+
+                pos.y = cursor_pos.y - popup_height_ / 2 ;
+            }
+
+            if(!SetWindowPos(
+                    hwnd_, HWND_TOP, pos.x, pos.y,
+                    0, 0, SWP_NOSIZE | SWP_SHOWWINDOW)) {
+                return false ;
+            }
+
+            if(!SetForegroundWindow(hwnd_)) {
+                return false ;
+            }
+
+            return true ;
+        }
+
         void get_message(MSG& message) {
             if(PeekMessage(&message, hwnd_, 0, 0, PM_REMOVE)) {
                 DispatchMessage(&message) ;
             }
+        }
+
+        bool check_if_foreground() {
+            return GetForegroundWindow() == hwnd_ ;
         }
 
     public:
@@ -219,7 +238,10 @@ namespace fluent_tray
         : menus_(),
           tooltip_text_(),
           hwnd_(NULL),
-          icon_data_()
+          icon_data_(),
+          popup_width_(100),
+          popup_height_(100),
+          status_(Status::STOPPED)
         {
             std::wstring app_name_wide ;
             util::string2wstring(app_name, app_name_wide) ;
@@ -232,7 +254,7 @@ namespace fluent_tray
             winc.style = CS_HREDRAW | CS_VREDRAW ;
             winc.lpfnWndProc = &FluentTray::callback ;
             winc.cbClsExtra = 0 ;
-            winc.cbWndExtra = 0 ;
+            winc.cbWndExtra = sizeof(LONG) * 2 ;  // To store two-part address.
             winc.hInstance = hinstance,
             winc.hIcon = LoadIcon(NULL, IDI_APPLICATION) ;
             winc.hCursor = LoadCursor(NULL, IDC_ARROW) ;
@@ -244,10 +266,10 @@ namespace fluent_tray
                 return ;
             }
 
-            hwnd_ = CreateWindowExA(
+            hwnd_ = CreateWindowExW(
                 WS_EX_TOOLWINDOW | WS_EX_LAYERED,
-                app_name.c_str(),
-                app_name.c_str(),
+                app_name_wide.c_str(),
+                app_name_wide.c_str(),
                 WS_POPUPWINDOW,
                 0, 0, popup_width_, popup_height_,
                 NULL, NULL,
@@ -256,6 +278,15 @@ namespace fluent_tray
             if(!hwnd_) {
                 return ;
             }
+
+            // To access the this pointer inside the callback function,
+            // the address divide into the two part address.
+            constexpr auto long_bits = static_cast<int>(sizeof(LONG) * CHAR_BIT) ;
+            auto addr = reinterpret_cast<std::size_t>(this) ;
+            auto addr1 = static_cast<LONG>(addr >> long_bits) ;
+            auto addr2 = static_cast<LONG>(addr & ((static_cast<std::size_t>(1) << long_bits) - 1)) ;
+            SetWindowLongW(hwnd_, 0, addr1) ;
+            SetWindowLongW(hwnd_, sizeof(LONG), addr2) ;
 
             if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
                 return ;
@@ -272,6 +303,8 @@ namespace fluent_tray
         FluentTray(FluentTray&&) = default ;
         FluentTray& operator=(FluentTray&&) = default ;
 
+        ~FluentTray() noexcept = default ;
+
         void append_menu(const FluentMenu& menu) {
             menus_.push_back(menu) ;
         }
@@ -279,32 +312,41 @@ namespace fluent_tray
             menus_.push_back(std::move(menu)) ;
         }
 
-        bool update(
-            bool parallel=true,
-            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(5)) {
+        template <typename ...Args>
+        void emplace_menu(Args&&... args) {
+            menus_.emplace_back(std::forward<Args>(args)...) ;
+        }
+
+        bool update() {
             MSG msg ;
+            get_message(msg) ;
 
-            if(!parallel) {
-                get_message(msg) ;
+            if(!check_if_foreground()) {
+                hide_popup() ;
             }
-            else {
-                // TODO: launch async
-                while(true) {
-                    get_message(msg) ;
 
-                    Sleep(static_cast<int>(sleep_time.count())) ;
+            return true ;
+        }
 
-                    if(status_ == Status::SHOULD_STOP) {
-                        status_ = Status::STOPPED ;
-                        break ;
-                    }
+        bool update_parallel(
+            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(5)) {
+
+            // TODO: launch async
+            MSG msg ;
+            while(true) {
+                get_message(msg) ;
+
+                Sleep(static_cast<int>(sleep_time.count())) ;
+
+                if(status_ == Status::SHOULD_STOP) {
+                    status_ = Status::STOPPED ;
+                    break ;
                 }
             }
 
-            if(GetForegroundWindow() != hwnd_) {
-                ShowWindow(hwnd_, SW_HIDE) ;
+            if(!check_if_foreground()) {
+                hide_popup() ;
             }
-
             return true ;
         }
 
@@ -342,24 +384,24 @@ namespace fluent_tray
             if(!Shell_NotifyIconW(NIM_ADD, &icon_data_)) {
                 return false ;
             }
-            ShowWindow(hwnd_, SW_HIDE) ;
+            hide_popup() ;
 
             return true ;
         }
 
-        void show() {
+        bool show_popup() {
+            return SetForegroundWindow(hwnd_) != 0 ;
+        }
+
+        bool hide_popup() {
             ShowWindow(hwnd_, SW_HIDE) ;
+            return true ;
         }
 
         Status get_status() const noexcept {
             return status_ ;
         }
     } ;
-
-    Status FluentTray::status_ = Status::STOPPED ;
-    LONG FluentTray::popup_width_ = 100 ;
-    LONG FluentTray::popup_height_ = 100 ;
-    LONG FluentTray::popup_offset_ = 10 ;
 }
 
 #endif
