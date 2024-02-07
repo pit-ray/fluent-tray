@@ -9,6 +9,7 @@ int main()
     FluentTray tray("demo", "demo/sample_icon.ico", 20, 500, "Consolas") ;
     if(!tray.create_tray()) {
         std::cout << "Failed Tray Initialization\n" ;
+        std::cout << GetLastError() << std::endl ;
         return 1 ;
     }
 

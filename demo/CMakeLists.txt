@@ -4,7 +4,7 @@ project(fluent-tray-demo VERSION 1.0)
 add_compile_options(
   /W4
   /std:c++17
-  /MT
+  # /MT
   /D_UNICODE
   /DUNICODE
   /utf-8

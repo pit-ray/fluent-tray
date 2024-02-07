@@ -142,6 +142,7 @@ namespace fluent_tray
         const std::string font_name_ ;
         LOGFONTW logfont_ ;
 
+
     public:
         explicit FluentTray(
             const std::string& app_name,
@@ -219,20 +220,32 @@ namespace fluent_tray
                 return false ;
             }
 
+            std::cout << "parent_hwnd: " << hwnd_ << std::endl ;
+
             // To access the this pointer inside the callback function,
             // the address divide into the two part address.
             constexpr auto long_bits = static_cast<int>(sizeof(LONG) * CHAR_BIT) ;
             auto addr = reinterpret_cast<std::size_t>(this) ;
             auto addr1 = static_cast<LONG>(addr >> long_bits) ;
             auto addr2 = static_cast<LONG>(addr & ((static_cast<std::size_t>(1) << long_bits) - 1)) ;
-            SetWindowLongW(hwnd_, 0, addr1) ;
-            SetWindowLongW(hwnd_, sizeof(LONG), addr2) ;
+            SetLastError(0) ;
+            if(!SetWindowLongW(hwnd_, 0, addr1) && GetLastError() != 0) {
+                return false ;
+            }
+            SetLastError(0) ;
+            if(!SetWindowLongW(hwnd_, sizeof(LONG), addr2) && GetLastError() != 0) {
+                return false ;
+            }
+
+            std::cout << "set: " << std::hex << this << std::endl ;
 
             if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
                 return false ;
             }
 
-            change_icon(icon_path_) ;
+            if(!change_icon(icon_path_)) {
+                return false ;
+            }
 
             /*
             if(!set_font()) {
@@ -312,6 +325,10 @@ namespace fluent_tray
             return status_ ;
         }
 
+        void stop() noexcept {
+            status_ = Status::SHOULD_STOP ;
+        }
+
         HWND window_handle() const noexcept {
             return hwnd_ ;
         }
@@ -360,82 +377,124 @@ namespace fluent_tray
             return true ;
         }
 
+        bool show_popup_window() {
+            LONG max_label_length = 0 ;
+            for(auto& menu : menus_) {
+                if(max_label_length < menu.label().length()) {
+                    max_label_length = static_cast<LONG>(menu.label().length()) ;
+                }
+            }
+            auto menu_width = max_label_length * menu_font_width_ + menu_x_pad_ ;
+            auto menu_height = menu_font_height_ + menu_y_pad_ ;
+            auto popup_width = 2 * menu_x_offset_ + menu_width ;
+            auto popup_height = static_cast<LONG>(
+                menus_.size() * (menu_y_offset_ + menu_height) + menu_y_offset_) ;
+
+            POINT cursor_pos ;
+            if(!GetCursorPos(&cursor_pos)) {
+                return false ;
+            }
+
+            RECT work_rect ;
+            if(!SystemParametersInfo(
+                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
+                return false ;
+            }
+
+            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
+            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
+
+            auto work_width = work_rect.right - work_rect.left ;
+            auto work_height = work_rect.bottom - work_rect.top ;
+
+            auto taskbar_width = screen_width - work_width ;
+            auto taskbar_height = screen_height - work_height ;
+
+            auto pos = cursor_pos ;
+            if(taskbar_width == 0) {  // horizontal taskbar
+                if(cursor_pos.y <= taskbar_height) {
+                    //top
+                    pos.y = taskbar_height ;
+                }
+                else {
+                    //bottom
+                    // add 10% offset
+                    pos.y = screen_height - (popup_height + 11 * taskbar_height / 10) ;
+                }
+                pos.x = cursor_pos.x - popup_width / 2 ;
+            }
+            else {  // vertical taskbar
+                if(pos.x <= taskbar_width) {
+                    //left
+                    pos.x = taskbar_width ;
+                }
+                else {
+                    //right
+                    // add 10% offset
+                    pos.x = popup_width + 11 * taskbar_width / 10 ;
+                }
+
+                pos.y = cursor_pos.y - popup_height / 2 ;
+            }
+
+            if(!SetWindowPos(
+                    hwnd_, HWND_TOP,
+                    pos.x, pos.y, popup_width, popup_height,
+                    SWP_SHOWWINDOW)) {
+                return false ;
+            }
+
+            auto menu_top = menu_y_offset_ ;
+            for(auto& menu : menus_) {
+                if(!SetWindowPos(
+                        menu.window_handle(), HWND_TOP,
+                        menu_x_offset_, menu_top, menu_width, menu_height,
+                        SWP_SHOWWINDOW)) {
+                    return false ;
+                }
+                menu_top += menu_height + menu_y_offset_ ;
+            }
+
+            if(!SetForegroundWindow(hwnd_)) {
+                return false ;
+            }
+
+            return true ;
+        }
+
+
     private:
         static LRESULT CALLBACK callback(
                 HWND hwnd,
                 UINT msg,
                 WPARAM wparam,
                 LPARAM lparam) {
+            auto get_instance = [hwnd]() {
+                auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
+                auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
+                auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
+                return self ;
+            } ;
 
-            auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
-            auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
-            auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
-            if(!self) {
-                return DefWindowProc(hwnd, msg, wparam, lparam) ;
+            if(msg == WM_DESTROY || msg == WM_QUIT || msg == WM_CLOSE) {
+                if(auto self = get_instance()) {
+                    // self->status_ = Status::SHOULD_STOP ;
+                    self->stop() ;
+                    return 0 ;
+                }
             }
-
-            //massage process
-            switch(msg) {
-                case WM_CREATE: {
-                    break ;
-                }
-                case WM_PAINT: {
-                    break ;
-                }
-                case WM_DESTROY: {
-                    self->status_ = Status::SHOULD_STOP ;
+            else if(msg== WM_ACTIVATE && wparam == WA_INACTIVE) {
+                if(auto self = get_instance()) {
+                    self->hide_popup() ;
                     return 0 ;
                 }
-
-                case WM_QUIT: {
-                    self->status_ = Status::SHOULD_STOP ;
-                    return 0 ;
-                }
-
-                case WM_CLOSE: {
-                    self->status_ = Status::SHOULD_STOP ;
-                    return 0 ;
-                }
-
-                case WM_CTLCOLORSTATIC: {
-                    auto received_hwnd = reinterpret_cast<HWND>(lparam) ;
-                    auto hdc = reinterpret_cast<HDC>(wparam) ;
-                    if(!self->set_color_settings(received_hwnd, hdc)) {
+            }
+            else if(msg == MESSAGE_ID) {  //On NotifyIcon
+                if(auto self = get_instance()) {
+                    if(lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {
+                        self->show_popup_window() ;
                         return 0 ;
                     }
-                    break ;
-                }
-
-                case WM_SHOWWINDOW: {
-                    if(!wparam) {
-                        break ;
-                    }
-
-                    return 0 ;
-                }
-
-                case WM_ACTIVATE: {
-                    if(wparam == WA_INACTIVE) {
-                        if(!self->hide_popup()) {
-                            return 0 ;
-
-                        }
-                        break ;
-                    }
-                }
-
-                case MESSAGE_ID: {
-                    //On NotifyIcon
-                    switch(lparam) {
-                        case WM_LBUTTONUP: 
-                        case WM_RBUTTONUP: {
-                            if(!self->show_popup_window()) {
-                                return 0 ;
-                            }
-                            break ;
-                        }
-                    }
-                    return 0 ;
                 }
             }
 
@@ -529,95 +588,6 @@ namespace fluent_tray
                 return false ;
             }
             if(!DeleteObject(font)) {
-                return false ;
-            }
-
-            return true ;
-        }
-
-        bool show_popup_window() {
-            if(menus_.empty()) {
-                return true ;
-            }
-
-            LONG max_label_length = 0 ;
-            for(auto& menu : menus_) {
-                if(max_label_length < menu.label().length()) {
-                    max_label_length = static_cast<LONG>(menu.label().length()) ;
-                }
-            }
-            auto menu_width = max_label_length * menu_font_width_ + menu_x_pad_ ;
-            auto menu_height = menu_font_height_ + menu_y_pad_ ;
-            auto popup_width = 2 * menu_x_offset_ + menu_width ;
-            auto popup_height = static_cast<LONG>(
-                menus_.size() * (menu_y_offset_ + menu_height) + menu_y_offset_) ;
-
-            POINT cursor_pos ;
-            if(!GetCursorPos(&cursor_pos)) {
-                return false ;
-            }
-
-            RECT work_rect ;
-            if(!SystemParametersInfo(
-                    SPI_GETWORKAREA, 0, reinterpret_cast<PVOID>(&work_rect), 0)) {
-                return false ;
-            }
-
-            auto screen_width = GetSystemMetrics(SM_CXSCREEN) ;
-            auto screen_height = GetSystemMetrics(SM_CYSCREEN) ;
-
-            auto work_width = work_rect.right - work_rect.left ;
-            auto work_height = work_rect.bottom - work_rect.top ;
-
-            auto taskbar_width = screen_width - work_width ;
-            auto taskbar_height = screen_height - work_height ;
-
-            auto pos = cursor_pos ;
-            if(taskbar_width == 0) {  // horizontal taskbar
-                if(cursor_pos.y <= taskbar_height) {
-                    //top
-                    pos.y = taskbar_height ;
-                }
-                else {
-                    //bottom
-                    // add 10% offset
-                    pos.y = screen_height - (popup_height + 11 * taskbar_height / 10) ;
-                }
-                pos.x = cursor_pos.x - popup_width / 2 ;
-            }
-            else {  // vertical taskbar
-                if(pos.x <= taskbar_width) {
-                    //left
-                    pos.x = taskbar_width ;
-                }
-                else {
-                    //right
-                    // add 10% offset
-                    pos.x = popup_width + 11 * taskbar_width / 10 ;
-                }
-
-                pos.y = cursor_pos.y - popup_height / 2 ;
-            }
-
-            if(!SetWindowPos(
-                    hwnd_, HWND_TOP,
-                    pos.x, pos.y, popup_width, popup_height,
-                    SWP_SHOWWINDOW)) {
-                return false ;
-            }
-
-            auto menu_top = menu_y_offset_ ;
-            for(auto& menu : menus_) {
-                if(!SetWindowPos(
-                        menu.window_handle(), HWND_TOP,
-                        menu_x_offset_, menu_top, menu_width, menu_height,
-                        SWP_SHOWWINDOW)) {
-                    return false ;
-                }
-                menu_top += menu_height + menu_y_offset_ ;
-            }
-
-            if(!SetForegroundWindow(hwnd_)) {
                 return false ;
             }
 
