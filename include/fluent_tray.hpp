@@ -93,10 +93,15 @@ namespace fluent_tray
 
             hwnd_ = CreateWindowW(
                 TEXT("BUTTON"), label_text_wide.c_str(),
-                WS_CHILD | WS_VISIBLE,
+                WS_CHILD | WS_VISIBLE | BS_FLAT | BS_LEFT,
                 0, 0, 100, 100,
                 parent_hwnd, reinterpret_cast<HMENU>(id),
                 hinstance, NULL) ;
+
+            // Hide dash lines when selecting.
+            SendMessageW(
+                hwnd_, WM_CHANGEUISTATE,
+                WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
             return hwnd_ != NULL ;
         }
 
