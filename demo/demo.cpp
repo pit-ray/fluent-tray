@@ -31,6 +31,7 @@ int main()
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
     }
+    tray.add_line() ;
     if(!tray.add_menu("Togglable1", "demo/sample_icon.ico", true)) {
         std::cout << "Failed Menu 4\n" ;
         return 1 ;

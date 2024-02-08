@@ -139,6 +139,7 @@ namespace fluent_tray
     class FluentTray {
     private:
         std::vector<FluentMenu> menus_ ;
+        std::vector<bool> lines_ ;
 
         std::string app_name_ ;
         std::filesystem::path icon_path_ ;
@@ -179,6 +180,7 @@ namespace fluent_tray
             LONG font_weight=FW_NORMAL,
             const std::string& font_name="Segoe UI")
         : menus_(),
+          lines_(),
           app_name_(app_name),
           icon_path_(icon_path),
           hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
@@ -266,8 +268,6 @@ namespace fluent_tray
                 return false ;
             }
 
-            std::cout << "set: " << std::hex << this << std::endl ;
-
             if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
                 return false ;
             }
@@ -306,8 +306,15 @@ namespace fluent_tray
             }
 
             menus_.push_back(std::move(menu)) ;
+            lines_.push_back(false) ;
             next_menu_id_ ++ ;
             return true ;
+        }
+
+        void add_line() {
+            if(!lines_.empty()) {
+                lines_.back() = true ;
+            }
         }
 
         bool update() {
@@ -550,6 +557,19 @@ namespace fluent_tray
                         item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - self->menu_font_height_) / 2,
                         label_wide.c_str(), static_cast<int>(label_wide.length()))) {
                         return FALSE ;
+                    }
+
+                    if(self->lines_[menu_idx]) {
+                        auto lx = item->rcItem.left ;
+                        auto ly = item->rcItem.bottom - 1 ;
+                        auto rx = item->rcItem.right ;
+                        auto ry = ly + 1 ;
+                        if(!SelectObject(item->hDC, GetStockObject(BLACK_BRUSH))) {
+                            return FALSE ;
+                        }
+                        if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
+                            return FALSE ;
+                        }
                     }
 
                     return TRUE ;
