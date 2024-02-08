@@ -159,6 +159,8 @@ namespace fluent_tray
         LONG menu_x_offset_ ;
         LONG menu_y_offset_ ;
 
+        LONG menu_label_x_offset_ ;
+
         LONG menu_x_pad_ ;
         LONG menu_y_pad_ ;
 
@@ -190,10 +192,11 @@ namespace fluent_tray
           menu_font_height_(font_size),
           menu_x_offset_(5),
           menu_y_offset_(5),
+          menu_label_x_offset_(50),
           menu_x_pad_(20),
           menu_y_pad_(20),
           menu_text_color_(RGB(30, 30, 30)),
-          menu_back_color_(RGB(222, 222, 222)),
+          menu_back_color_(GetSysColor(COLOR_WINDOW)),
           logfont_(),
           font_name_(font_name)
         {
@@ -535,12 +538,34 @@ namespace fluent_tray
                         return FALSE ;
                     }
 
-                    TextOutW(
+                    /*
+                    if(SetTextAlign(item->hDC, TA_LEFT | TA_NOUPDATECP) == GDI_ERROR) {
+                        return FALSE ;
+                    }
+                    */
+
+                    if(!TextOutW(
                         item->hDC,
-                        item->rcItem.left, item->rcItem.top,
-                        label_wide.c_str(), static_cast<int>(label_wide.length())) ;
+                        item->rcItem.left + self->menu_label_x_offset_,
+                        item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - self->menu_font_height_) / 2,
+                        label_wide.c_str(), static_cast<int>(label_wide.length()))) {
+                        return FALSE ;
+                    }
 
                     return TRUE ;
+                }
+            }
+            else if(msg == WM_CTLCOLORBTN) {
+                if(auto self = get_instance()) {
+                    auto menu_idx = self->get_menu_index_from_window(reinterpret_cast<HWND>(lparam)) ;
+                    if(menu_idx < 0) {
+                        return DefWindowProc(hwnd, msg, wparam, lparam) ;
+                    }
+                    auto hbrash = GetSysColorBrush(COLOR_WINDOW) ;
+                    if(SetBkColor(reinterpret_cast<HDC>(wparam), self->menu_back_color_) == CLR_INVALID) {
+                        return DefWindowProc(hwnd, msg, wparam, lparam) ;
+                    }
+                    return reinterpret_cast<LRESULT>(hbrash) ;
                 }
             }
             else if(msg == WM_COMMAND) {

@@ -15,7 +15,7 @@ int main()
 
     if(!tray.add_menu(
             "TextTest 1", "demo/sample_icon.ico", false,
-            []{std::cout << "clicked 1!\n" ; return false;})) {
+            []{std::cout << "clicked 1!\n" ; return true ;})) {
         std::cout << "Failed Menu 1\n" ;
         return 1 ;
     }
@@ -39,7 +39,7 @@ int main()
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
     }
-    if(!tray.add_menu("Togglable3", "demo/sample_icon.ico", true)) {
+    if(!tray.add_menu("Exit", "demo/sample_icon.ico", false, []{return false ;})) {
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
     }
