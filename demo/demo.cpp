@@ -13,7 +13,9 @@ int main()
         return 1 ;
     }
 
-    if(!tray.add_menu("TextTest 1", "demo/sample_icon.ico")) {
+    if(!tray.add_menu(
+            "TextTest 1", "demo/sample_icon.ico", false,
+            []{std::cout << "clicked!\n" ; return true ;})) {
         std::cout << "Failed Menu 1\n" ;
         return 1 ;
     }

@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cmath>
 #include <filesystem>
+#include <functional>
 #include <initializer_list>
 #include <memory>
 #include <string>
@@ -62,15 +63,19 @@ namespace fluent_tray
 
         HWND hwnd_ ;
 
+        std::function<bool(void)> callback_ ;
+
     public:
         explicit FluentMenu(
             const std::string& label_text="",
             const std::filesystem::path& icon_path="",
-            bool toggle=false)
+            bool toggle=false,
+            const std::function<bool(void)>& callback=[]{return true ;})
         : label_(label_text),
           toggle_(toggle),
           icon_path_(icon_path),
-          hwnd_(NULL)
+          hwnd_(NULL),
+          callback_(callback)
         {}
 
         // Copy
@@ -91,9 +96,10 @@ namespace fluent_tray
             std::wstring label_text_wide ;
             util::string2wstring(label_, label_text_wide) ;
 
+            auto style = WS_CHILD | WS_VISIBLE | BS_FLAT | BS_LEFT | BS_OWNERDRAW ;
+
             hwnd_ = CreateWindowW(
-                TEXT("BUTTON"), label_text_wide.c_str(),
-                WS_CHILD | WS_VISIBLE | BS_FLAT | BS_LEFT,
+                TEXT("BUTTON"), label_text_wide.c_str(), style,
                 0, 0, 100, 100,
                 parent_hwnd, reinterpret_cast<HMENU>(id),
                 hinstance, NULL) ;
@@ -111,6 +117,10 @@ namespace fluent_tray
 
         const std::string& label() const noexcept {
             return label_ ;
+        }
+
+        bool process_click_event() {
+            return callback_() ;
         }
     } ;
 
@@ -273,8 +283,10 @@ namespace fluent_tray
         bool add_menu(
                 const std::string& label_text="",
                 const std::filesystem::path& icon_path="",
-                bool toggle=false) {
-            FluentMenu menu(label_text, icon_path, toggle) ;
+                bool toggle=false,
+                const std::function<bool(void)>& callback=[]{return true ;}) {
+            FluentMenu menu(
+                label_text, icon_path, toggle, callback) ;
             if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_)) {
                 return false ;
             }
@@ -488,10 +500,49 @@ namespace fluent_tray
                     return 0 ;
                 }
             }
-            else if(msg== WM_ACTIVATE && wparam == WA_INACTIVE) {
+            else if(msg == WM_ACTIVATE && wparam == WA_INACTIVE) {
                 if(auto self = get_instance()) {
                     self->hide_popup() ;
                     return 0 ;
+                }
+            }
+            else if(msg == WM_DRAWITEM) {
+                if(auto self = get_instance()) {
+                    auto item = reinterpret_cast<LPDRAWITEMSTRUCT>(lparam) ;
+                    auto menu_idx = self->get_menu_index(item->hwndItem) ;
+                    if(menu_idx < 0) {
+                        return FALSE ;
+                    }
+                    auto& menu = self->menus_[menu_idx] ;
+
+                    if(!self->set_color_settings(item->hwndItem, item->hDC)) {
+                        return FALSE ;
+                    }
+
+                    std::wstring label_wide ;
+                    if(!util::string2wstring(menu.label(), label_wide)) {
+                        return FALSE ;
+                    }
+
+                    TextOutW(
+                        item->hDC,
+                        item->rcItem.left, item->rcItem.top,
+                        label_wide.c_str(), label_wide.length()) ;
+
+                    return TRUE ;
+                }
+            }
+            else if(msg == WM_COMMAND) {
+                if(auto self = get_instance()) {
+                    auto menu_idx = self->get_menu_index(hwnd) ;
+                    if(menu_idx < 0) {
+                        return FALSE ;
+                    }
+                    auto& menu = self->menus_[menu_idx] ;
+                    if(!menu.process_click_event()) {
+                        return FALSE ;
+                    }
+                    return TRUE ;
                 }
             }
             else if(msg == MESSAGE_ID) {  //On NotifyIcon
@@ -504,6 +555,17 @@ namespace fluent_tray
             }
 
             return DefWindowProc(hwnd, msg, wparam, lparam) ;
+        }
+
+        int get_menu_index(HWND hwnd) {
+            int i = 0 ;
+            for(auto& m : menus_) {
+                if(m.window_handle() == hwnd) {
+                    return i ;
+                }
+                i ++ ;
+            }
+            return -1 ;
         }
 
         bool set_color_settings(HWND received_hwnd, HDC hdc) {
