@@ -14,32 +14,31 @@ int main()
     }
 
     if(!tray.add_menu(
-            "TextTest 1", "demo/sample_icon.ico", false,
+            "テスト", "demo/sample_icon.ico", false,
             []{std::cout << "clicked 1!\n" ; return true ;})) {
         std::cout << "Failed Menu 1\n" ;
         return 1 ;
     }
-    if(!tray.add_menu("日本語テスト", "demo/sample_icon.ico")) {
+    tray.add_line() ;
+    if(!tray.add_menu("Setup with Windows", "demo/sample_icon.ico")) {
         std::cout << "Failed Menu 2\n" ;
         return 1 ;
     }
-    if(!tray.add_menu("Button1", "demo/sample_icon.ico")) {
+    tray.add_line() ;
+    if(!tray.add_menu("Open Root Directory", "demo/sample_icon.ico")) {
         std::cout << "Failed Menu 3\n" ;
         return 1 ;
     }
-    if(!tray.add_menu("Button2", "demo/sample_icon.ico")) {
+    if(!tray.add_menu("Check Update", "demo/sample_icon.ico")) {
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
     }
     tray.add_line() ;
-    if(!tray.add_menu("Togglable1", "demo/sample_icon.ico", true)) {
+    if(!tray.add_menu("About", "demo/sample_icon.ico", true)) {
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
     }
-    if(!tray.add_menu("Togglable2", "demo/sample_icon.ico", true)) {
-        std::cout << "Failed Menu 4\n" ;
-        return 1 ;
-    }
+    tray.add_line() ;
     if(!tray.add_menu("Exit", "demo/sample_icon.ico", false, []{return false ;})) {
         std::cout << "Failed Menu 4\n" ;
         return 1 ;
