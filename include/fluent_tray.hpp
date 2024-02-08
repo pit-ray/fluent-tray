@@ -62,6 +62,7 @@ namespace fluent_tray
         bool toggle_ ;
 
         HWND hwnd_ ;
+        HMENU hmenu_ ;
 
         std::function<bool(void)> callback_ ;
 
@@ -75,6 +76,7 @@ namespace fluent_tray
           toggle_(toggle),
           icon_path_(icon_path),
           hwnd_(NULL),
+          hmenu_(NULL),
           callback_(callback)
         {}
 
@@ -98,10 +100,11 @@ namespace fluent_tray
 
             auto style = WS_CHILD | WS_VISIBLE | BS_FLAT | BS_LEFT | BS_OWNERDRAW ;
 
+            hmenu_ = reinterpret_cast<HMENU>(id) ;
             hwnd_ = CreateWindowW(
                 TEXT("BUTTON"), label_text_wide.c_str(), style,
                 0, 0, 100, 100,
-                parent_hwnd, reinterpret_cast<HMENU>(id),
+                parent_hwnd, hmenu_,
                 hinstance, NULL) ;
 
             // Hide dash lines when selecting.
@@ -113,6 +116,14 @@ namespace fluent_tray
 
         HWND window_handle() const noexcept {
             return hwnd_ ;
+        }
+
+        HMENU menu_handle() const noexcept {
+            return hmenu_ ;
+        }
+
+        std::size_t id() const noexcept {
+            return reinterpret_cast<std::size_t>(hmenu_) ;
         }
 
         const std::string& label() const noexcept {
@@ -308,7 +319,7 @@ namespace fluent_tray
         }
 
         bool update_parallel(
-            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(50)) {
+            std::chrono::milliseconds sleep_time=std::chrono::milliseconds(5)) {
 
             // TODO: launch async
             MSG msg ;
@@ -435,8 +446,8 @@ namespace fluent_tray
                 }
                 else {
                     //bottom
-                    // add 10% offset
-                    pos.y = screen_height - (popup_height + 11 * taskbar_height / 10) ;
+                    // add 20% offset
+                    pos.y = screen_height - (popup_height + 12 * taskbar_height / 10) ;
                 }
                 pos.x = cursor_pos.x - popup_width / 2 ;
             }
@@ -447,8 +458,8 @@ namespace fluent_tray
                 }
                 else {
                     //right
-                    // add 10% offset
-                    pos.x = popup_width + 11 * taskbar_width / 10 ;
+                    // add 20% offset
+                    pos.x = popup_width + 12 * taskbar_width / 10 ;
                 }
 
                 pos.y = cursor_pos.y - popup_height / 2 ;
@@ -509,7 +520,7 @@ namespace fluent_tray
             else if(msg == WM_DRAWITEM) {
                 if(auto self = get_instance()) {
                     auto item = reinterpret_cast<LPDRAWITEMSTRUCT>(lparam) ;
-                    auto menu_idx = self->get_menu_index(item->hwndItem) ;
+                    auto menu_idx = self->get_menu_index_from_window(item->hwndItem) ;
                     if(menu_idx < 0) {
                         return FALSE ;
                     }
@@ -527,19 +538,20 @@ namespace fluent_tray
                     TextOutW(
                         item->hDC,
                         item->rcItem.left, item->rcItem.top,
-                        label_wide.c_str(), label_wide.length()) ;
+                        label_wide.c_str(), static_cast<int>(label_wide.length())) ;
 
                     return TRUE ;
                 }
             }
             else if(msg == WM_COMMAND) {
                 if(auto self = get_instance()) {
-                    auto menu_idx = self->get_menu_index(hwnd) ;
+                    auto menu_idx = self->get_menu_index_from_id(LOWORD(wparam)) ;
                     if(menu_idx < 0) {
                         return FALSE ;
                     }
                     auto& menu = self->menus_[menu_idx] ;
                     if(!menu.process_click_event()) {
+                        self->status_ = Status::SHOULD_STOP ;
                         return FALSE ;
                     }
                     return TRUE ;
@@ -557,10 +569,21 @@ namespace fluent_tray
             return DefWindowProc(hwnd, msg, wparam, lparam) ;
         }
 
-        int get_menu_index(HWND hwnd) {
+        int get_menu_index_from_window(HWND hwnd) {
             int i = 0 ;
             for(auto& m : menus_) {
                 if(m.window_handle() == hwnd) {
+                    return i ;
+                }
+                i ++ ;
+            }
+            return -1 ;
+        }
+
+        int get_menu_index_from_id(WORD id) {
+            int i = 0 ;
+            for(auto& m : menus_) {
+                if(m.id() == static_cast<std::size_t>(id)) {
                     return i ;
                 }
                 i ++ ;
