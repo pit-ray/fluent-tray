@@ -46,6 +46,34 @@ namespace fluent_tray
             }
             return true ;
         }
+
+        inline constexpr std::size_t bit2mask(std::size_t bits) noexcept {
+            return (static_cast<std::size_t>(1) << bits) - 1 ;
+        }
+
+        template <typename Type>
+        inline constexpr int type2bit() noexcept {
+            return static_cast<int>(sizeof(Type) * CHAR_BIT) ;
+        }
+
+        template <typename InType, typename OutType>
+        inline void split_bits(InType value, OutType& upper, OutType& lower) noexcept {
+            constexpr auto bits = type2bit<OutType>() ;
+            constexpr auto lower_mask = util::bit2mask(bits) ;
+
+            upper = static_cast<OutType>(reinterpret_cast<std::size_t>(value) >> bits) ;
+            lower = static_cast<OutType>(reinterpret_cast<std::size_t>(value) & lower_mask) ;
+        }
+
+        template <typename InType, typename OutType>
+        inline void concatenate_bits(InType upper, InType lower, OutType& out) noexcept {
+            constexpr auto bits = type2bit<InType>() ;
+            constexpr auto lower_mask = util::bit2mask(bits) ;
+
+            auto out_upper = static_cast<std::size_t>(upper) << bits ;
+            auto out_lower = static_cast<std::size_t>(lower) & lower_mask ;
+            out = reinterpret_cast<OutType>(out_upper | out_lower) ;
+        }
     }
 
     enum class Status
@@ -251,24 +279,21 @@ namespace fluent_tray
                 return false ;
             }
 
-            std::cout << "parent_hwnd: " << hwnd_ << std::endl ;
-
             // To access the this pointer inside the callback function,
             // the address divide into the two part address.
-            constexpr auto long_bits = static_cast<int>(sizeof(LONG) * CHAR_BIT) ;
-            auto addr = reinterpret_cast<std::size_t>(this) ;
-            auto addr1 = static_cast<LONG>(addr >> long_bits) ;
-            auto addr2 = static_cast<LONG>(addr & ((static_cast<std::size_t>(1) << long_bits) - 1)) ;
+            LONG upper_addr, lower_addr ;
+            util::split_bits(this, upper_addr, lower_addr) ;
+
             SetLastError(0) ;
-            if(!SetWindowLongW(hwnd_, 0, addr1) && GetLastError() != 0) {
+            if(!SetWindowLongW(hwnd_, 0, upper_addr) && GetLastError() != 0) {
                 return false ;
             }
             SetLastError(0) ;
-            if(!SetWindowLongW(hwnd_, sizeof(LONG), addr2) && GetLastError() != 0) {
+            if(!SetWindowLongW(hwnd_, sizeof(LONG), lower_addr) && GetLastError() != 0) {
                 return false ;
             }
 
-            if(!SetLayeredWindowAttributes(hwnd_, 0, 200, LWA_ALPHA)) {
+            if(!SetLayeredWindowAttributes(hwnd_, 0, 255, LWA_ALPHA)) {
                 return false ;
             }
 
@@ -508,9 +533,18 @@ namespace fluent_tray
                 WPARAM wparam,
                 LPARAM lparam) {
             auto get_instance = [hwnd]() {
-                auto addr1 = static_cast<std::size_t>(GetWindowLongW(hwnd, 0)) ;
-                auto addr2 = static_cast<std::size_t>(GetWindowLongW(hwnd, sizeof(LONG))) ;
-                auto self = reinterpret_cast<FluentTray*>((addr1 << sizeof(LONG) * CHAR_BIT) + addr2) ;
+                auto upper_addr = GetWindowLongW(hwnd, 0) ;
+                if(!upper_addr) {
+                    return reinterpret_cast<FluentTray*>(nullptr) ;
+                }
+
+                auto lower_addr = GetWindowLongW(hwnd, sizeof(LONG)) ;
+                if(!lower_addr) {
+                    return reinterpret_cast<FluentTray*>(nullptr) ;
+                }
+
+                FluentTray* self ;
+                util::concatenate_bits(upper_addr, lower_addr, self) ;
                 return self ;
             } ;
 

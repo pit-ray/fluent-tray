@@ -7,7 +7,7 @@ Fluent design based GUI library for system tray applications written in C++ sing
 ```sh
 $ cmake -B build demo
 $ cmake --build build
-$ ./demo/Debug/fluent-tray-demo.exe
+$ ./build/Debug/fluent-tray-demo.exe
 ```
 
 
