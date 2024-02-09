@@ -175,12 +175,19 @@ namespace fluent_tray
         HWND hwnd_ ;
         HINSTANCE hinstance_ ;
         NOTIFYICONDATAW icon_data_ ;
+        HRGN hrgn_ ;
+
+        std::size_t num_last_drawn_menus ;
 
         LONG popup_width_ ;
         LONG popup_height_ ;
+        int popup_corner_round_ ;
         Status status_ ;
 
         std::size_t next_menu_id_ ;
+
+        LONG menu_width_ ;
+        LONG menu_height_ ;
 
         LONG menu_font_width_ ;
         LONG menu_font_height_ ;
@@ -214,10 +221,15 @@ namespace fluent_tray
           hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
           hwnd_(NULL),
           icon_data_(),
+          hrgn_(NULL),
+          num_last_drawn_menus(0),
           popup_width_(200),
           popup_height_(100),
+          popup_corner_round_(30),
           status_(Status::STOPPED),
           next_menu_id_(1),
+          menu_width_(100),
+          menu_height_(100),
           menu_font_width_(font_size / 2),
           menu_font_height_(font_size),
           menu_x_offset_(5),
@@ -296,6 +308,16 @@ namespace fluent_tray
             if(!SetLayeredWindowAttributes(hwnd_, 0, 255, LWA_ALPHA)) {
                 return false ;
             }
+
+            /*
+            auto pref = DWMWCP_ROUND ;
+            if(DwmSetWindowAttribute(
+                    hwnd_,
+                    DWMWA_WINDOW_CORNER_PREFERENCE,
+                    &pref, sizeof(pref)) != S_OK) {
+                return false ;
+            }
+            */
 
             if(!change_icon(icon_path_)) {
                 return false ;
@@ -441,17 +463,23 @@ namespace fluent_tray
         }
 
         bool show_popup_window() {
-            LONG max_label_length = 0 ;
-            for(auto& menu : menus_) {
-                if(max_label_length < menu.label().length()) {
-                    max_label_length = static_cast<LONG>(menu.label().length()) ;
+            if(menus_.size() != num_last_drawn_menus) {
+                LONG max_label_length = 0 ;
+                for(auto& menu : menus_) {
+                    if(max_label_length < menu.label().length()) {
+                        max_label_length = static_cast<LONG>(menu.label().length()) ;
+                    }
                 }
+
+                // Update the sizes
+                menu_width_ = max_label_length * menu_font_width_ + menu_x_pad_ ;
+                menu_height_ = menu_font_height_ + menu_y_pad_ ;
+                popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
+                popup_height_ = static_cast<LONG>(
+                    menus_.size() * (menu_y_offset_ + menu_height_) + menu_y_offset_) ;
+
+                num_last_drawn_menus = menus_.size() ;
             }
-            auto menu_width = max_label_length * menu_font_width_ + menu_x_pad_ ;
-            auto menu_height = menu_font_height_ + menu_y_pad_ ;
-            auto popup_width = 2 * menu_x_offset_ + menu_width ;
-            auto popup_height = static_cast<LONG>(
-                menus_.size() * (menu_y_offset_ + menu_height) + menu_y_offset_) ;
 
             POINT cursor_pos ;
             if(!GetCursorPos(&cursor_pos)) {
@@ -482,9 +510,9 @@ namespace fluent_tray
                 else {
                     //bottom
                     // add 20% offset
-                    pos.y = screen_height - (popup_height + 12 * taskbar_height / 10) ;
+                    pos.y = screen_height - (popup_height_ + 12 * taskbar_height / 10) ;
                 }
-                pos.x = cursor_pos.x - popup_width / 2 ;
+                pos.x = cursor_pos.x - popup_width_ / 2 ;
             }
             else {  // vertical taskbar
                 if(pos.x <= taskbar_width) {
@@ -494,28 +522,37 @@ namespace fluent_tray
                 else {
                     //right
                     // add 20% offset
-                    pos.x = popup_width + 12 * taskbar_width / 10 ;
+                    pos.x = popup_width_ + 12 * taskbar_width / 10 ;
                 }
 
-                pos.y = cursor_pos.y - popup_height / 2 ;
+                pos.y = cursor_pos.y - popup_height_ / 2 ;
             }
 
             if(!SetWindowPos(
                     hwnd_, HWND_TOP,
-                    pos.x, pos.y, popup_width, popup_height,
+                    pos.x, pos.y, popup_width_, popup_height_,
                     SWP_SHOWWINDOW)) {
                 return false ;
+            }
+
+            hrgn_ = CreateRoundRectRgn(
+                0, 0, popup_width_, popup_height_,
+                popup_corner_round_, popup_corner_round_) ;
+            if(hrgn_) {
+                if(!SetWindowRgn(hwnd_, hrgn_, TRUE)) {
+                    return false ;
+                }
             }
 
             auto menu_top = menu_y_offset_ ;
             for(auto& menu : menus_) {
                 if(!SetWindowPos(
                         menu.window_handle(), HWND_TOP,
-                        menu_x_offset_, menu_top, menu_width, menu_height,
+                        menu_x_offset_, menu_top, menu_width_, menu_height_,
                         SWP_SHOWWINDOW)) {
                     return false ;
                 }
-                menu_top += menu_height + menu_y_offset_ ;
+                menu_top += menu_height_ + menu_y_offset_ ;
             }
 
             if(!SetForegroundWindow(hwnd_)) {
@@ -731,6 +768,7 @@ namespace fluent_tray
                 return false ;
             }
 
+            /*
             auto font = CreateFontIndirectW(&logfont_) ;
             if(!font) {
                 return false ;
@@ -740,6 +778,7 @@ namespace fluent_tray
                 EndPaint(hwnd, &ps) ;
                 return false ;
             }
+            */
 
             if(SetBkColor(hdc, menu_back_color_) == CLR_INVALID) {
                 EndPaint(hwnd, &ps) ;
@@ -751,14 +790,18 @@ namespace fluent_tray
                 return false ;
             }
 
+            /*
             SendMessage(hwnd, WM_SETFONT, WPARAM(font), TRUE);
+            */
 
             if(!EndPaint(hwnd, &ps)) {
                 return false ;
             }
+            /*
             if(!DeleteObject(font)) {
                 return false ;
             }
+            */
 
             return true ;
         }
