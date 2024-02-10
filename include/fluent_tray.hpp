@@ -16,6 +16,9 @@
 
 #include <windows.h>
 
+#include <dwmapi.h>
+#pragma comment(lib, "Dwmapi")
+
 
 namespace fluent_tray
 {
@@ -177,8 +180,6 @@ namespace fluent_tray
         NOTIFYICONDATAW icon_data_ ;
         HRGN hrgn_ ;
 
-        std::size_t num_last_drawn_menus ;
-
         LONG popup_width_ ;
         LONG popup_height_ ;
         int popup_corner_round_ ;
@@ -189,8 +190,7 @@ namespace fluent_tray
         LONG menu_width_ ;
         LONG menu_height_ ;
 
-        LONG menu_font_width_ ;
-        LONG menu_font_height_ ;
+        LONG menu_font_size_ ;
 
         LONG menu_x_offset_ ;
         LONG menu_y_offset_ ;
@@ -203,17 +203,12 @@ namespace fluent_tray
         COLORREF menu_text_color_ ;
         COLORREF menu_back_color_ ;
 
-        const std::string font_name_ ;
-        LOGFONTW logfont_ ;
-
+        HFONT font_ ;
 
     public:
         explicit FluentTray(
             const std::string& app_name,
-            const std::filesystem::path& icon_path="",
-            LONG font_size=12,
-            LONG font_weight=FW_NORMAL,
-            const std::string& font_name="Segoe UI")
+            const std::filesystem::path& icon_path="")
         : menus_(),
           lines_(),
           app_name_(app_name),
@@ -222,16 +217,14 @@ namespace fluent_tray
           hwnd_(NULL),
           icon_data_(),
           hrgn_(NULL),
-          num_last_drawn_menus(0),
           popup_width_(200),
           popup_height_(100),
-          popup_corner_round_(30),
+          popup_corner_round_(20),
           status_(Status::STOPPED),
           next_menu_id_(1),
           menu_width_(100),
           menu_height_(100),
-          menu_font_width_(font_size / 2),
-          menu_font_height_(font_size),
+          menu_font_size_(12),
           menu_x_offset_(5),
           menu_y_offset_(5),
           menu_label_x_offset_(50),
@@ -239,12 +232,8 @@ namespace fluent_tray
           menu_y_pad_(20),
           menu_text_color_(RGB(30, 30, 30)),
           menu_back_color_(GetSysColor(COLOR_WINDOW)),
-          logfont_(),
-          font_name_(font_name)
-        {
-            logfont_.lfHeight = font_size ;
-            logfont_.lfWeight = font_weight ;
-        }
+          font_(NULL)
+        {}
 
         // Copy
         FluentTray(const FluentTray&) = delete ;
@@ -254,7 +243,11 @@ namespace fluent_tray
         FluentTray(FluentTray&&) = default ;
         FluentTray& operator=(FluentTray&&) = default ;
 
-        ~FluentTray() noexcept = default ;
+        ~FluentTray() noexcept {
+            if(font_ != NULL) {
+                DeleteObject(font_) ;
+            }
+        }
 
         bool create_tray() {
             std::wstring app_name_wide ;
@@ -309,7 +302,6 @@ namespace fluent_tray
                 return false ;
             }
 
-            /*
             auto pref = DWMWCP_ROUND ;
             if(DwmSetWindowAttribute(
                     hwnd_,
@@ -317,9 +309,12 @@ namespace fluent_tray
                     &pref, sizeof(pref)) != S_OK) {
                 return false ;
             }
-            */
 
             if(!change_icon(icon_path_)) {
+                return false ;
+            }
+
+            if(!set_font()) {
                 return false ;
             }
 
@@ -463,23 +458,19 @@ namespace fluent_tray
         }
 
         bool show_popup_window() {
-            if(menus_.size() != num_last_drawn_menus) {
-                LONG max_label_length = 0 ;
-                for(auto& menu : menus_) {
-                    if(max_label_length < menu.label().length()) {
-                        max_label_length = static_cast<LONG>(menu.label().length()) ;
-                    }
+            LONG max_label_length = 0 ;
+            for(auto& menu : menus_) {
+                if(max_label_length < menu.label().length()) {
+                    max_label_length = static_cast<LONG>(menu.label().length()) ;
                 }
-
-                // Update the sizes
-                menu_width_ = max_label_length * menu_font_width_ + menu_x_pad_ ;
-                menu_height_ = menu_font_height_ + menu_y_pad_ ;
-                popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
-                popup_height_ = static_cast<LONG>(
-                    menus_.size() * (menu_y_offset_ + menu_height_) + menu_y_offset_) ;
-
-                num_last_drawn_menus = menus_.size() ;
             }
+
+            // Update the sizes
+            menu_width_ = max_label_length * menu_font_size_ / 2 + menu_x_pad_ ;
+            menu_height_ = menu_font_size_ + menu_y_pad_ ;
+            popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
+            popup_height_ = static_cast<LONG>(
+                menus_.size() * (menu_y_offset_ + menu_height_) + menu_y_offset_) ;
 
             POINT cursor_pos ;
             if(!GetCursorPos(&cursor_pos)) {
@@ -535,6 +526,7 @@ namespace fluent_tray
                 return false ;
             }
 
+            /*
             hrgn_ = CreateRoundRectRgn(
                 0, 0, popup_width_, popup_height_,
                 popup_corner_round_, popup_corner_round_) ;
@@ -543,6 +535,52 @@ namespace fluent_tray
                     return false ;
                 }
             }
+
+            ::GraphicsPath path ;
+            path.AddArc(
+
+            FILE *fp = fopen(".\\demo\\test_ulw.png", "rb") ;
+            if(fp == NULL) {
+                std::cout << "Could not open\n" ;
+                return false ;
+            }
+
+            auto hbitmap = LoadPngFromFile(hwnd_, fp, popup_width_, popup_height_) ;
+            if(hbitmap == NULL){
+                std::cout << "Could load bitmap\n" ;
+                return false ;
+            }
+
+            fclose(fp) ;
+
+            auto hdc_display = GetDC(NULL) ;
+            auto hdc_window = GetDC(hwnd_) ;
+            auto hdc = CreateCompatibleDC(hdc_window) ;
+
+
+            SIZE win_size = {popup_width_, popup_height_} ;
+            POINT pos_layer = {0, 0} ;
+
+            BLENDFUNCTION blend ;
+            blend.BlendOp = AC_SRC_OVER ;
+            blend.BlendFlags = 0 ;
+            blend.SourceConstantAlpha = 255 ;
+            blend.AlphaFormat = AC_SRC_ALPHA ;
+
+            auto old_obj = SelectObject(hdc, hbitmap) ;
+            BitBlt(hdc_window, 0, 0, popup_width_, popup_height_, hdc, 0, 0, SRCCOPY | CAPTUREBLT) ;
+
+            if(!UpdateLayeredWindow(
+                    hwnd_, hdc_display, &pos, &win_size,
+                    hdc, &pos_layer, 0, &blend, ULW_ALPHA)) {
+                return false ;
+            }
+
+            SelectObject(hdc, old_obj) ;
+            DeleteDC(hdc) ;
+            ReleaseDC(hwnd_, hdc_window) ;
+            ReleaseDC(NULL, hdc_display) ;
+            */
 
             auto menu_top = menu_y_offset_ ;
             for(auto& menu : menus_) {
@@ -560,6 +598,54 @@ namespace fluent_tray
             }
 
             return true ;
+        }
+
+        bool set_font(
+                LONG font_size=0,
+                LONG font_weight=0,
+                const std::string& font_name="") {
+            NONCLIENTMETRICS metrics ;
+            metrics.cbSize = sizeof(metrics) ;
+
+            if(!SystemParametersInfo(
+                    SPI_GETNONCLIENTMETRICS,
+                    metrics.cbSize, &metrics, 0)) {
+                return false ;
+            }
+
+            auto& logfont = metrics.lfCaptionFont ;
+            if(font_size != 0) {
+                logfont.lfHeight = font_size ;
+            }
+            if(font_weight != 0) {
+                logfont.lfWeight = font_weight ;
+            }
+
+            if(!font_name.empty()) {
+                std::wstring font_name_wide ;
+                if(!util::string2wstring(font_name, font_name_wide)) {
+                    return false ;
+                }
+                auto dst = logfont.lfFaceName ;
+
+                if(font_name_wide.size() < LF_FACESIZE) {
+                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
+                    dst[font_name_wide.size()] = L'\0' ;
+                }
+                else {
+                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
+                    dst[LF_FACESIZE - 1] = L'\0' ;
+                }
+            }
+
+            auto font = CreateFontIndirectW(&logfont) ;
+            if(!font) {
+                return false ;
+            }
+            font_ = font ;
+            menu_font_size_ = std::abs(logfont.lfHeight) ;
+
+            return true;
         }
 
 
@@ -600,49 +686,9 @@ namespace fluent_tray
             }
             else if(msg == WM_DRAWITEM) {
                 if(auto self = get_instance()) {
-                    auto item = reinterpret_cast<LPDRAWITEMSTRUCT>(lparam) ;
-                    auto menu_idx = self->get_menu_index_from_window(item->hwndItem) ;
-                    if(menu_idx < 0) {
+                    if(!self->draw_menu(reinterpret_cast<LPDRAWITEMSTRUCT>(lparam))) {
                         return FALSE ;
                     }
-                    auto& menu = self->menus_[menu_idx] ;
-
-                    if(!self->set_color_settings(item->hwndItem, item->hDC)) {
-                        return FALSE ;
-                    }
-
-                    std::wstring label_wide ;
-                    if(!util::string2wstring(menu.label(), label_wide)) {
-                        return FALSE ;
-                    }
-
-                    /*
-                    if(SetTextAlign(item->hDC, TA_LEFT | TA_NOUPDATECP) == GDI_ERROR) {
-                        return FALSE ;
-                    }
-                    */
-
-                    if(!TextOutW(
-                        item->hDC,
-                        item->rcItem.left + self->menu_label_x_offset_,
-                        item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - self->menu_font_height_) / 2,
-                        label_wide.c_str(), static_cast<int>(label_wide.length()))) {
-                        return FALSE ;
-                    }
-
-                    if(self->lines_[menu_idx]) {
-                        auto lx = item->rcItem.left ;
-                        auto ly = item->rcItem.bottom - 1 ;
-                        auto rx = item->rcItem.right ;
-                        auto ry = ly + 1 ;
-                        if(!SelectObject(item->hDC, GetStockObject(BLACK_BRUSH))) {
-                            return FALSE ;
-                        }
-                        if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
-                            return FALSE ;
-                        }
-                    }
-
                     return TRUE ;
                 }
             }
@@ -723,43 +769,6 @@ namespace fluent_tray
             return true ;
         }
 
-        bool set_font() {
-            //default setting
-            logfont_.lfWidth = 0 ;
-            logfont_.lfEscapement = 0 ;
-            logfont_.lfOrientation = 0 ;
-            logfont_.lfWeight = FW_LIGHT ;
-            logfont_.lfItalic = FALSE ;
-            logfont_.lfUnderline = FALSE ;
-            logfont_.lfStrikeOut = FALSE ;
-            logfont_.lfCharSet = ANSI_CHARSET ;
-            logfont_.lfOutPrecision = OUT_TT_ONLY_PRECIS ;
-            logfont_.lfClipPrecision = CLIP_DEFAULT_PRECIS ;
-            logfont_.lfQuality = ANTIALIASED_QUALITY ;
-            logfont_.lfPitchAndFamily = 0 ;
-
-            if(font_name_.empty()) {
-                logfont_.lfFaceName[0] = '\0' ;
-            }
-            else {
-                std::wstring font_name_wide ;
-                if(!util::string2wstring(font_name_, font_name_wide)) {
-                    return false ;
-                }
-                auto dst = logfont_.lfFaceName ;
-
-                if(font_name_wide.size() < LF_FACESIZE) {
-                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
-                    dst[font_name_wide.size()] = L'\0' ;
-                }
-                else {
-                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
-                    dst[LF_FACESIZE - 1] = L'\0' ;
-                }
-            }
-
-            return true;
-        }
 
         bool set_paint_settings(HWND hwnd) {
             PAINTSTRUCT ps ;
@@ -802,6 +811,58 @@ namespace fluent_tray
                 return false ;
             }
             */
+
+            return true ;
+        }
+
+        bool draw_menu(const LPDRAWITEMSTRUCT& item) {
+            auto menu_idx = get_menu_index_from_window(item->hwndItem) ;
+            if(menu_idx < 0) {
+                return false ;
+            }
+            auto& menu = menus_[menu_idx] ;
+
+            if(!set_color_settings(item->hwndItem, item->hDC)) {
+                return false ;
+            }
+
+            std::wstring label_wide ;
+            if(!util::string2wstring(menu.label(), label_wide)) {
+                return false ;
+            }
+
+            /*
+            if(SetTextAlign(item->hDC, TA_LEFT | TA_NOUPDATECP) == GDI_ERROR) {
+                return FALSE ;
+            }
+            */
+
+            if(font_) {
+                if(!SelectObject(item->hDC, font_)) {
+                    return false ;
+                }
+            }
+
+            if(!TextOutW(
+                item->hDC,
+                item->rcItem.left + menu_label_x_offset_,
+                item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - menu_font_size_) / 2,
+                label_wide.c_str(), static_cast<int>(label_wide.length()))) {
+                return false ;
+            }
+
+            if(lines_[menu_idx]) {
+                auto lx = item->rcItem.left ;
+                auto ly = item->rcItem.bottom - 1 ;
+                auto rx = item->rcItem.right ;
+                auto ry = ly + 1 ;
+                if(!SelectObject(item->hDC, GetStockObject(BLACK_BRUSH))) {
+                    return false ;
+                }
+                if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
+                    return false ;
+                }
+            }
 
             return true ;
         }

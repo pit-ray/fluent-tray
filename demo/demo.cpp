@@ -6,10 +6,14 @@
 int main()
 {
     using namespace fluent_tray ;
-    FluentTray tray("demo", "demo/sample_icon.ico", 20, 500, "Consolas") ;
+    FluentTray tray("demo", "demo/sample_icon.ico") ;
     if(!tray.create_tray()) {
         std::cout << "Failed Tray Initialization\n" ;
         std::cout << GetLastError() << std::endl ;
+        return 1 ;
+    }
+
+    if(!tray.set_font(20, FW_MEDIUM)) {
         return 1 ;
     }
 
