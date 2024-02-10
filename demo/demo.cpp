@@ -7,7 +7,7 @@ int main()
 {
     using namespace fluent_tray ;
     FluentTray tray("demo", "demo/sample_icon.ico") ;
-    if(!tray.create_tray()) {
+    if(!tray.create_tray(240)) {
         std::cout << "Failed Tray Initialization\n" ;
         std::cout << GetLastError() << std::endl ;
         return 1 ;
