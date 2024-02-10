@@ -1,6 +1,7 @@
 #ifndef _FLUENT_TRAY_HPP
 #define _FLUENT_TRAY_HPP
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -76,6 +77,13 @@ namespace fluent_tray
             auto out_upper = static_cast<std::size_t>(upper) << bits ;
             auto out_lower = static_cast<std::size_t>(lower) & lower_mask ;
             out = reinterpret_cast<OutType>(out_upper | out_lower) ;
+        }
+
+        inline unsigned char rgb2gray(const COLORREF& rgb) {
+            auto r = GetRValue(rgb) ;
+            auto g = GetGValue(rgb) ;
+            auto b = GetBValue(rgb) ;
+            return static_cast<unsigned char>(0.2126 * r + 0.7152 * g + 0.0722 * b) ;
         }
     }
 
@@ -200,8 +208,10 @@ namespace fluent_tray
         LONG menu_x_pad_ ;
         LONG menu_y_pad_ ;
 
-        COLORREF menu_text_color_ ;
-        COLORREF menu_back_color_ ;
+        COLORREF text_color_ ;
+        COLORREF back_color_ ;
+        COLORREF ash_color_ ;
+        HBRUSH back_brash_ ;
 
         HFONT font_ ;
 
@@ -228,10 +238,12 @@ namespace fluent_tray
           menu_x_offset_(5),
           menu_y_offset_(5),
           menu_label_x_offset_(50),
-          menu_x_pad_(20),
-          menu_y_pad_(20),
-          menu_text_color_(RGB(30, 30, 30)),
-          menu_back_color_(GetSysColor(COLOR_WINDOW)),
+          menu_x_pad_(10),
+          menu_y_pad_(10),
+          text_color_(RGB(30, 30, 30)),
+          back_color_(RGB(200, 200, 200)),
+          ash_color_(RGB(100, 100, 100)),
+          back_brash_(NULL),
           font_(NULL)
         {}
 
@@ -246,6 +258,9 @@ namespace fluent_tray
         ~FluentTray() noexcept {
             if(font_ != NULL) {
                 DeleteObject(font_) ;
+            }
+            if(back_brash_ != NULL) {
+                DeleteObject(back_brash_) ;
             }
         }
 
@@ -302,6 +317,7 @@ namespace fluent_tray
                 return false ;
             }
 
+            // Set rounded window for Windows 11 only.
             auto pref = DWMWCP_ROUND ;
             if(DwmSetWindowAttribute(
                     hwnd_,
@@ -318,20 +334,9 @@ namespace fluent_tray
                 return false ;
             }
 
-            /*
-            if(!set_font()) {
+            if(!set_color()) {
                 return false ;
             }
-            if(!set_paint_settings(hwnd_)) {
-                return 0 ;
-            }
-            static auto hfont = CreateFontIndirectW(&logfont_) ;
-            if(!hfont) {
-                return false ;
-            }
-            // static auto hfont = reinterpret_cast<HFONT>(GetStockObject(DEFAULT_GUI_FONT)) ;
-            SendMessage(hwnd_, WM_SETFONT, WPARAM(hfont), MAKELPARAM(FALSE, 0));
-            */
 
             return true ;
         }
@@ -364,7 +369,7 @@ namespace fluent_tray
             get_message(msg) ;
 
             if(!check_if_foreground()) {
-                hide_popup() ;
+                hide_popup_window() ;
             }
 
             return true ;
@@ -387,17 +392,8 @@ namespace fluent_tray
             }
 
             if(!check_if_foreground()) {
-                hide_popup() ;
+                hide_popup_window() ;
             }
-            return true ;
-        }
-
-        bool show_popup() {
-            return SetForegroundWindow(hwnd_) != 0 ;
-        }
-
-        bool hide_popup() {
-            ShowWindow(hwnd_, SW_HIDE) ;
             return true ;
         }
 
@@ -452,8 +448,13 @@ namespace fluent_tray
             if(!Shell_NotifyIconW(NIM_ADD, &icon_data_)) {
                 return false ;
             }
-            hide_popup() ;
+            hide_popup_window() ;
 
+            return true ;
+        }
+
+        bool hide_popup_window() {
+            ShowWindow(hwnd_, SW_HIDE) ;
             return true ;
         }
 
@@ -466,7 +467,7 @@ namespace fluent_tray
             }
 
             // Update the sizes
-            menu_width_ = max_label_length * menu_font_size_ / 2 + menu_x_pad_ ;
+            menu_width_ = max_label_length * 2 * menu_font_size_ / 3 + menu_x_pad_ ;
             menu_height_ = menu_font_size_ + menu_y_pad_ ;
             popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
             popup_height_ = static_cast<LONG>(
@@ -535,51 +536,7 @@ namespace fluent_tray
                     return false ;
                 }
             }
-
-            ::GraphicsPath path ;
-            path.AddArc(
-
-            FILE *fp = fopen(".\\demo\\test_ulw.png", "rb") ;
-            if(fp == NULL) {
-                std::cout << "Could not open\n" ;
-                return false ;
-            }
-
-            auto hbitmap = LoadPngFromFile(hwnd_, fp, popup_width_, popup_height_) ;
-            if(hbitmap == NULL){
-                std::cout << "Could load bitmap\n" ;
-                return false ;
-            }
-
-            fclose(fp) ;
-
-            auto hdc_display = GetDC(NULL) ;
-            auto hdc_window = GetDC(hwnd_) ;
-            auto hdc = CreateCompatibleDC(hdc_window) ;
-
-
-            SIZE win_size = {popup_width_, popup_height_} ;
-            POINT pos_layer = {0, 0} ;
-
-            BLENDFUNCTION blend ;
-            blend.BlendOp = AC_SRC_OVER ;
-            blend.BlendFlags = 0 ;
-            blend.SourceConstantAlpha = 255 ;
-            blend.AlphaFormat = AC_SRC_ALPHA ;
-
-            auto old_obj = SelectObject(hdc, hbitmap) ;
-            BitBlt(hdc_window, 0, 0, popup_width_, popup_height_, hdc, 0, 0, SRCCOPY | CAPTUREBLT) ;
-
-            if(!UpdateLayeredWindow(
-                    hwnd_, hdc_display, &pos, &win_size,
-                    hdc, &pos_layer, 0, &blend, ULW_ALPHA)) {
-                return false ;
-            }
-
-            SelectObject(hdc, old_obj) ;
-            DeleteDC(hdc) ;
-            ReleaseDC(hwnd_, hdc_window) ;
-            ReleaseDC(NULL, hdc_display) ;
+            /
             */
 
             auto menu_top = menu_y_offset_ ;
@@ -648,6 +605,78 @@ namespace fluent_tray
             return true;
         }
 
+        bool set_color(
+                const COLORREF& text_color=CLR_INVALID,
+                const COLORREF& back_color=CLR_INVALID,
+                unsigned char color_decay=16) {
+            if(back_color == CLR_INVALID) {
+                // Get Taskbar color
+                APPBARDATA abd ;
+                abd.cbSize = sizeof(abd) ;
+                if(!SHAppBarMessage(ABM_GETTASKBARPOS, &abd)) {
+                    return false ;
+                }
+
+                if(auto dc = GetDC(NULL)) {
+                    // Get Taskbar color
+                    back_color_ = GetPixel(dc, abd.rc.left + 1, abd.rc.top + 1) ;
+                    if(back_color_ == CLR_INVALID) {
+                        // if failed, use COLOR_WINDOW color.
+                        back_color_ = GetSysColor(COLOR_WINDOW) ;
+                    }
+                    if(!ReleaseDC(NULL, dc)) {
+                        return false ;
+                    }
+                }
+            }
+            else {
+                back_color_ = back_color ;
+            }
+
+            auto back_gray_color_ = util::rgb2gray(back_color_) ;
+
+            unsigned char ash_value = back_gray_color_ ;
+            if(back_gray_color_ < 128) {
+                ash_value = (std::min)(ash_value + color_decay, 255) ;
+            }
+            else {
+                ash_value = (std::max)(ash_value - color_decay, 0) ;
+            }
+            std::cout << (int)ash_value << std::endl ;
+            ash_color_ = RGB(ash_value, ash_value, ash_value) ;
+
+            if(text_color == CLR_INVALID) {
+                text_color_ = GetSysColor(COLOR_WINDOWTEXT) ;
+                if(back_gray_color_ < 128) {
+                    // if dark background, use light text color.
+                    text_color_ = 0x00FFFFFF & ~text_color_ ;
+                }
+            }
+            else {
+                text_color_ = text_color ;
+            }
+
+            // Create brash handle to draw a background of window.
+            if(back_brash_) {
+                // Release old handle.
+                if(!DeleteObject(back_brash_)) {
+                    return false ;
+                }
+            }
+            back_brash_ = CreateSolidBrush(back_color_) ;
+            if(back_brash_ == NULL) {
+                return false ;
+            }
+
+            if(!SetClassLongPtr(
+                    hwnd_, GCLP_HBRBACKGROUND,
+                    reinterpret_cast<LONG_PTR>(back_brash_))) {
+                return false ;
+            }
+
+            return true ;
+        }
+
 
     private:
         static LRESULT CALLBACK callback(
@@ -680,7 +709,7 @@ namespace fluent_tray
             }
             else if(msg == WM_ACTIVATE && wparam == WA_INACTIVE) {
                 if(auto self = get_instance()) {
-                    self->hide_popup() ;
+                    self->hide_popup_window() ;
                     return 0 ;
                 }
             }
@@ -698,11 +727,10 @@ namespace fluent_tray
                     if(menu_idx < 0) {
                         return DefWindowProc(hwnd, msg, wparam, lparam) ;
                     }
-                    auto hbrash = GetSysColorBrush(COLOR_WINDOW) ;
-                    if(SetBkColor(reinterpret_cast<HDC>(wparam), self->menu_back_color_) == CLR_INVALID) {
+                    if(!self->set_color_settings(reinterpret_cast<HDC>(wparam))) {
                         return DefWindowProc(hwnd, msg, wparam, lparam) ;
                     }
-                    return reinterpret_cast<LRESULT>(hbrash) ;
+                    return reinterpret_cast<LRESULT>(self->back_brash_) ;
                 }
             }
             else if(msg == WM_COMMAND) {
@@ -753,65 +781,13 @@ namespace fluent_tray
             return -1 ;
         }
 
-        bool set_color_settings(HWND received_hwnd, HDC hdc) {
-            for(auto& menu : menus_) {
-                //Color Setting of Popup window
-                if(received_hwnd == menu.window_handle()) {
-                    if(SetTextColor(hdc, menu_text_color_) == CLR_INVALID) {
-                        return false ;
-                    }
-                    if(SetBkColor(hdc, menu_back_color_) == CLR_INVALID) {
-                        return false ;
-                    }
-                    return true ;
-                }
-            }
-            return true ;
-        }
-
-
-        bool set_paint_settings(HWND hwnd) {
-            PAINTSTRUCT ps ;
-            auto hdc = BeginPaint(hwnd, &ps) ;
-            if(!hdc) {
+        bool set_color_settings(HDC hdc) {
+            if(SetTextColor(hdc, text_color_) == CLR_INVALID) {
                 return false ;
             }
-
-            /*
-            auto font = CreateFontIndirectW(&logfont_) ;
-            if(!font) {
+            if(SetBkColor(hdc, back_color_) == CLR_INVALID) {
                 return false ;
             }
-
-            if(!SelectObject(hdc, font)) {
-                EndPaint(hwnd, &ps) ;
-                return false ;
-            }
-            */
-
-            if(SetBkColor(hdc, menu_back_color_) == CLR_INVALID) {
-                EndPaint(hwnd, &ps) ;
-                return false ;
-            }
-
-            if(SetTextColor(hdc, menu_text_color_) == CLR_INVALID) {
-                EndPaint(hwnd, &ps) ;
-                return false ;
-            }
-
-            /*
-            SendMessage(hwnd, WM_SETFONT, WPARAM(font), TRUE);
-            */
-
-            if(!EndPaint(hwnd, &ps)) {
-                return false ;
-            }
-            /*
-            if(!DeleteObject(font)) {
-                return false ;
-            }
-            */
-
             return true ;
         }
 
@@ -822,7 +798,7 @@ namespace fluent_tray
             }
             auto& menu = menus_[menu_idx] ;
 
-            if(!set_color_settings(item->hwndItem, item->hDC)) {
+            if(!set_color_settings(item->hDC)) {
                 return false ;
             }
 
@@ -830,12 +806,6 @@ namespace fluent_tray
             if(!util::string2wstring(menu.label(), label_wide)) {
                 return false ;
             }
-
-            /*
-            if(SetTextAlign(item->hDC, TA_LEFT | TA_NOUPDATECP) == GDI_ERROR) {
-                return FALSE ;
-            }
-            */
 
             if(font_) {
                 if(!SelectObject(item->hDC, font_)) {
@@ -852,14 +822,20 @@ namespace fluent_tray
             }
 
             if(lines_[menu_idx]) {
+                auto original_obj = SelectObject(item->hDC, GetStockObject(DC_PEN)) ;
+                if(SetDCPenColor(item->hDC, ash_color_) == CLR_INVALID) {
+                    return false ;
+                }
+
                 auto lx = item->rcItem.left ;
                 auto ly = item->rcItem.bottom - 1 ;
                 auto rx = item->rcItem.right ;
                 auto ry = ly + 1 ;
-                if(!SelectObject(item->hDC, GetStockObject(BLACK_BRUSH))) {
+                if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
                     return false ;
                 }
-                if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
+
+                if(!SelectObject(item->hDC, original_obj)) {
                     return false ;
                 }
             }
