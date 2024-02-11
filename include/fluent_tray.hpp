@@ -91,7 +91,8 @@ namespace fluent_tray
     {
         RUNNING,
         SHOULD_STOP,
-        STOPPED
+        FAILED,
+        STOPPED,
     } ;
 
     enum class RenderingStatus : unsigned char
@@ -104,7 +105,11 @@ namespace fluent_tray
     private:
         std::string label_ ;
         std::filesystem::path icon_path_ ;
-        bool toggle_ ;
+        HICON hicon_ ;
+
+        bool togglable_ ;
+        bool checked_ ;
+        std::string checkmark_ ;
 
         HWND hwnd_ ;
         HMENU hmenu_ ;
@@ -119,16 +124,22 @@ namespace fluent_tray
         RenderingStatus render_status_ ;
 
         std::function<bool(void)> callback_ ;
+        std::function<bool(void)> unchecked_callback_ ;
 
     public:
         explicit FluentMenu(
             const std::string& label_text="",
             const std::filesystem::path& icon_path="",
-            bool toggle=false,
-            const std::function<bool(void)>& callback=[]{return true ;})
+            bool togglable=false,
+            const std::string& checkmark="✓",
+            const std::function<bool(void)>& callback=[] {return true ;},
+            const std::function<bool(void)>& unchecked_callback=[] {return true ;})
         : label_(label_text),
-          toggle_(toggle),
           icon_path_(icon_path),
+          hicon_(NULL),
+          togglable_(togglable),
+          checked_(false),
+          checkmark_(checkmark),
           hwnd_(NULL),
           hmenu_(NULL),
           under_line_(false),
@@ -137,7 +148,8 @@ namespace fluent_tray
           border_color_(RGB(128, 128, 128)),
           back_brush_(NULL),
           render_status_(RenderingStatus::SHOULD_UPDATE),
-          callback_(callback)
+          callback_(callback),
+          unchecked_callback_(unchecked_callback)
         {}
 
         // Copy
@@ -179,6 +191,21 @@ namespace fluent_tray
                 hwnd_, WM_CHANGEUISTATE,
                 WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
 
+            if(!icon_path_.empty()) {
+                std::wstring icon_path_wide ;
+                if(!util::string2wstring(icon_path_.u8string(), icon_path_wide)) {
+                    return false ;
+                }
+
+                hicon_ = static_cast<HICON>(LoadImageW(
+                        NULL, icon_path_wide.c_str(),
+                        IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
+                if(!hicon_) {
+                    return false ;
+                }
+            }
+
+            // SendMessage(hwnd_, BM_SETIMAGE, IMAGE_ICON, reinterpret_cast<LPARAM>(hicon)) ;
             return true ;
         }
 
@@ -199,6 +226,12 @@ namespace fluent_tray
         }
 
         bool process_click_event() {
+            if(togglable_) {
+                checked_ = !checked_ ;
+                if(!checked_) {
+                    return unchecked_callback_() ;
+                }
+            }
             return callback_() ;
         }
 
@@ -227,6 +260,17 @@ namespace fluent_tray
         }
         void disable_under_line() noexcept {
             under_line_ = false ;
+        }
+
+        bool togglable() const noexcept {
+            return togglable_ ;
+        }
+
+        void check() noexcept {
+            checked_ = true ;
+        }
+        void uncheck() noexcept {
+            checked_ = false ;
         }
 
         bool set_color(
@@ -262,9 +306,46 @@ namespace fluent_tray
             return back_brush_ ;
         }
 
-        bool draw_menu(HFONT font_, LONG font_size, LPDRAWITEMSTRUCT item) {
+        bool calculate_required_size(HFONT font_, SIZE& size) {
+            auto hdc = GetDC(hwnd_) ;
+            if(font_) {
+                if(!SelectObject(hdc, font_)) {
+                    return false ;
+                }
+            }
+
             std::wstring label_wide ;
             if(!util::string2wstring(label_, label_wide)) {
+                return false ;
+            }
+
+            if(!GetTextExtentPoint32W(
+                    hdc, label_wide.c_str(),
+                    static_cast<int>(label_wide.length()), &size)) {
+                return false ;
+            }
+
+            LONG checkmark_size, label_height, icon_size, margin ;
+            if(!calculate_layouts(
+                    hdc, checkmark_size, label_height, icon_size, margin)) {
+                return false ;
+            }
+
+            size.cx += margin + checkmark_size + margin + icon_size + margin ;
+
+            return true ;
+        }
+
+        bool draw_menu(
+                LPDRAWITEMSTRUCT item,
+                HFONT font_) {
+            std::wstring label_wide ;
+            if(!util::string2wstring(label_, label_wide)) {
+                return false ;
+            }
+
+            std::wstring checkmark_wide ;
+            if(!util::string2wstring(checkmark_, checkmark_wide)) {
                 return false ;
             }
 
@@ -282,11 +363,39 @@ namespace fluent_tray
                 }
             }
 
+            LONG checkmark_size, label_height, icon_size, margin ;
+            if(!calculate_layouts(
+                    item->hDC,
+                    checkmark_size, label_height, icon_size, margin)) {
+                return false ;
+            }
+
+            auto& rect = item->rcItem ;
+
+            auto y_center = rect.top + (rect.bottom - rect.top) / 2 ;
+            auto x = rect.left + margin ;
+
+            if(togglable_ && checked_) {
+                if(!TextOutW(
+                        item->hDC, x, y_center - label_height / 2, checkmark_wide.c_str(),
+                        static_cast<int>(checkmark_wide.length()))) {
+                    return false ;
+                }
+            }
+            x += checkmark_size + margin ;
+
+            if(hicon_) {
+                if(!DrawIconEx(
+                        item->hDC, x, y_center - SM_CYICON / 2, hicon_,
+                        icon_size, icon_size, 0, NULL, DI_NORMAL)) {
+                    return false ;
+                }
+            }
+            x += icon_size + margin ;
+
             if(!TextOutW(
-                item->hDC,
-                item->rcItem.left + 50,  // TODO: remove offset
-                item->rcItem.top + (item->rcItem.bottom - item->rcItem.top - font_size) / 2,
-                label_wide.c_str(), static_cast<int>(label_wide.length()))) {
+                    item->hDC, x, y_center - label_height / 2, label_wide.c_str(),
+                    static_cast<int>(label_wide.length()))) {
                 return false ;
             }
 
@@ -313,6 +422,25 @@ namespace fluent_tray
 
             return true ;
         }
+
+    private:
+        bool calculate_layouts(
+                HDC hdc,
+                LONG& checkmark_size,
+                LONG& label_height,
+                LONG& icon_size,
+                LONG& margin) {
+            SIZE size ;
+            if(!GetTextExtentPoint32W(hdc, L" ", 1, &size)) {
+                return false ;
+            }
+            checkmark_size = size.cy ;
+            margin = size.cy / 2 ;
+            label_height = size.cy ;
+            icon_size = 4 * label_height / 5 ;
+            return true ;
+        }
+
     } ;
 
 
@@ -381,8 +509,8 @@ namespace fluent_tray
           menu_x_offset_(5),
           menu_y_offset_(5),
           menu_label_x_offset_(50),
-          menu_x_pad_(10),
-          menu_y_pad_(10),
+          menu_x_pad_(5),
+          menu_y_pad_(5),
           text_color_(RGB(30, 30, 30)),
           back_color_(RGB(200, 200, 200)),
           ash_color_(RGB(100, 100, 100)),
@@ -407,7 +535,7 @@ namespace fluent_tray
             }
         }
 
-        bool create_tray(LONG opacity=255, bool round_corner=true) {
+        bool create_tray(BYTE opacity=255, bool round_corner=true) {
             std::wstring app_name_wide ;
             if(!util::string2wstring(app_name_, app_name_wide)) {
                 return false ;
@@ -489,10 +617,14 @@ namespace fluent_tray
         bool add_menu(
                 const std::string& label_text="",
                 const std::filesystem::path& icon_path="",
-                bool toggle=false,
-                const std::function<bool(void)>& callback=[]{return true ;}) {
+                bool togglable=false,
+                const std::string& checkmark="✓",
+                const std::function<bool(void)>& callback=[] {return true ;},
+                const std::function<bool(void)>& unchecked_callback=[] {return true ;}) {
             FluentMenu menu(
-                label_text, icon_path, toggle, callback) ;
+                label_text, icon_path,
+                togglable, checkmark,
+                callback, unchecked_callback) ;
             if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_)) {
                 return false ;
             }
@@ -557,6 +689,10 @@ namespace fluent_tray
                     status_ = TrayStatus::STOPPED ;
                     break ;
                 }
+                if(status_ == TrayStatus::FAILED) {
+                    status_ = TrayStatus::STOPPED ;
+                    return false ;
+                }
 
                 if(!update()) {
                     return false ;
@@ -610,7 +746,7 @@ namespace fluent_tray
             icon_data_.uCallbackMessage = MESSAGE_ID ;
             icon_data_.hIcon = static_cast<HICON>(
                 LoadImageW(
-                    0, icon_path_wide.c_str(),
+                    NULL, icon_path_wide.c_str(),
                     IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
             wcscpy_s(icon_data_.szTip, app_name_wide.c_str()) ;
             icon_data_.dwState = NIS_SHAREDICON ;
@@ -635,16 +771,22 @@ namespace fluent_tray
         }
 
         bool show_popup_window() {
-            LONG max_label_length = 0 ;
+            LONG max_label_size = 0 ;
             for(auto& menu : menus_) {
-                if(max_label_length < menu.label().length()) {
-                    max_label_length = static_cast<LONG>(menu.label().length()) ;
+                SIZE size ;
+                if(!menu.calculate_required_size(font_, size)) {
+                    return false ;
+                }
+                if(max_label_size < size.cx) {
+                    max_label_size = size.cx ;
                 }
             }
 
+            std::cout << max_label_size << std::endl ;
+
             // Update the sizes
-            menu_width_ = max_label_length * 2 * menu_font_size_ / 3 + menu_x_pad_ ;
-            menu_height_ = menu_font_size_ + menu_y_pad_ ;
+            menu_width_ = max_label_size + 2 * menu_x_pad_ ;
+            menu_height_ = menu_font_size_ + 2 * menu_y_pad_ ;
             popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
             popup_height_ = static_cast<LONG>(
                 menus_.size() * (menu_y_offset_ + menu_height_) + menu_y_offset_) ;
@@ -759,8 +901,14 @@ namespace fluent_tray
             if(font_size != 0) {
                 logfont.lfHeight = font_size ;
             }
+            else {
+                logfont.lfHeight = 20 ;
+            }
             if(font_weight != 0) {
                 logfont.lfWeight = font_weight ;
+            }
+            else {
+                logfont.lfWeight = FW_MEDIUM ;
             }
 
             if(!font_name.empty()) {
@@ -822,10 +970,12 @@ namespace fluent_tray
 
             unsigned char ash_value = back_gray_color_ ;
             if(back_gray_color_ < 128) {
-                ash_value = (std::min)(ash_value + color_decay, 255) ;
+                ash_value = static_cast<decltype(ash_value)>(
+                    (std::min)(ash_value + color_decay, 255)) ;
             }
             else {
-                ash_value = (std::max)(ash_value - color_decay, 0) ;
+                ash_value = static_cast<decltype(ash_value)>(
+                    (std::max)(ash_value - color_decay, 0)) ;
             }
             ash_color_ = RGB(ash_value, ash_value, ash_value) ;
 
@@ -885,14 +1035,15 @@ namespace fluent_tray
 
             if(msg == WM_DESTROY || msg == WM_QUIT || msg == WM_CLOSE) {
                 if(auto self = get_instance()) {
-                    // self->status_ = TrayStatus::SHOULD_STOP ;
                     self->stop() ;
                     return 0 ;
                 }
             }
             else if(msg == WM_ACTIVATE && wparam == WA_INACTIVE) {
                 if(auto self = get_instance()) {
-                    self->hide_popup_window() ;
+                    if(!self->hide_popup_window()) {
+                        self->fail() ;
+                    }
                     return 0 ;
                 }
             }
@@ -904,8 +1055,9 @@ namespace fluent_tray
                         return FALSE ;
                     }
                     auto& menu = self->menus_[menu_idx] ;
-                    if(!menu.draw_menu(self->font_, self->menu_font_size_, item)) {
-                        return false ;
+                    if(!menu.draw_menu(item, self->font_)) {
+                        self->fail() ;
+                        return FALSE ;
                     }
                     return TRUE ;
                 }
@@ -928,8 +1080,14 @@ namespace fluent_tray
                     }
                     auto& menu = self->menus_[menu_idx] ;
                     if(!menu.process_click_event()) {
-                        self->status_ = TrayStatus::SHOULD_STOP ;
+                        self->stop() ;
                         return FALSE ;
+                    }
+                    if(menu.togglable()) {
+                        // Update the toggle menu for checkmark
+                        if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
+                            return false ;
+                        }
                     }
                     return TRUE ;
                 }
@@ -973,6 +1131,11 @@ namespace fluent_tray
                 DispatchMessage(&message) ;
             }
         }
+
+        void fail() noexcept {
+            status_ = TrayStatus::FAILED ;
+        }
+
 
         bool check_if_foreground() {
             return GetForegroundWindow() == hwnd_ ;

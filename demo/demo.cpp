@@ -7,48 +7,77 @@ int main()
 {
     using namespace fluent_tray ;
     FluentTray tray("demo", "demo/sample_icon.ico") ;
-    if(!tray.create_tray(240)) {
-        std::cout << "Failed Tray Initialization\n" ;
-        std::cout << GetLastError() << std::endl ;
-        return 1 ;
-    }
-
-    if(!tray.set_font(20, FW_MEDIUM)) {
+    BYTE opacity = 240 ;
+    if(!tray.create_tray(opacity)) {
         return 1 ;
     }
 
     if(!tray.add_menu(
-            "テスト", "demo/sample_icon.ico", false,
-            []{std::cout << "clicked 1!\n" ; return true ;})) {
-        std::cout << "Failed Menu 1\n" ;
-        return 1 ;
-    }
-    tray.add_line() ;
-    if(!tray.add_menu("Setup with Windows", "demo/sample_icon.ico")) {
-        std::cout << "Failed Menu 2\n" ;
-        return 1 ;
-    }
-    tray.add_line() ;
-    if(!tray.add_menu("Open Root Directory", "demo/sample_icon.ico")) {
-        std::cout << "Failed Menu 3\n" ;
-        return 1 ;
-    }
-    if(!tray.add_menu("Check Update", "demo/sample_icon.ico")) {
-        std::cout << "Failed Menu 4\n" ;
-        return 1 ;
-    }
-    tray.add_line() ;
-    if(!tray.add_menu("About", "demo/sample_icon.ico", true)) {
-        std::cout << "Failed Menu 4\n" ;
-        return 1 ;
-    }
-    tray.add_line() ;
-    if(!tray.add_menu("Exit", "demo/sample_icon.ico", false, []{return false ;})) {
-        std::cout << "Failed Menu 4\n" ;
+            "Home", "demo/assets/fa-home.ico", false, "",
+            [] {
+                std::cout << "Home\n" ;
+                return true ;
+            })) {
         return 1 ;
     }
 
-    tray.update_parallel() ;
+    tray.add_line() ;
+
+    if(!tray.add_menu("Download", "demo/assets/fa-download.ico", false, "",
+            [] {
+                std::cout << "Download\n" ;
+                return true ;
+            })) {
+        return 1 ;
+    }
+
+    if(!tray.add_menu(
+            "Insight", "demo/assets/fa-line-chart.ico", false, "",
+            [] {
+                std::cout << "Insight\n" ;
+                return true ;
+            })) {
+        return 1 ;
+    }
+
+    tray.add_line() ;
+
+    if(!tray.add_menu("Coffee", "demo/assets/fa-coffee.ico", true, "・",
+            [] {
+                std::cout << "I like coffee\n" ;
+                return true ;
+            },
+            [] {
+                std::cout << "I don't like coffe\n" ;
+                return true ;
+            })) {
+        return 1 ;
+    }
+    if(!tray.add_menu("Desktop", "demo/assets/fa-desktop.ico", true, "・",
+            [] {
+                std::cout << "Connect to Desktop\n" ;
+                return true ;
+            },
+            [] {
+                std::cout << "Disconnect from desktop\n" ;
+                return true ;
+            })) {
+        return 1 ;
+    }
+
+    tray.add_line() ;
+
+    if(!tray.add_menu(
+            "Exit", "demo/assets/fa-sign-out.ico", false, "",
+            [] {
+                return false ;
+            })) {
+        return 1 ;
+    }
+
+    if(!tray.update_parallel()) {
+        return 1 ;
+    }
 
     return 0 ;
 }
