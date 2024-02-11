@@ -14,7 +14,7 @@
     </a>
 
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/msvc.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=Windows%20build&logo=github&style=flat-square" />
+    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=Windows&logo=github&style=flat-square" />
     </a>
 </p>
 
