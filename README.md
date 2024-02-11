@@ -8,6 +8,10 @@
     <img alt="Coverity Scan Build Status"
          src="https://img.shields.io/coverity/scan/29752.svg"/>
   </a>
+  <a helf="https://app.codacy.com/project/badge/Grade/f071c043e5a14b16a7833b125f16a3bb">
+    <img src="https://app.codacy.com/gh/pit-ray/fluent-tray/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade" />
+  </a>
+
 
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coverity.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coverity.yml?branch=main&label=cov-build&logo=github&style=flat-square" />
