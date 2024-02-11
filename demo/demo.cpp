@@ -6,9 +6,11 @@
 int main()
 {
     using namespace fluent_tray ;
-    FluentTray tray("demo") ;
+    FluentTray tray{} ;
     BYTE opacity = 240 ;
-    if(!tray.create_tray("demo/sample_icon.ico", 5, 5, 10, 5, opacity, true)) {
+    if(!tray.create_tray(
+            "demo", "demo/sample_icon.ico",
+            5, 5, 10, 5, opacity, true)) {
         return 1 ;
     }
 

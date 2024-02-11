@@ -51,6 +51,32 @@ namespace fluent_tray
             return true ;
         }
 
+        bool wstring2string(const std::wstring& wstr, std::string& str) {
+            if(wstr.empty()) {
+                str.clear() ;
+                return true ;
+            }
+
+            auto needed_size = WideCharToMultiByte(
+                    CP_UTF8, 0,
+                    wstr.c_str(), static_cast<int>(wstr.length()),
+                    NULL, 0,
+                    NULL, NULL) ;
+            if(needed_size <= 0) {
+                return false ;
+            }
+
+            str.resize(needed_size) ;
+            if(WideCharToMultiByte(
+                        CP_UTF8, 0,
+                        wstr.c_str(), static_cast<int>(wstr.length()),
+                        &str[0], static_cast<int>(str.size()),
+                        NULL, NULL) <= 0) {
+                return false ;
+            }
+            return true ;
+        }
+
         inline constexpr std::size_t bit2mask(std::size_t bits) noexcept {
             return (static_cast<std::size_t>(1) << bits) - 1 ;
         }
@@ -97,12 +123,12 @@ namespace fluent_tray
 
     class FluentMenu {
     private:
-        std::string label_ ;
+        std::wstring label_ ;
         HICON hicon_ ;
 
         bool togglable_ ;
         bool checked_ ;
-        std::string checkmark_ ;
+        std::wstring checkmark_ ;
 
         HWND hwnd_ ;
         HMENU hmenu_ ;
@@ -119,16 +145,14 @@ namespace fluent_tray
 
     public:
         explicit FluentMenu(
-            const std::string& label_text="",
             bool togglable=false,
-            const std::string& checkmark="✓",
             const std::function<bool(void)>& callback=[] {return true ;},
             const std::function<bool(void)>& unchecked_callback=[] {return true ;})
-        : label_(label_text),
+        : label_(),
           hicon_(NULL),
           togglable_(togglable),
           checked_(false),
-          checkmark_(checkmark),
+          checkmark_(),
           hwnd_(NULL),
           hmenu_(NULL),
           under_line_(false),
@@ -158,16 +182,23 @@ namespace fluent_tray
                 HINSTANCE hinstance,
                 HWND parent_hwnd,
                 std::size_t id,
-                const std::filesystem::path& icon_path="") {
+                const std::filesystem::path& icon_path="",
+                const std::string& label_text="",
+                const std::string& checkmark="✓") {
 
-            std::wstring label_text_wide ;
-            util::string2wstring(label_, label_text_wide) ;
+            // Convert strings to the wide-strings
+            if(!util::string2wstring(label_text, label_)) {
+                return false ;
+            }
+            if(!util::string2wstring(checkmark, checkmark_)) {
+                return false ;
+            }
 
             auto style = WS_CHILD | WS_VISIBLE | BS_FLAT | BS_LEFT | BS_OWNERDRAW ;
 
             hmenu_ = reinterpret_cast<HMENU>(id) ;
             hwnd_ = CreateWindowW(
-                TEXT("BUTTON"), label_text_wide.c_str(), style,
+                TEXT("BUTTON"), label_.c_str(), style,
                 0, 0, 100, 100,
                 parent_hwnd, hmenu_,
                 hinstance, NULL) ;
@@ -210,8 +241,8 @@ namespace fluent_tray
             return reinterpret_cast<std::size_t>(hmenu_) ;
         }
 
-        const std::string& label() const noexcept {
-            return label_ ;
+        bool get_label(std::string& str) const {
+            return util::wstring2string(label_, str) ;
         }
 
         bool process_click_event() {
@@ -298,14 +329,9 @@ namespace fluent_tray
                 }
             }
 
-            std::wstring label_wide ;
-            if(!util::string2wstring(label_, label_wide)) {
-                return false ;
-            }
-
             if(!GetTextExtentPoint32W(
-                    hdc, label_wide.c_str(),
-                    static_cast<int>(label_wide.length()), &size)) {
+                    hdc, label_.c_str(),
+                    static_cast<int>(label_.length()), &size)) {
                 return false ;
             }
 
@@ -323,16 +349,6 @@ namespace fluent_tray
         bool draw_menu(
                 LPDRAWITEMSTRUCT item,
                 HFONT font_) {
-            std::wstring label_wide ;
-            if(!util::string2wstring(label_, label_wide)) {
-                return false ;
-            }
-
-            std::wstring checkmark_wide ;
-            if(!util::string2wstring(checkmark_, checkmark_wide)) {
-                return false ;
-            }
-
             if(SetTextColor(item->hDC, text_color_) == CLR_INVALID) {
                 return false ;
             }
@@ -361,8 +377,8 @@ namespace fluent_tray
 
             if(togglable_ && checked_) {
                 if(!TextOutW(
-                        item->hDC, x, y_center - label_height / 2, checkmark_wide.c_str(),
-                        static_cast<int>(checkmark_wide.length()))) {
+                        item->hDC, x, y_center - label_height / 2, checkmark_.c_str(),
+                        static_cast<int>(checkmark_.length()))) {
                     return false ;
                 }
             }
@@ -378,8 +394,8 @@ namespace fluent_tray
             x += icon_size + margin ;
 
             if(!TextOutW(
-                    item->hDC, x, y_center - label_height / 2, label_wide.c_str(),
-                    static_cast<int>(label_wide.length()))) {
+                    item->hDC, x, y_center - label_height / 2, label_.c_str(),
+                    static_cast<int>(label_.length()))) {
                 return false ;
             }
 
@@ -431,7 +447,7 @@ namespace fluent_tray
         std::vector<FluentMenu> menus_ ;
         std::vector<bool> mouse_is_over_ ;
 
-        std::string app_name_ ;
+        std::wstring app_name_ ;
 
         HWND hwnd_ ;
         bool visible_ ;
@@ -457,10 +473,10 @@ namespace fluent_tray
         HFONT font_ ;
 
     public:
-        explicit FluentTray(const std::string& app_name)
+        explicit FluentTray()
         : menus_(),
           mouse_is_over_(),
-          app_name_(app_name),
+          app_name_(),
           hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
           hwnd_(NULL),
           visible_(false),
@@ -497,6 +513,7 @@ namespace fluent_tray
         }
 
         bool create_tray(
+                const std::string& app_name,
                 const std::filesystem::path& icon_path="",
                 LONG menu_x_margin=5,
                 LONG menu_y_margin=5,
@@ -504,8 +521,7 @@ namespace fluent_tray
                 LONG menu_y_pad=5, 
                 BYTE opacity=255,
                 bool round_corner=true) {
-            std::wstring app_name_wide ;
-            if(!util::string2wstring(app_name_, app_name_wide)) {
+            if(!util::string2wstring(app_name, app_name_)) {
                 return false ;
             }
 
@@ -524,7 +540,7 @@ namespace fluent_tray
             winc.hCursor = LoadCursor(NULL, IDC_ARROW) ;
             winc.hbrBackground = GetSysColorBrush(COLOR_WINDOW) ;
             winc.lpszMenuName = NULL ;
-            winc.lpszClassName = app_name_wide.c_str() ;
+            winc.lpszClassName = app_name_.c_str() ;
 
             if(!RegisterClassW(&winc)) {
                 return false ;
@@ -532,8 +548,8 @@ namespace fluent_tray
 
             hwnd_ = CreateWindowExW(
                 WS_EX_TOOLWINDOW | WS_EX_LAYERED,
-                app_name_wide.c_str(),
-                app_name_wide.c_str(),
+                app_name_.c_str(),
+                app_name_.c_str(),
                 WS_POPUPWINDOW,
                 0, 0, 100, 100,
                 NULL, NULL,
@@ -594,10 +610,10 @@ namespace fluent_tray
                 const std::string& checkmark="✓",
                 const std::function<bool(void)>& callback=[] {return true ;},
                 const std::function<bool(void)>& unchecked_callback=[] {return true ;}) {
-            FluentMenu menu(
-                label_text, togglable, checkmark,
-                callback, unchecked_callback) ;
-            if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_, icon_path)) {
+            FluentMenu menu(togglable, callback, unchecked_callback) ;
+            if(!menu.create_menu(
+                    hinstance_, hwnd_, next_menu_id_,
+                    icon_path, label_text, checkmark)) {
                 return false ;
             }
 
@@ -707,11 +723,6 @@ namespace fluent_tray
                 return false ;
             }
 
-            std::wstring app_name_wide ;
-            if(!util::string2wstring(app_name_, app_name_wide)) {
-                return false ;
-            }
-
             icon_data_.cbSize = sizeof(icon_data_) ;
             icon_data_.hWnd = hwnd_ ;
             icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;
@@ -720,7 +731,7 @@ namespace fluent_tray
                 LoadImageW(
                     NULL, icon_path_wide.c_str(),
                     IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
-            wcscpy_s(icon_data_.szTip, app_name_wide.c_str()) ;
+            wcscpy_s(icon_data_.szTip, app_name_.c_str()) ;
             icon_data_.dwState = NIS_SHAREDICON ;
             icon_data_.dwStateMask = NIS_SHAREDICON ;
 
