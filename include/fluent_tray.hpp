@@ -633,6 +633,11 @@ namespace fluent_tray
         }
 
         bool update() {
+            if(status_ == TrayStatus::FAILED) {
+                status_ = TrayStatus::STOPPED ;
+                return false ;
+            }
+
             MSG msg ;
             get_message(msg) ;
 
@@ -671,18 +676,13 @@ namespace fluent_tray
             return true ;
         }
 
-        bool update_parallel(
+        bool update_with_loop(
             std::chrono::milliseconds sleep_time=std::chrono::milliseconds(1)) {
 
-            // TODO: launch async
             while(true) {
                 if(status_ == TrayStatus::SHOULD_STOP) {
                     status_ = TrayStatus::STOPPED ;
                     break ;
-                }
-                if(status_ == TrayStatus::FAILED) {
-                    status_ = TrayStatus::STOPPED ;
-                    return false ;
                 }
 
                 if(!update()) {
@@ -691,7 +691,6 @@ namespace fluent_tray
 
                 Sleep(static_cast<int>(sleep_time.count())) ;
             }
-
             return true ;
         }
 

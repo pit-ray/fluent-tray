@@ -77,7 +77,7 @@ int main()
         return 1 ;
     }
 
-    if(!tray.update_parallel()) {
+    if(!tray.update_with_loop()) {
         return 1 ;
     }
 
