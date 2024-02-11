@@ -4,25 +4,12 @@
 <p align="center"><b>:fire:Warning: This project is still under development. Do not use it in a production environment.:fire:</b></p>
 
 <p align="center">
-  <a href="https://scan.coverity.com/projects/pit-ray-fluent-tray">
-    <img alt="Coverity Scan Build Status"
-         src="https://img.shields.io/coverity/scan/29752.svg"/>
-  </a>
-  <a href="https://app.codacy.com/gh/pit-ray/fluent-tray/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade">
-    <img src="https://app.codacy.com/project/badge/Grade/f071c043e5a14b16a7833b125f16a3bb"/>
-  </a>
-
+  <a href="https://scan.coverity.com/projects/pit-ray-fluent-tray"><img alt="Coverity Scan Build Status" src="https://img.shields.io/coverity/scan/29752.svg"/></a>
+  <a href="https://app.codacy.com/gh/pit-ray/fluent-tray/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade"><img src="https://app.codacy.com/project/badge/Grade/f071c043e5a14b16a7833b125f16a3bb"/></a>
   <br>  
-
-  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coverity.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coverity.yml?branch=main&label=cov-build&logo=github&style=flat-square" />
-  </a>
-  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/codeql.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/codeql.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
-  </a>
-  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/msvc.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=Windows&logo=github&style=flat-square" />
-  </a>
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coverity.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coverity.yml?branch=main&label=cov-build&logo=github&style=flat-square"/></a>
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/codeql.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/codeql.yml?branch=main&label=CodeQL&logo=github&style=flat-square"/></a>
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/msvc.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=Windows&logo=github&style=flat-square"/></a>
 </p>
 
 ## Concept
