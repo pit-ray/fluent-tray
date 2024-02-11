@@ -62,7 +62,7 @@ jobs:
     - name: Configure CMake
       run: |
         cov_tools/bin/cov-configure --config build/covtest/cov.xml --msvc --template
-        cmake -B build -G "Visual Studio 16 2019" -A x64 demo
+        cmake -B build -A x64 demo
 
     - name: Build with Coverity
       run: |
