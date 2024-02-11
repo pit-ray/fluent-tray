@@ -95,16 +95,9 @@ namespace fluent_tray
         STOPPED,
     } ;
 
-    enum class RenderingStatus : unsigned char
-    {
-        SHOULD_UPDATE,
-        RENDERED,
-    } ;
-
     class FluentMenu {
     private:
         std::string label_ ;
-        std::filesystem::path icon_path_ ;
         HICON hicon_ ;
 
         bool togglable_ ;
@@ -121,21 +114,17 @@ namespace fluent_tray
         COLORREF border_color_ ;
         HBRUSH back_brush_ ;
 
-        RenderingStatus render_status_ ;
-
         std::function<bool(void)> callback_ ;
         std::function<bool(void)> unchecked_callback_ ;
 
     public:
         explicit FluentMenu(
             const std::string& label_text="",
-            const std::filesystem::path& icon_path="",
             bool togglable=false,
             const std::string& checkmark="✓",
             const std::function<bool(void)>& callback=[] {return true ;},
             const std::function<bool(void)>& unchecked_callback=[] {return true ;})
         : label_(label_text),
-          icon_path_(icon_path),
           hicon_(NULL),
           togglable_(togglable),
           checked_(false),
@@ -147,7 +136,6 @@ namespace fluent_tray
           back_color_(RGB(255, 255, 255)),
           border_color_(RGB(128, 128, 128)),
           back_brush_(NULL),
-          render_status_(RenderingStatus::SHOULD_UPDATE),
           callback_(callback),
           unchecked_callback_(unchecked_callback)
         {}
@@ -169,7 +157,8 @@ namespace fluent_tray
         bool create_menu(
                 HINSTANCE hinstance,
                 HWND parent_hwnd,
-                std::size_t id) {
+                std::size_t id,
+                const std::filesystem::path& icon_path="") {
 
             std::wstring label_text_wide ;
             util::string2wstring(label_, label_text_wide) ;
@@ -191,9 +180,9 @@ namespace fluent_tray
                 hwnd_, WM_CHANGEUISTATE,
                 WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
 
-            if(!icon_path_.empty()) {
+            if(!icon_path.empty()) {
                 std::wstring icon_path_wide ;
-                if(!util::string2wstring(icon_path_.u8string(), icon_path_wide)) {
+                if(!util::string2wstring(icon_path.u8string(), icon_path_wide)) {
                     return false ;
                 }
 
@@ -247,14 +236,6 @@ namespace fluent_tray
             return detected_hwnd == hwnd_ ;
         }
 
-        RenderingStatus rendering_status() const noexcept {
-            return render_status_ ;
-        }
-
-        void change_rendering_state(RenderingStatus status) noexcept {
-            render_status_ = status ;
-        }
-
         void enable_under_line() noexcept {
             under_line_ = true ;
         }
@@ -271,6 +252,9 @@ namespace fluent_tray
         }
         void uncheck() noexcept {
             checked_ = false ;
+        }
+        bool is_checked() const noexcept {
+            return checked_ ;
         }
 
         bool set_color(
@@ -418,8 +402,6 @@ namespace fluent_tray
                 }
             }
 
-            render_status_ = RenderingStatus::RENDERED ;
-
             return true ;
         }
 
@@ -450,30 +432,18 @@ namespace fluent_tray
         std::vector<bool> mouse_is_over_ ;
 
         std::string app_name_ ;
-        std::filesystem::path icon_path_ ;
 
         HWND hwnd_ ;
         bool visible_ ;
         HINSTANCE hinstance_ ;
         NOTIFYICONDATAW icon_data_ ;
-        HRGN hrgn_ ;
 
-        LONG popup_width_ ;
-        LONG popup_height_ ;
-        int popup_corner_round_ ;
         TrayStatus status_ ;
 
         std::size_t next_menu_id_ ;
 
-        LONG menu_width_ ;
-        LONG menu_height_ ;
-
-        LONG menu_font_size_ ;
-
-        LONG menu_x_offset_ ;
-        LONG menu_y_offset_ ;
-
-        LONG menu_label_x_offset_ ;
+        LONG menu_x_margin_ ;
+        LONG menu_y_margin_ ;
 
         LONG menu_x_pad_ ;
         LONG menu_y_pad_ ;
@@ -483,38 +453,29 @@ namespace fluent_tray
         COLORREF ash_color_ ;
         HBRUSH back_brush_ ;
 
+        LONG menu_font_size_ ;
         HFONT font_ ;
 
     public:
-        explicit FluentTray(
-            const std::string& app_name,
-            const std::filesystem::path& icon_path="")
+        explicit FluentTray(const std::string& app_name)
         : menus_(),
           mouse_is_over_(),
           app_name_(app_name),
-          icon_path_(icon_path),
           hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
           hwnd_(NULL),
           visible_(false),
           icon_data_(),
-          hrgn_(NULL),
-          popup_width_(200),
-          popup_height_(100),
-          popup_corner_round_(20),
           status_(TrayStatus::STOPPED),
           next_menu_id_(1),
-          menu_width_(100),
-          menu_height_(100),
-          menu_font_size_(12),
-          menu_x_offset_(5),
-          menu_y_offset_(5),
-          menu_label_x_offset_(50),
+          menu_x_margin_(5),
+          menu_y_margin_(5),
           menu_x_pad_(5),
           menu_y_pad_(5),
           text_color_(RGB(30, 30, 30)),
           back_color_(RGB(200, 200, 200)),
           ash_color_(RGB(100, 100, 100)),
           back_brush_(NULL),
+          menu_font_size_(0),
           font_(NULL)
         {}
 
@@ -535,11 +496,23 @@ namespace fluent_tray
             }
         }
 
-        bool create_tray(BYTE opacity=255, bool round_corner=true) {
+        bool create_tray(
+                const std::filesystem::path& icon_path="",
+                LONG menu_x_margin=5,
+                LONG menu_y_margin=5,
+                LONG menu_x_pad=5,
+                LONG menu_y_pad=5, 
+                BYTE opacity=255,
+                bool round_corner=true) {
             std::wstring app_name_wide ;
             if(!util::string2wstring(app_name_, app_name_wide)) {
                 return false ;
             }
+
+            menu_x_margin_ = menu_x_margin ;
+            menu_y_margin_ = menu_y_margin ;
+            menu_x_pad_ = menu_x_pad ;
+            menu_y_pad_ = menu_y_pad ;
 
             WNDCLASSW winc ;
             winc.style = CS_HREDRAW | CS_VREDRAW ;
@@ -562,7 +535,7 @@ namespace fluent_tray
                 app_name_wide.c_str(),
                 app_name_wide.c_str(),
                 WS_POPUPWINDOW,
-                0, 0, popup_width_, popup_height_,
+                0, 0, 100, 100,
                 NULL, NULL,
                 hinstance_, NULL
             ) ;
@@ -599,7 +572,7 @@ namespace fluent_tray
                 }
             }
 
-            if(!change_icon(icon_path_)) {
+            if(!change_icon(icon_path)) {
                 return false ;
             }
 
@@ -622,10 +595,9 @@ namespace fluent_tray
                 const std::function<bool(void)>& callback=[] {return true ;},
                 const std::function<bool(void)>& unchecked_callback=[] {return true ;}) {
             FluentMenu menu(
-                label_text, icon_path,
-                togglable, checkmark,
+                label_text, togglable, checkmark,
                 callback, unchecked_callback) ;
-            if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_)) {
+            if(!menu.create_menu(hinstance_, hwnd_, next_menu_id_, icon_path)) {
                 return false ;
             }
 
@@ -645,7 +617,7 @@ namespace fluent_tray
             MSG msg ;
             get_message(msg) ;
 
-            if(!check_if_foreground() && visible_) {
+            if(GetForegroundWindow() != hwnd_ && visible_) {
                 hide_popup_window() ;
             }
 
@@ -782,14 +754,12 @@ namespace fluent_tray
                 }
             }
 
-            std::cout << max_label_size << std::endl ;
-
             // Update the sizes
-            menu_width_ = max_label_size + 2 * menu_x_pad_ ;
-            menu_height_ = menu_font_size_ + 2 * menu_y_pad_ ;
-            popup_width_ = 2 * menu_x_offset_ + menu_width_ ;
-            popup_height_ = static_cast<LONG>(
-                menus_.size() * (menu_y_offset_ + menu_height_) + menu_y_offset_) ;
+            auto menu_width = max_label_size + 2 * menu_x_pad_ ;
+            auto menu_height = menu_font_size_ + 2 * menu_y_pad_ ;
+            auto popup_width = 2 * menu_x_margin_ + menu_width ;
+            auto popup_height = static_cast<LONG>(
+                menus_.size() * (menu_y_margin_ + menu_height) + menu_y_margin_) ;
 
             POINT cursor_pos ;
             if(!GetCursorPos(&cursor_pos)) {
@@ -820,9 +790,9 @@ namespace fluent_tray
                 else {
                     //bottom
                     // add 20% offset
-                    pos.y = screen_height - (popup_height_ + 12 * taskbar_height / 10) ;
+                    pos.y = screen_height - (popup_height + 12 * taskbar_height / 10) ;
                 }
-                pos.x = cursor_pos.x - popup_width_ / 2 ;
+                pos.x = cursor_pos.x - popup_width / 2 ;
             }
             else {  // vertical taskbar
                 if(pos.x <= taskbar_width) {
@@ -832,38 +802,26 @@ namespace fluent_tray
                 else {
                     //right
                     // add 20% offset
-                    pos.x = popup_width_ + 12 * taskbar_width / 10 ;
+                    pos.x = popup_width + 12 * taskbar_width / 10 ;
                 }
 
-                pos.y = cursor_pos.y - popup_height_ / 2 ;
+                pos.y = cursor_pos.y - popup_height / 2 ;
             }
 
             if(!SetWindowPos(
                     hwnd_, HWND_TOP,
-                    pos.x, pos.y, popup_width_, popup_height_,
+                    pos.x, pos.y, popup_width, popup_height,
                     SWP_SHOWWINDOW)) {
                 return false ;
             }
 
-            /*
-            hrgn_ = CreateRoundRectRgn(
-                0, 0, popup_width_, popup_height_,
-                popup_corner_round_, popup_corner_round_) ;
-            if(hrgn_) {
-                if(!SetWindowRgn(hwnd_, hrgn_, TRUE)) {
-                    return false ;
-                }
-            }
-            /
-            */
-
             for(LONG i = 0 ; i < menus_.size() ; i ++) {
                 auto& menu = menus_[i] ;
-                auto y = menu_y_offset_ + i * (menu_height_ + menu_y_offset_) ;
+                auto y = menu_y_margin_ + i * (menu_height + menu_y_margin_) ;
                 if(!SetWindowPos(
                         menu.window_handle(), HWND_TOP,
-                        menu_x_offset_, y,
-                        menu_width_, menu_height_,
+                        menu_x_margin_, y,
+                        menu_width, menu_height,
                         SWP_SHOWWINDOW)) {
                     return false ;
                 }
@@ -1010,7 +968,6 @@ namespace fluent_tray
             return true ;
         }
 
-
     private:
         static LRESULT CALLBACK callback(
                 HWND hwnd,
@@ -1134,11 +1091,6 @@ namespace fluent_tray
 
         void fail() noexcept {
             status_ = TrayStatus::FAILED ;
-        }
-
-
-        bool check_if_foreground() {
-            return GetForegroundWindow() == hwnd_ ;
         }
     } ;
 }

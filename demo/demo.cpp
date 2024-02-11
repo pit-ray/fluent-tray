@@ -6,9 +6,9 @@
 int main()
 {
     using namespace fluent_tray ;
-    FluentTray tray("demo", "demo/sample_icon.ico") ;
+    FluentTray tray("demo") ;
     BYTE opacity = 240 ;
-    if(!tray.create_tray(opacity)) {
+    if(!tray.create_tray("demo/sample_icon.ico", 5, 5, 10, 5, opacity, true)) {
         return 1 ;
     }
 
@@ -42,7 +42,7 @@ int main()
 
     tray.add_line() ;
 
-    if(!tray.add_menu("Coffee", "demo/assets/fa-coffee.ico", true, "・",
+    if(!tray.add_menu("Coffee", "demo/assets/fa-coffee.ico", true, "✓",
             [] {
                 std::cout << "I like coffee\n" ;
                 return true ;
@@ -53,7 +53,7 @@ int main()
             })) {
         return 1 ;
     }
-    if(!tray.add_menu("Desktop", "demo/assets/fa-desktop.ico", true, "・",
+    if(!tray.add_menu("Desktop", "demo/assets/fa-desktop.ico", true, "✓",
             [] {
                 std::cout << "Connect to Desktop\n" ;
                 return true ;
