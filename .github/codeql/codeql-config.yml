@@ -1,0 +1,4 @@
+name: 'GitHub CodeQL config'
+paths:
+  - 'include/fluent_tray.hpp'
+  - 'demo/demo.cpp'
