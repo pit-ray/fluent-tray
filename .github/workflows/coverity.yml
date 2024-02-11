@@ -57,7 +57,7 @@ jobs:
     - name: Install Coverity scan tools
       if: ${{ hashFiles('cov_tools/') == '' }}
       run: |
-        wget.exe https://scan.coverity.com/download/cxx/win64 --post-data "token=${{env.TOKEN}}&project=pit-ray%%2Fwin-vind" -O cov_tools.zip
+        wget.exe https://scan.coverity.com/download/cxx/win64 --post-data "token=${{env.TOKEN}}&project=pit-ray%%2Ffluent-tray" -O cov_tools.zip
         unzip cov_tools.zip
         mv cov-analysis-win64-*.* cov_tools
 
