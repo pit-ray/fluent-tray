@@ -122,6 +122,15 @@ namespace fluent_tray
             auto b = GetBValue(rgb) ;
             return static_cast<unsigned char>(0.2126 * r + 0.7152 * g + 0.0722 * b) ;
         }
+
+        inline bool exists(const std::filesystem::path& fs) noexcept {
+            try {
+                return std::filesystem::exists(fs) ;
+            }
+            catch(const std::filesystem::filesystem_error&) {
+                return false ;
+            }
+        }
     }
 
     enum class TrayStatus : unsigned char
@@ -223,7 +232,7 @@ namespace fluent_tray
                 WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
 
             if(!icon_path.empty()) {
-                if(!std::filesystem::exists(icon_path)) {
+                if(!exists(icon_path)) {
                     return false ;
                 }
 
@@ -660,11 +669,7 @@ namespace fluent_tray
                 auto& menu = menus_[i] ;
                 if(menu.is_mouse_over()) {
                     if(!mouse_is_over_[i]) {
-                        if(!menu.set_color(
-                                text_color_, ash_color_, ash_color_)) {
-                            return false ;
-                        }
-                        if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
+                        if(!change_menu_back_color(menu, ash_color_)) {
                             return false ;
                         }
                     }
@@ -672,11 +677,7 @@ namespace fluent_tray
                 }
                 else {
                     if(mouse_is_over_[i]) {
-                        if(!menu.set_color(
-                                text_color_, back_color_, ash_color_)) {
-                            return false ;
-                        }
-                        if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
+                        if(!change_menu_back_color(menu, back_color_)) {
                             return false ;
                         }
                     }
@@ -731,7 +732,7 @@ namespace fluent_tray
                 return true ;
             }
 
-            if(!std::filesystem::exists(icon_path)) {
+            if(!exists(icon_path)) {
                 return false ;
             }
 
@@ -1119,6 +1120,18 @@ namespace fluent_tray
 
         void fail() noexcept {
             status_ = TrayStatus::FAILED ;
+        }
+
+        bool change_menu_back_color(FluentMenu& menu, COLORREF new_color) {
+            if(!menu.set_color(
+                    text_color_, new_color, ash_color_)) {
+                return false ;
+            }
+            // Redraw
+            if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
+                return false ;
+            }
+            return true ;
         }
     } ;
 }
