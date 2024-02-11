@@ -13,9 +13,8 @@ Currently, only Windows is supported.
 
 <img src="assets/white.png" height=300 /> <img src="assets/black.png" height=300 /> <img src="assets/navy.png" height=300 />
 
-Simply create a `FluentTray` object and add a menu with `.add_menu()`.
-
 #### Code
+Simply create a `FluentTray` object and add a menu with `.add_menu()`.
 
 ```cpp
 #include "fluent_tray.hpp"
