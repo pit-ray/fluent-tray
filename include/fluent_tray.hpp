@@ -18,7 +18,14 @@
 #include <windows.h>
 
 #include <dwmapi.h>
+
+#if defined(DWMWA_COLOR_DEFAULT)
+#define FLUENT_TRAY_DWMWA_AVAIABLE 1
+#endif
+
+#if defined(FLUENT_TRAY_DWMWA_AVAIABLE)
 #pragma comment(lib, "Dwmapi")
+#endif
 
 
 namespace fluent_tray
@@ -582,6 +589,7 @@ namespace fluent_tray
 
             // Set rounded window for Windows 11 only.
             if(round_corner) {
+#if defined(FLUENT_TRAY_DWMWA_AVAIABLE)
                 auto pref = DWMWCP_ROUND ;
                 if(DwmSetWindowAttribute(
                         hwnd_,
@@ -589,6 +597,7 @@ namespace fluent_tray
                         &pref, sizeof(pref)) != S_OK) {
                     return false ;
                 }
+#endif
             }
 
             if(!change_icon(icon_path)) {

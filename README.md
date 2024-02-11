@@ -3,10 +3,20 @@
 <p align="center"><b>Fluent Design-based GUI Library for System Tray Applications</b></p>
 <p align="center"><b>:fire:Warning: This project is still under development. Do not use it in a production environment.:fire:</b></p>
 
-<a href="https://scan.coverity.com/projects/pit-ray-fluent-tray">
-  <img alt="Coverity Scan Build Status"
-       src="https://img.shields.io/coverity/scan/29752.svg"/>
-</a>
+<p align="center">
+  <a href="https://scan.coverity.com/projects/pit-ray-fluent-tray">
+    <img alt="Coverity Scan Build Status"
+         src="https://img.shields.io/coverity/scan/29752.svg"/>
+  </a>
+
+  <a href="https://github.com/pit-ray/win-vind/actions/workflows/codeql-analysis.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/win-vind/codeql-analysis.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
+    </a>
+
+  <a href="https://github.com/pit-ray/win-vind/actions/workflows/msvc.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/widnows.yml?branch=main&label=Windows%20build&logo=github&style=flat-square" />
+    </a>
+</p>
 
 ## Concept
 fluent-tray provides a simple system tray icon and menu to easily create resident applications that do not require complex windows.

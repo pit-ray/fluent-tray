@@ -16,6 +16,7 @@ on:
     - cron: '0 18 * * 4'
 
   push:
+    branches: [ main ]
     tags:
       - v*.*.*
 

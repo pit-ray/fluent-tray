@@ -5,6 +5,7 @@ on:
     - cron: '0 18 * * 3'
 
   push:
+    branches: [ main ]
     tags:
       - v*.*.*
       - coverity*
