@@ -9,7 +9,7 @@
          src="https://img.shields.io/coverity/scan/29752.svg"/>
   </a>
 
-  <a href="https://github.com/pit-ray/win-vind/actions/workflows/coverity.yml">
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coverity.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coverity.yml?branch=main&label=cov-build&logo=github&style=flat-square" />
   </a>
 
