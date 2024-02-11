@@ -57,9 +57,7 @@ $ ./build/Debug/fluent-tray-demo.exe
 ```
 
 #### Appearance
-<img src="assets/white.png" height=300 />
-<img src="assets/black.png" height=300 />
-<img src="assets/navy.png" height=300 />
+<img src="assets/white.png" height=300 /> <img src="assets/black.png" height=300 /> <img src="assets/navy.png" height=300 />
 
 ## License
 This library is provided by pit-ray under the [MIT License](./LICENSE.txt).
