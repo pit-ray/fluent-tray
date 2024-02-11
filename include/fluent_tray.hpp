@@ -212,6 +212,10 @@ namespace fluent_tray
                 WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
 
             if(!icon_path.empty()) {
+                if(!std::filesystem::exists(icon_path)) {
+                    return false ;
+                }
+
                 std::wstring icon_path_wide ;
                 if(!util::string2wstring(icon_path.u8string(), icon_path_wide)) {
                     return false ;
@@ -225,7 +229,6 @@ namespace fluent_tray
                 }
             }
 
-            // SendMessage(hwnd_, BM_SETIMAGE, IMAGE_ICON, reinterpret_cast<LPARAM>(hicon)) ;
             return true ;
         }
 
@@ -716,6 +719,10 @@ namespace fluent_tray
             if(icon_path.empty()) {
                 icon_data_.cbSize = 0 ;
                 return true ;
+            }
+
+            if(!std::filesystem::exists(icon_path)) {
+                return false ;
             }
 
             std::wstring icon_path_wide ;

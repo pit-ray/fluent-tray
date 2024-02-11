@@ -9,7 +9,7 @@ int main()
     FluentTray tray{} ;
     BYTE opacity = 240 ;
     if(!tray.create_tray(
-            "demo", "demo/sample_icon.ico",
+            "demo", "demo/assets/icon.ico",
             5, 5, 10, 5, opacity, true)) {
         return 1 ;
     }
