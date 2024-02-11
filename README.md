@@ -9,8 +9,8 @@
          src="https://img.shields.io/coverity/scan/29752.svg"/>
   </a>
 
-  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/codeql-analysis.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/codeql-analysis.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/codeql.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/codeql.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
     </a>
 
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/msvc.yml">
