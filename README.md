@@ -9,11 +9,11 @@
          src="https://img.shields.io/coverity/scan/29752.svg"/>
   </a>
 
-  <a href="https://github.com/pit-ray/win-vind/actions/workflows/codeql-analysis.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/win-vind/codeql-analysis.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
+  <a href="https://github.com/pit-ray/fluent-ray/actions/workflows/codeql-analysis.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-ray/codeql-analysis.yml?branch=main&label=CodeQL&logo=github&style=flat-square" />
     </a>
 
-  <a href="https://github.com/pit-ray/win-vind/actions/workflows/msvc.yml">
+  <a href="https://github.com/pit-ray/fluent-ray/actions/workflows/msvc.yml">
     <img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/widnows.yml?branch=main&label=Windows%20build&logo=github&style=flat-square" />
     </a>
 </p>
