@@ -11,7 +11,7 @@ Currently, only Windows is supported.
 
 ## Demo
 
-<img src="assets/demo.png" height=300 />
+<img src="assets/demo.png" />
 
 #### Code
 Simply create a `FluentTray` object and add a menu with `.add_menu()`.
