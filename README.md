@@ -10,6 +10,9 @@ Since only the native API is used, all you have to do is include a single header
 Currently, only Windows is supported.
 
 ## Demo
+
+<img src="assets/white.png" height=300 /> <img src="assets/black.png" height=300 /> <img src="assets/navy.png" height=300 />
+
 Simply create a `FluentTray` object and add a menu with `.add_menu()`.
 
 #### Code
@@ -55,9 +58,6 @@ $ cmake -B build demo
 $ cmake --build build
 $ ./build/Debug/fluent-tray-demo.exe
 ```
-
-#### Appearance
-<img src="assets/white.png" height=300 /> <img src="assets/black.png" height=300 /> <img src="assets/navy.png" height=300 />
 
 ## License
 This library is provided by pit-ray under the [MIT License](./LICENSE.txt).
