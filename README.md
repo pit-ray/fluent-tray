@@ -52,7 +52,7 @@ int main()
     tray.add_menu("Exit", "demo/assets/fa-sign-out.ico") ;
 
     // Start message loop
-    tray.update_parallel() ;
+    tray.update_with_loop() ;
 
     return 0 ;
 }
