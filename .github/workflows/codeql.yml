@@ -16,12 +16,12 @@ on:
     - cron: '0 18 * * 4'
 
   push:
-    branches: [ main ]
     tags:
       - v*.*.*
 
   pull_request:
     # The branches below must be a subset of the branches above
+    branches: [ main ]
     paths:
       - '!README.md'
       - '!CONTRIBUTING.md'

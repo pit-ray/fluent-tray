@@ -10,6 +10,7 @@ on:
       - coverity*
 
   pull_request:
+    branches: [ main ]
     paths:
       - '!README.md'
       - '!CONTRIBUTING.md'
