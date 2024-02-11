@@ -41,6 +41,7 @@ jobs:
       with:
         arch: x64
 
+
     - name: Install tools
       run: |
         choco install -y unzip
@@ -54,7 +55,11 @@ jobs:
         key: x64-coverity-cache
 
     - name: Install Coverity scan tools
-      run: "tools/install_coverity_tools.bat ${{env.TOKEN}}"
+      if: ${{ hashFiles('cov_tools/') == '' }}
+      run: |
+        wget https://scan.coverity.com/download/cxx/win64 --post-data "token=${{env.TOKEN}}&project=pit-ray%%2Fwin-vind" -O cov_tools.zip
+        unzip cov_tools.zip
+        mv cov-analysis-win64-*.* cov_tools
 
     - name: Configure CMake
       run: |

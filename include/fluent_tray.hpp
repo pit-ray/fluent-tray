@@ -96,7 +96,7 @@ namespace fluent_tray
         template <typename InType, typename OutType>
         inline void split_bits(InType value, OutType& upper, OutType& lower) noexcept {
             constexpr auto bits = type2bit<OutType>() ;
-            constexpr auto lower_mask = util::bit2mask(bits) ;
+            auto lower_mask = util::bit2mask(bits) ;
 
             upper = static_cast<OutType>(reinterpret_cast<std::size_t>(value) >> bits) ;
             lower = static_cast<OutType>(reinterpret_cast<std::size_t>(value) & lower_mask) ;
@@ -105,7 +105,7 @@ namespace fluent_tray
         template <typename InType, typename OutType>
         inline void concatenate_bits(InType upper, InType lower, OutType& out) noexcept {
             constexpr auto bits = type2bit<InType>() ;
-            constexpr auto lower_mask = util::bit2mask(bits) ;
+            auto lower_mask = util::bit2mask(bits) ;
 
             auto out_upper = static_cast<std::size_t>(upper) << bits ;
             auto out_lower = static_cast<std::size_t>(lower) & lower_mask ;
