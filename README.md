@@ -1,5 +1,6 @@
+<h1 align="center">fluent-tray</h1>
 <p align="center"><img src="./assets/banner.png" width=128/></p>
-<h1 align="center">fluent-tray<h1>
+<p align="center"><b>Fluent Design Based GUI Library for System Tray Applications</b></p>
 
 ## Demo
 
