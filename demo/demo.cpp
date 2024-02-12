@@ -23,7 +23,7 @@ int main()
         return 1 ;
     }
 
-    tray.add_line() ;
+    tray.add_separator() ;
 
     if(!tray.add_menu("Download", "demo/assets/fa-download.ico", false, "",
             [] {
@@ -42,7 +42,7 @@ int main()
         return 1 ;
     }
 
-    tray.add_line() ;
+    tray.add_separator() ;
 
     if(!tray.add_menu("Coffee", "demo/assets/fa-coffee.ico", true, "✓",
             [] {
@@ -67,7 +67,7 @@ int main()
         return 1 ;
     }
 
-    tray.add_line() ;
+    tray.add_separator() ;
 
     if(!tray.add_menu(
             "Exit", "demo/assets/fa-sign-out.ico", false, "",

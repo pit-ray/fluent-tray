@@ -39,15 +39,15 @@ int main()
 
     // Add menus in order from the top.
     tray.add_menu("Home", "demo/assets/fa-home.ico") ;
-    tray.add_line() ;
+    tray.add_separator() ;
 
     tray.add_menu("Download", "demo/assets/fa-download.ico") ;
     tray.add_menu("Insight", "demo/assets/fa-line-chart.ico") ;
-    tray.add_line() ;
+    tray.add_separator() ;
 
     tray.add_menu("Coffee", "demo/assets/fa-coffee.ico", true) ;
     tray.add_menu("Desktop", "demo/assets/fa-desktop.ico", true) ;
-    tray.add_line() ;
+    tray.add_separator() ;
 
     tray.add_menu("Exit", "demo/assets/fa-sign-out.ico") ;
 

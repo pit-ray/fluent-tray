@@ -1,9 +1,18 @@
+/**
+ * @file fluent_tray.hpp
+ * @brief Fluent Design-based GUI Library for System Tray Applications
+ * @author pit-ray
+ * @date 2024
+ **/
+
 #ifndef _FLUENT_TRAY_HPP
 #define _FLUENT_TRAY_HPP
 
 #include <windows.h>
 
 #include <dwmapi.h>
+
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 #ifndef DWMWA_COLOR_DEFAULT
 #define DWMWA_WINDOW_CORNER_PREFERENCE static_cast<DWMWINDOWATTRIBUTE>(33)
@@ -13,7 +22,13 @@ typedef enum {
     DWMWCP_ROUND = 2,
     DWMWCP_ROUNDSMALL = 3
 } DWM_WINDOW_CORNER_PREFERENCE;
+#endif /* DWMWA_COLOR_DEFAULT */
+
+#if defined(DEBUG)
+#include <iostream>
 #endif
+
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 #pragma comment(lib, "Dwmapi")
 
@@ -25,21 +40,34 @@ typedef enum {
 #include <string>
 #include <vector>
 
-#if defined(DEBUG)
-#include <iostream>
-#endif
-
 #ifndef FLUENT_TRAY_MESSAGE_ID_OFFSET
+/**
+ * @brief Unique message identifier
+ */
 #define FLUENT_TRAY_MESSAGE_ID_OFFSET (25)
 #endif
 
-
+/**
+ * @namespace fluent_tray
+ * @brief Base namespace
+ */
 namespace fluent_tray
 {
     static constexpr int MESSAGE_ID = WM_APP + FLUENT_TRAY_MESSAGE_ID_OFFSET ;
 
+    /**
+     * @namespace fluent_tray::util
+     * @brief Utility namespace
+     */
     namespace util
     {
+        /**
+         * @brief Converts a UTF-8 encoded string to a wide string.
+         * @param [in]   str a UTF-8 encoded string object.
+         * @param [out] wstr a output wide string object.
+         * @return Returns true on success, false on failure.
+         * @sa wstring2string
+         */
         bool string2wstring(const std::string& str, std::wstring& wstr) {
             if(str.empty()) {
                 wstr.clear() ;
@@ -64,6 +92,13 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Converts a wide string to a UTF-8 encoded string.
+         * @param [in] wstr a output wide string object.
+         * @param [out] str a UTF-8 encoded string object.
+         * @return Returns true on success, false on failure.
+         * @sa string2wstring
+         */
         bool wstring2string(const std::wstring& wstr, std::string& str) {
             if(wstr.empty()) {
                 str.clear() ;
@@ -90,24 +125,48 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Generates a mask with the specified number of lower bits set to 1.
+         * @param [in] bits Number of bits
+         * @return A generated bit mask.
+         */
         inline constexpr std::size_t bit2mask(std::size_t bits) noexcept {
             return (static_cast<std::size_t>(1) << bits) - 1 ;
         }
 
+        /**
+         * @brief Calculate the number of bits of type
+         * @return The number of bits.
+         */
         template <typename Type>
         inline constexpr int type2bit() noexcept {
             return static_cast<int>(sizeof(Type) * CHAR_BIT) ;
         }
 
+        /**
+         * @brief Divides the input value into upper and lower bits.
+         * @param [in] input A input value.
+         * @param [out] upper A output upper bits.
+         * @param [out] lower A outputs lower bits.
+         * @details The splits is performed by storing the lower bits of number of bits of OutType in lower and the remaining bits in upper.
+         * @sa concatenate_bits
+         */
         template <typename InType, typename OutType>
-        inline void split_bits(InType value, OutType& upper, OutType& lower) noexcept {
+        inline void split_bits(InType input, OutType& upper, OutType& lower) noexcept {
             constexpr auto bits = type2bit<OutType>() ;
             auto lower_mask = util::bit2mask(bits) ;
 
-            upper = static_cast<OutType>(reinterpret_cast<std::size_t>(value) >> bits) ;
-            lower = static_cast<OutType>(reinterpret_cast<std::size_t>(value) & lower_mask) ;
+            upper = static_cast<OutType>(reinterpret_cast<std::size_t>(input) >> bits) ;
+            lower = static_cast<OutType>(reinterpret_cast<std::size_t>(input) & lower_mask) ;
         }
 
+        /**
+         * @brief Generates a variable that combines the bits of two variables.
+         * @param [in] upper A input upper bits.
+         * @param [in] lower A input lower bits.
+         * @param [out] out A output value.
+         * @sa split_bits
+         */
         template <typename InType, typename OutType>
         inline void concatenate_bits(InType upper, InType lower, OutType& out) noexcept {
             constexpr auto bits = type2bit<InType>() ;
@@ -117,7 +176,11 @@ namespace fluent_tray
             auto out_lower = static_cast<std::size_t>(lower) & lower_mask ;
             out = reinterpret_cast<OutType>(out_upper | out_lower) ;
         }
-
+        /**
+         * @brief Calculate grayscale value from RGB
+         * @param [in] rgb A input rgb value.
+         * @return The grayscale value.
+         */
         inline unsigned char rgb2gray(const COLORREF& rgb) {
             auto r = GetRValue(rgb) ;
             auto g = GetGValue(rgb) ;
@@ -125,26 +188,44 @@ namespace fluent_tray
             return static_cast<unsigned char>(0.2126 * r + 0.7152 * g + 0.0722 * b) ;
         }
 
+        /**
+         * @brief Checks if the file exists.
+         * @param [in] path A input wide string of path.
+         * @return Returns true if the file exists, false if it does not.
+         */
         inline bool exists(const std::wstring& path) {
             struct _stat buffer ;
             return _wstat(path.c_str(), &buffer) == 0 ;
         }
     }
 
+    /**
+     * @brief Current tray status
+     */
     enum class TrayStatus : unsigned char
     {
+        //! The tray is working properly.
         RUNNING,
+
+        //! The tray is trying to exit successfully.
         SHOULD_STOP,
+
+        //! The tray has errors.
         FAILED,
+
+        //! The tray is stopped successfully.
         STOPPED,
     } ;
 
+    /**
+     * @brief Class with information on each menu.
+     */
     class FluentMenu {
     private:
         std::wstring label_ ;
         HICON hicon_ ;
 
-        bool togglable_ ;
+        bool toggleable_ ;
         bool checked_ ;
         std::wstring checkmark_ ;
 
@@ -162,13 +243,20 @@ namespace fluent_tray
         std::function<bool(void)> unchecked_callback_ ;
 
     public:
+        /**
+         * @brief Create menu object.
+         * @param [in] toggleable Create a switchable menu
+         * @param [in] callback Function called when a click on the menu or a check is enabled.
+         * @param [in] unchecked_callback Function called when a check is distabled.
+         * @details The callback function must be a function with a bool return value and no arguments. The tray will exit successfully if the callback function returns false.
+         */
         explicit FluentMenu(
-            bool togglable=false,
+            bool toggleable=false,
             const std::function<bool(void)>& callback=[] {return true ;},
             const std::function<bool(void)>& unchecked_callback=[] {return true ;})
         : label_(),
           hicon_(NULL),
-          togglable_(togglable),
+          toggleable_(toggleable),
           checked_(false),
           checkmark_(),
           hwnd_(NULL),
@@ -182,11 +270,9 @@ namespace fluent_tray
           unchecked_callback_(unchecked_callback)
         {}
 
-        // Copy
         FluentMenu(const FluentMenu&) = default ;
         FluentMenu& operator=(const FluentMenu&) = default ;
 
-        // Move
         FluentMenu(FluentMenu&&) = default ;
         FluentMenu& operator=(FluentMenu&&) = default ;
 
@@ -196,12 +282,22 @@ namespace fluent_tray
             }
         }
 
+        /**
+         * @brief Creates a menu window.
+         * @param [in] hinstance An instance handle of application.
+         * @param [in] parent_hwnd A window handle of tray.
+         * @param [in] id A new unique identifier.
+         * @param [in] label_text A label text.
+         * @param [in] icon_path An icon path to show next to the label.
+         * @param [in] checkmark A checkmark string.
+         * @return Returns true on success, false on failure.
+         */
         bool create_menu(
                 HINSTANCE hinstance,
                 HWND parent_hwnd,
                 std::size_t id,
-                const std::string& icon_path="",
                 const std::string& label_text="",
+                const std::string& icon_path="",
                 const std::string& checkmark="✓") {
 
             // Convert strings to the wide-strings
@@ -250,24 +346,13 @@ namespace fluent_tray
             return true ;
         }
 
-        HWND window_handle() const noexcept {
-            return hwnd_ ;
-        }
-
-        HMENU menu_handle() const noexcept {
-            return hmenu_ ;
-        }
-
-        std::size_t id() const noexcept {
-            return reinterpret_cast<std::size_t>(hmenu_) ;
-        }
-
-        bool get_label(std::string& str) const {
-            return util::wstring2string(label_, str) ;
-        }
-
+        /**
+         * @brief Execute the process when clicked on the menu.
+         * @return Returns true on success, false on failure.
+         *
+         */
         bool process_click_event() {
-            if(togglable_) {
+            if(toggleable_) {
                 checked_ = !checked_ ;
                 if(!checked_) {
                     return unchecked_callback_() ;
@@ -276,6 +361,10 @@ namespace fluent_tray
             return callback_() ;
         }
 
+        /**
+         * @brief Checks whether the mouse cursor is over the menu or not.
+         * @return If the cursor is over it, true is returned; otherwise, false is returned.
+         */
         bool is_mouse_over() const {
             POINT pos ;
             if(!GetCursorPos(&pos)) {
@@ -288,27 +377,97 @@ namespace fluent_tray
             return detected_hwnd == hwnd_ ;
         }
 
-        void enable_under_line() noexcept {
-            under_line_ = true ;
-        }
-        void disable_under_line() noexcept {
-            under_line_ = false ;
-        }
-
-        bool togglable() const noexcept {
-            return togglable_ ;
-        }
-
+        /**
+         * @brief Checks the menu if it is toggleable.
+         */
         void check() noexcept {
-            checked_ = true ;
+            if(toggleable_) {
+                checked_ = true ;
+            }
         }
+
+        /**
+         * @brief Unchecks the menu if it is toggleable.
+         */
         void uncheck() noexcept {
-            checked_ = false ;
+            if(toggleable_) {
+                checked_ = false ;
+            }
         }
+
+        /**
+         * @brief Refer to the check status of the menu
+         * @return If the menu is toggleable, returns whether it is checked or not, and always returns false if it is not toggleable.
+         */
         bool is_checked() const noexcept {
+            if(!toggleable_) {
+                return false ;
+            }
             return checked_ ;
         }
 
+        /**
+         * @brief Check if the menu is toggleable.
+         * @return Returns true if the menu is toggleable, false otherwise.
+         */
+        bool toggleable() const noexcept {
+            return toggleable_ ;
+        }
+
+        /**
+         * @brief Refer to the menu window handle.
+         * @return The window handle.
+         */
+        HWND window_handle() const noexcept {
+            return hwnd_ ;
+        }
+
+        /**
+         * @brief Refer to the menu handle.
+         * @return The menu handle.
+         */
+        HMENU menu_handle() const noexcept {
+            return hmenu_ ;
+        }
+
+        /**
+         * @brief Refer to the menu identifier.
+         * @return The identifier.
+         */
+        std::size_t id() const noexcept {
+            return reinterpret_cast<std::size_t>(hmenu_) ;
+        }
+        /**
+         * @brief Get menu label as UTF-8 string.
+         * @param [out] str The output string.
+         * @return Returns true on success, false on failure.
+         */
+        bool get_label(std::string& str) const {
+            return util::wstring2string(label_, str) ;
+        }
+
+        /**
+         * @brief Show a separator line under the menu.
+         */
+        void show_separator_line() noexcept {
+            under_line_ = true ;
+        }
+
+        /**
+         * @brief Hide a separator line under the menu.
+         */
+        void hide_separator_line() noexcept {
+            under_line_ = false ;
+        }
+
+        /**
+         * @brief Set the menu color.
+         * @param [in] text_color The color for label text.
+         * @param [in] back_color The color for background.
+         * @param [in] border_color The color for separator line.
+         * @return Returns true on success, false on failure.
+         * @details If the set value is CLR_INVALID, the value is not changed.
+         */
         bool set_color(
                 const COLORREF& text_color=CLR_INVALID,
                 const COLORREF& back_color=CLR_INVALID,
@@ -338,14 +497,103 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Draws a menu using drawing information and the specified font.
+         * @param [in] info Structure that holds drawing information.
+         * @param [in] font The handle of font.
+         * @return Returns true on success, false on failure.
+         * @details info is the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-drawitemstruct">DRAWITEMSTRUCT</a> obtained when the owner window receives a <a href="https://learn.microsoft.com/en-us/windows/win32/controls/wm-drawitem">WM_DRAWITEM</a> message.
+         */
+        bool draw_menu(LPDRAWITEMSTRUCT info, HFONT font) {
+            if(SetTextColor(info->hDC, text_color_) == CLR_INVALID) {
+                return false ;
+            }
+
+            if(SetBkColor(info->hDC, back_color_) == CLR_INVALID) {
+                return false ;
+            }
+
+            if(font) {
+                if(!SelectObject(info->hDC, font)) {
+                    return false ;
+                }
+            }
+
+            LONG checkmark_size, label_height, icon_size, margin ;
+            if(!calculate_layouts(
+                    info->hDC,
+                    checkmark_size, label_height, icon_size, margin)) {
+                return false ;
+            }
+
+            auto& rect = info->rcItem ;
+
+            auto y_center = rect.top + (rect.bottom - rect.top) / 2 ;
+            auto x = rect.left + margin ;
+
+            if(toggleable_ && checked_) {
+                if(!TextOutW(
+                        info->hDC, x, y_center - label_height / 2, checkmark_.c_str(),
+                        static_cast<int>(checkmark_.length()))) {
+                    return false ;
+                }
+            }
+            x += checkmark_size + margin ;
+
+            if(hicon_) {
+                if(!DrawIconEx(
+                        info->hDC, x, y_center - SM_CYICON / 2, hicon_,
+                        icon_size, icon_size, 0, NULL, DI_NORMAL)) {
+                    return false ;
+                }
+            }
+            x += icon_size + margin ;
+
+            if(!TextOutW(
+                    info->hDC, x, y_center - label_height / 2, label_.c_str(),
+                    static_cast<int>(label_.length()))) {
+                return false ;
+            }
+
+            if(under_line_) {
+                auto original_obj = SelectObject(info->hDC, GetStockObject(DC_PEN)) ;
+                if(SetDCPenColor(info->hDC, border_color_) == CLR_INVALID) {
+                    return false ;
+                }
+
+                auto lx = info->rcItem.left ;
+                auto ly = info->rcItem.bottom - 1 ;
+                auto rx = info->rcItem.right ;
+                auto ry = ly + 1 ;
+                if(!Rectangle(info->hDC, lx, ly, rx, ry)) {
+                    return false ;
+                }
+
+                if(!SelectObject(info->hDC, original_obj)) {
+                    return false ;
+                }
+            }
+
+            return true ;
+        }
+        /**
+         * @brief Refer to the brush for drawing the background.
+         * @return The handle of brush.
+         * @details Used for the return value of <a href="https://learn.microsoft.com/en-us/windows/win32/controls/wm-ctlcolorbtn">WM_CTLCOLORBTN</a> message.
+         */
         HBRUSH background_brush() const noexcept {
             return back_brush_ ;
         }
-
-        bool calculate_required_size(HFONT font_, SIZE& size) {
+        /**
+         * @brief Calculates the size of the bounding box surrounding the menu based on the font information and the length of the label.
+         * @param [in] font The handle of font.
+         * @param [out] size The output width and height dimensions.
+         * @return Returns true on success, false on failure.
+         */
+        bool calculate_required_dims(HFONT font, SIZE& size) {
             auto hdc = GetDC(hwnd_) ;
-            if(font_) {
-                if(!SelectObject(hdc, font_)) {
+            if(font) {
+                if(!SelectObject(hdc, font)) {
                     return false ;
                 }
             }
@@ -367,80 +615,6 @@ namespace fluent_tray
             return true ;
         }
 
-        bool draw_menu(
-                LPDRAWITEMSTRUCT item,
-                HFONT font_) {
-            if(SetTextColor(item->hDC, text_color_) == CLR_INVALID) {
-                return false ;
-            }
-
-            if(SetBkColor(item->hDC, back_color_) == CLR_INVALID) {
-                return false ;
-            }
-
-            if(font_) {
-                if(!SelectObject(item->hDC, font_)) {
-                    return false ;
-                }
-            }
-
-            LONG checkmark_size, label_height, icon_size, margin ;
-            if(!calculate_layouts(
-                    item->hDC,
-                    checkmark_size, label_height, icon_size, margin)) {
-                return false ;
-            }
-
-            auto& rect = item->rcItem ;
-
-            auto y_center = rect.top + (rect.bottom - rect.top) / 2 ;
-            auto x = rect.left + margin ;
-
-            if(togglable_ && checked_) {
-                if(!TextOutW(
-                        item->hDC, x, y_center - label_height / 2, checkmark_.c_str(),
-                        static_cast<int>(checkmark_.length()))) {
-                    return false ;
-                }
-            }
-            x += checkmark_size + margin ;
-
-            if(hicon_) {
-                if(!DrawIconEx(
-                        item->hDC, x, y_center - SM_CYICON / 2, hicon_,
-                        icon_size, icon_size, 0, NULL, DI_NORMAL)) {
-                    return false ;
-                }
-            }
-            x += icon_size + margin ;
-
-            if(!TextOutW(
-                    item->hDC, x, y_center - label_height / 2, label_.c_str(),
-                    static_cast<int>(label_.length()))) {
-                return false ;
-            }
-
-            if(under_line_) {
-                auto original_obj = SelectObject(item->hDC, GetStockObject(DC_PEN)) ;
-                if(SetDCPenColor(item->hDC, border_color_) == CLR_INVALID) {
-                    return false ;
-                }
-
-                auto lx = item->rcItem.left ;
-                auto ly = item->rcItem.bottom - 1 ;
-                auto rx = item->rcItem.right ;
-                auto ry = ly + 1 ;
-                if(!Rectangle(item->hDC, lx, ly, rx, ry)) {
-                    return false ;
-                }
-
-                if(!SelectObject(item->hDC, original_obj)) {
-                    return false ;
-                }
-            }
-
-            return true ;
-        }
 
     private:
         bool calculate_layouts(
@@ -463,6 +637,9 @@ namespace fluent_tray
     } ;
 
 
+    /**
+     * @brief Class with information on the entire tray.
+     */
     class FluentTray {
     private:
         std::vector<FluentMenu> menus_ ;
@@ -494,6 +671,9 @@ namespace fluent_tray
         HFONT font_ ;
 
     public:
+        /**
+         * @brief Create tray object.
+         */
         explicit FluentTray()
         : menus_(),
           mouse_is_over_(),
@@ -524,7 +704,7 @@ namespace fluent_tray
         FluentTray(FluentTray&&) = default ;
         FluentTray& operator=(FluentTray&&) = default ;
 
-        ~FluentTray() noexcept {
+        virtual ~FluentTray() noexcept {
             if(font_ != NULL) {
                 DeleteObject(font_) ;
             }
@@ -533,6 +713,18 @@ namespace fluent_tray
             }
         }
 
+        /**
+         * @brief Initialize tray and create icon on tray
+         * @param [in] app_name
+         * @param [in] icon_path
+         * @param [in] menu_x_margin
+         * @param [in] menu_y_margin
+         * @param [in] menu_x_pad
+         * @param [in] menu_y_pad
+         * @param [in] opacity
+         * @param [in] round_corner
+         * @return Returns true on success, false on failure.
+         */
         bool create_tray(
                 const std::string& app_name,
                 const std::string& icon_path="",
@@ -624,17 +816,27 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Add a menu in order from the top.
+         * @param [in] label_text
+         * @param [in] icon_path
+         * @param [in] toggleable
+         * @param [in] checkmark
+         * @param [in] callback
+         * @param [in] unchecked_callback
+         * @return Returns true on success, false on failure.
+         */
         bool add_menu(
                 const std::string& label_text="",
                 const std::string& icon_path="",
-                bool togglable=false,
+                bool toggleable=false,
                 const std::string& checkmark="✓",
                 const std::function<bool(void)>& callback=[] {return true ;},
                 const std::function<bool(void)>& unchecked_callback=[] {return true ;}) {
-            FluentMenu menu(togglable, callback, unchecked_callback) ;
+            FluentMenu menu(toggleable, callback, unchecked_callback) ;
             if(!menu.create_menu(
                     hinstance_, hwnd_, next_menu_id_,
-                    icon_path, label_text, checkmark)) {
+                    label_text, icon_path, checkmark)) {
                 return false ;
             }
 
@@ -644,15 +846,21 @@ namespace fluent_tray
             return true ;
         }
 
-        void add_line() {
+        /**
+         * @brief Add a separator line under the last menu item added.
+         */
+        void add_separator() {
             if(!menus_.empty()) {
-                menus_.back().enable_under_line() ;
+                menus_.back().show_separator_line() ;
             }
         }
 
+        /**
+         * @brief Get window message and update tray.
+         * @return Returns true on success, false on failure.
+         */
         bool update() {
             if(status_ == TrayStatus::FAILED) {
-                status_ = TrayStatus::STOPPED ;
                 return false ;
             }
 
@@ -660,7 +868,7 @@ namespace fluent_tray
             get_message(msg) ;
 
             if(GetForegroundWindow() != hwnd_ && visible_) {
-                hide_popup_window() ;
+                hide_menu_window() ;
             }
 
             for(std::size_t i = 0 ; i < menus_.size() ; i ++) {
@@ -686,6 +894,11 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Create a message loop to update the tray.
+         * @param [in] sleep_time
+         * @return Returns true on success, false on failure.
+         */
         bool update_with_loop(
             std::chrono::milliseconds sleep_time=std::chrono::milliseconds(1)) {
 
@@ -704,76 +917,23 @@ namespace fluent_tray
             return true ;
         }
 
-        TrayStatus get_status() const noexcept {
-            return status_ ;
-        }
-
-        void stop() noexcept {
-            status_ = TrayStatus::SHOULD_STOP ;
-        }
-
+        /**
+         * @brief Refer to the handle of menu window.
+         * @return The handle of window.
+         */
         HWND window_handle() const noexcept {
             return hwnd_ ;
         }
 
-        bool change_icon(const std::string& icon_path) {
-            if(icon_data_.cbSize > 0) {
-                if(!Shell_NotifyIconW(NIM_DELETE, &icon_data_)) {
-                    return false ;
-                }
-            }
-
-            ZeroMemory(&icon_data_, sizeof(icon_data_)) ;
-
-            if(icon_path.empty()) {
-                icon_data_.cbSize = 0 ;
-                return true ;
-            }
-
-            std::wstring icon_path_wide ;
-            if(!util::string2wstring(icon_path, icon_path_wide)) {
-                return false ;
-            }
-
-            if(!util::exists(icon_path_wide)) {
-                return false ;
-            }
-
-            icon_data_.cbSize = sizeof(icon_data_) ;
-            icon_data_.hWnd = hwnd_ ;
-            icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;
-            icon_data_.uCallbackMessage = MESSAGE_ID ;
-            icon_data_.hIcon = static_cast<HICON>(
-                LoadImageW(
-                    NULL, icon_path_wide.c_str(),
-                    IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
-            wcscpy_s(icon_data_.szTip, app_name_.c_str()) ;
-            icon_data_.dwState = NIS_SHAREDICON ;
-            icon_data_.dwStateMask = NIS_SHAREDICON ;
-
-            if(!Shell_NotifyIconW(NIM_ADD, &icon_data_)) {
-                return false ;
-            }
-            hide_popup_window() ;
-
-            return true ;
-        }
-
-        bool hide_popup_window() {
-            if(!ShowWindow(hwnd_, SW_HIDE)) {
-                return false ;
-            }
-            visible_ = false ;
-
-            std::fill(mouse_is_over_.begin(), mouse_is_over_.end(), false) ;
-            return true ;
-        }
-
-        bool show_popup_window() {
+        /**
+         * @brief Show the menu window above the tray icon
+         * @return Returns true on success, false on failure.
+         */
+        bool show_menu_window() {
             LONG max_label_size = 0 ;
             for(auto& menu : menus_) {
                 SIZE size ;
-                if(!menu.calculate_required_size(font_, size)) {
+                if(!menu.calculate_required_dims(font_, size)) {
                     return false ;
                 }
                 if(max_label_size < size.cx) {
@@ -859,7 +1019,6 @@ namespace fluent_tray
             }
             std::fill(mouse_is_over_.begin(), mouse_is_over_.end(), false) ;
 
-
             if(!SetForegroundWindow(hwnd_)) {
                 return false ;
             }
@@ -869,6 +1028,42 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Hide the menu window above the tray icon.
+         * @return Returns true on success, false on failure.
+         */
+        bool hide_menu_window() {
+            if(!ShowWindow(hwnd_, SW_HIDE)) {
+                return false ;
+            }
+            visible_ = false ;
+
+            std::fill(mouse_is_over_.begin(), mouse_is_over_.end(), false) ;
+            return true ;
+        }
+
+        /**
+         * @brief Get the current status of tray.
+         * @return The status.
+         */
+        TrayStatus status() const noexcept {
+            return status_ ;
+        }
+
+        /**
+         * @brief Exit the tray successfully.
+         */
+        void stop() noexcept {
+            status_ = TrayStatus::SHOULD_STOP ;
+        }
+
+        /**
+         * @brief Set font information to draw menus.
+         * @param [in] font_size
+         * @param [in] font_weight
+         * @param [in] font_name
+         * @return Returns true on success, false on failure.
+         */
         bool set_font(
                 LONG font_size=0,
                 LONG font_weight=0,
@@ -923,6 +1118,13 @@ namespace fluent_tray
             return true;
         }
 
+        /**
+         * @brief Set colors to draw menus.
+         * @param [in] text_color
+         * @param [in] back_color
+         * @param [in] color_decay
+         * @return Returns true on success, false on failure.
+         */
         bool set_color(
                 const COLORREF& text_color=CLR_INVALID,
                 const COLORREF& back_color=CLR_INVALID,
@@ -995,6 +1197,53 @@ namespace fluent_tray
             return true ;
         }
 
+        /**
+         * @brief Load the image file and change the icon.
+         * @return Returns true on success, false on failure.
+         */
+        bool change_icon(const std::string& icon_path) {
+            if(icon_data_.cbSize > 0) {
+                if(!Shell_NotifyIconW(NIM_DELETE, &icon_data_)) {
+                    return false ;
+                }
+            }
+
+            ZeroMemory(&icon_data_, sizeof(icon_data_)) ;
+
+            if(icon_path.empty()) {
+                icon_data_.cbSize = 0 ;
+                return true ;
+            }
+
+            std::wstring icon_path_wide ;
+            if(!util::string2wstring(icon_path, icon_path_wide)) {
+                return false ;
+            }
+
+            if(!util::exists(icon_path_wide)) {
+                return false ;
+            }
+
+            icon_data_.cbSize = sizeof(icon_data_) ;
+            icon_data_.hWnd = hwnd_ ;
+            icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;
+            icon_data_.uCallbackMessage = MESSAGE_ID ;
+            icon_data_.hIcon = static_cast<HICON>(
+                LoadImageW(
+                    NULL, icon_path_wide.c_str(),
+                    IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;
+            wcscpy_s(icon_data_.szTip, app_name_.c_str()) ;
+            icon_data_.dwState = NIS_SHAREDICON ;
+            icon_data_.dwStateMask = NIS_SHAREDICON ;
+
+            if(!Shell_NotifyIconW(NIM_ADD, &icon_data_)) {
+                return false ;
+            }
+            hide_menu_window() ;
+
+            return true ;
+        }
+
     private:
         static LRESULT CALLBACK callback(
                 HWND hwnd,
@@ -1025,7 +1274,7 @@ namespace fluent_tray
             }
             else if(msg == WM_ACTIVATE && wparam == WA_INACTIVE) {
                 if(auto self = get_instance()) {
-                    if(!self->hide_popup_window()) {
+                    if(!self->hide_menu_window()) {
                         self->fail() ;
                     }
                     return 0 ;
@@ -1067,7 +1316,7 @@ namespace fluent_tray
                         self->stop() ;
                         return FALSE ;
                     }
-                    if(menu.togglable()) {
+                    if(menu.toggleable()) {
                         // Update the toggle menu for checkmark
                         if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
                             return false ;
@@ -1079,7 +1328,7 @@ namespace fluent_tray
             else if(msg == MESSAGE_ID) {  //On NotifyIcon
                 if(auto self = get_instance()) {
                     if(lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {
-                        self->show_popup_window() ;
+                        self->show_menu_window() ;
                         return 0 ;
                     }
                 }
