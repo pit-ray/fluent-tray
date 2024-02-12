@@ -49,7 +49,7 @@ jobs:
       run: pip install --user cpp-coveralls
 
     - name: Configure CMake
-      run: cmake -B build_test tests
+      run: cmake -B build_test -G "MinGW Makefiles" tests
 
     - name: Build
       run: cmake --build build_test --config ${{env.BUILD_TYPE}}
