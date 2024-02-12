@@ -19,6 +19,7 @@ add_compile_options(
     /DDEBUG
     /utf-8
 )
+add_link_options(/FORCE:MULTIPLE)
 
 include(ProcessorCount)
 ProcessorCount(PROC_N)
@@ -30,18 +31,17 @@ set(
 include_directories(../include)
 add_library(doctest STATIC test.cpp)
 
-file(
-    GLOB TEST_FILES
-    LIST_DIRECTORIES false
-    ${CMAKE_CURRENT_SOURCE_DIR}/*test.cpp
-)
+function(AddTest TEST_NAME)
+        add_executable(${TEST_NAME} ${ARGN})
+    target_link_libraries(${TEST_NAME} doctest)
+    add_test(
+        NAME ${TEST_NAME}
+        COMMAND $<TARGET_FILE:${TEST_NAME}>
+        WORKING_DIRECTORY ..
+    )
+endfunction()
 
-add_executable(${PROJECT_NAME} ${TEST_FILES})
-add_test(
-    NAME ${PROJECT_NAME}
-    COMMAND $<TARGET_FILE:${PROJECT_NAME}>
-    WORKING_DIRECTORY ..
-)
+AddTest(string_test string_test.cpp)
 
 set(
     CMAKE_CTEST_ARGUMENTS
