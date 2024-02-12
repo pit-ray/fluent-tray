@@ -13,14 +13,14 @@ if(${MSVC})
       /DDEBUG
     )
 else()
-    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     set(CMAKE_CXX_FLAGS 
         -static
-        -std=c++17
+        -std=c++11
         -lstdc++
         -lstdc++fs
         -lgcc
@@ -45,12 +45,14 @@ else()
         -DWINVER=0x0A00
         -D_WIN32_WINNT=0x0A00
         --coverage
+        -m64
+        -O0
+        -g3
+        -DDEBUG
     )
     list(REMOVE_DUPLICATES CMAKE_CXX_FLAGS)
     string(REPLACE ";" " " CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g3 -DDEBUG")
     set(CMAKE_SH "CMAKE_SH-NOTFOUND")
 endif()
 

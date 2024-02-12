@@ -1,5 +1,6 @@
-build
-build_test
-build_mingw
-.vscode
 .vimspector.json
+.vscode
+build
+build_mingw
+build_test
+venv
