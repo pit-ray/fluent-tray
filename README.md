@@ -12,7 +12,7 @@
   <br>  
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coverity.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coverity.yml?branch=main&label=Coverity Build&logo=github&style=flat-square"/></a>
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/coveralls.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/coveralls.yml?branch=main&label=Coveralls Build&logo=github&style=flat-square"/></a>
-  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/windows.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=Windows Build&logo=github&style=flat-square"/></a>
+  <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/windows.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/windows.yml?branch=main&label=MSVC Build&logo=github&style=flat-square"/></a>
   <a href="https://github.com/pit-ray/fluent-tray/actions/workflows/mingw.yml"><img src="https://img.shields.io/github/actions/workflow/status/pit-ray/fluent-tray/mingw.yml?branch=main&label=MinGW Build&logo=github&style=flat-square"/></a>
 </p>
 
