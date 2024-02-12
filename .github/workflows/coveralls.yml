@@ -28,6 +28,7 @@ on:
 
 env:
   BUILD_TYPE: Debug
+  TOKEN: ${{secrets.COVERITY_TOKEN}}
 
 jobs:
   Windows:
@@ -44,8 +45,8 @@ jobs:
       with:
         arch: x64
 
-    - name: Coveralls GitHub Action
-      uses: coverallsapp/github-action@v2.2.3
+    - name: Install cpp-coveralls
+      run: pip install --user cpp-coveralls
 
     - name: Configure CMake
       run: cmake -B build_test tests
@@ -55,3 +56,11 @@ jobs:
 
     - name: Test
       run: ctest -C ${{env.BUILD_TYPE}} --test-dir build_test --output-on-failure
+
+    - name: Collect gcov files
+      run: |
+        cmake -B build_test tests -DCOVERAGE=1
+        tar xvf build_test/gcov.tar.gz
+
+    - name: Submit the gcov into the Coveralls
+      run: coveralls -i Testing/CoverageInfo/fluent_tray.hpp.gcov -t ${{env.TOKEN}}
