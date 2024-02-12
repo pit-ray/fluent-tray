@@ -1,0 +1,54 @@
+name: test
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - v*.*.*
+      - test*
+    paths:
+      - '!README.md'
+      - '!CONTRIBUTING.md'
+      - '!docs/**'
+      - 'include/**'
+      - 'demo/**'
+      - '.github/**'
+      - 'tests/**'
+
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '!README.md'
+      - '!CONTRIBUTING.md'
+      - '!docs/**'
+      - 'include/**'
+      - 'demo/**'
+      - '.github/**'
+      - 'tests/**'
+
+env:
+  BUILD_TYPE: Debug
+
+jobs:
+  test-on-Windows:
+    runs-on: windows-2022
+
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: Configure CMake
+      run: cmake -B build_test tests
+
+    - name: Build
+      run: cmake --build build_test --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      run: ctest -C ${{env.BUILD_TYPE}} --test-dir build_test --output-on-failure
