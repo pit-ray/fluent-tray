@@ -1,5 +1,5 @@
-<h1 align="center">fluent-tray</h1>
-<p align="center"><img src="./assets/banner.png" width=128/></p>
+<p align="center"><h1>fluent-tray</h1></p>
+<p align="center"><img src="https://github.com/pit-ray/fluent-tray/blob/main/assets/banner.png?raw=true" width=128/></p>
 <p align="center"><b>Fluent Design-based GUI Library for System Tray Applications</b></p>
 <p align="center"><b>:fire:Warning: This project is still under development. Do not use it in a production environment.:fire:</b></p>
 
@@ -20,7 +20,7 @@ Currently, only Windows is supported.
 
 ## Demo
 
-<img src="assets/demo.png" />
+<img src="https://github.com/pit-ray/fluent-tray/blob/main/assets/demo.png?raw=true" />
 
 #### Code
 Simply create a `FluentTray` object and add a menu with `.add_menu()`.
