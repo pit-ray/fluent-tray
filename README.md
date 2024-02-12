@@ -72,7 +72,7 @@ $ ./build/Debug/fluent-tray-demo.exe
 ## Test
 
 ```sh
-$ cmake -B build_test test
+$ cmake -B build_test tests
 $ cmake --build build_test
 $ ctest -C Debug --test-dir build_test --output-on-failure
 ```
