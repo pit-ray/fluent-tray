@@ -1,20 +1,6 @@
 #ifndef _FLUENT_TRAY_HPP
 #define _FLUENT_TRAY_HPP
 
-#include <algorithm>
-#include <chrono>
-#include <cmath>
-#include <filesystem>
-#include <functional>
-#include <initializer_list>
-#include <memory>
-#include <string>
-#include <vector>
-
-#if defined(DEBUG)
-#include <iostream>
-#endif
-
 #include <windows.h>
 
 #include <dwmapi.h>
@@ -31,10 +17,26 @@ typedef enum {
 
 #pragma comment(lib, "Dwmapi")
 
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <functional>
+#include <memory>
+#include <string>
+#include <vector>
+
+#if defined(DEBUG)
+#include <iostream>
+#endif
+
+#ifndef FLUENT_TRAY_MESSAGE_ID_OFFSET
+#define FLUENT_TRAY_MESSAGE_ID_OFFSET (25)
+#endif
+
 
 namespace fluent_tray
 {
-    static constexpr int MESSAGE_ID = WM_APP + 25 ;
+    static constexpr int MESSAGE_ID = WM_APP + FLUENT_TRAY_MESSAGE_ID_OFFSET ;
 
     namespace util
     {
@@ -123,13 +125,9 @@ namespace fluent_tray
             return static_cast<unsigned char>(0.2126 * r + 0.7152 * g + 0.0722 * b) ;
         }
 
-        inline bool exists(const std::filesystem::path& fs) noexcept {
-            try {
-                return std::filesystem::exists(fs) ;
-            }
-            catch(const std::filesystem::filesystem_error&) {
-                return false ;
-            }
+        inline bool exists(const std::wstring& path) {
+            struct _stat buffer ;
+            return _wstat(path.c_str(), &buffer) == 0 ;
         }
     }
 
@@ -202,7 +200,7 @@ namespace fluent_tray
                 HINSTANCE hinstance,
                 HWND parent_hwnd,
                 std::size_t id,
-                const std::filesystem::path& icon_path="",
+                const std::string& icon_path="",
                 const std::string& label_text="",
                 const std::string& checkmark="✓") {
 
@@ -232,12 +230,12 @@ namespace fluent_tray
                 WPARAM(MAKELONG(UIS_SET, UISF_HIDEFOCUS)), 0) ;
 
             if(!icon_path.empty()) {
-                if(!exists(icon_path)) {
+                std::wstring icon_path_wide ;
+                if(!util::string2wstring(icon_path, icon_path_wide)) {
                     return false ;
                 }
 
-                std::wstring icon_path_wide ;
-                if(!util::string2wstring(icon_path.u8string(), icon_path_wide)) {
+                if(!util::exists(icon_path_wide)) {
                     return false ;
                 }
 
@@ -537,7 +535,7 @@ namespace fluent_tray
 
         bool create_tray(
                 const std::string& app_name,
-                const std::filesystem::path& icon_path="",
+                const std::string& icon_path="",
                 LONG menu_x_margin=5,
                 LONG menu_y_margin=5,
                 LONG menu_x_pad=5,
@@ -628,7 +626,7 @@ namespace fluent_tray
 
         bool add_menu(
                 const std::string& label_text="",
-                const std::filesystem::path& icon_path="",
+                const std::string& icon_path="",
                 bool togglable=false,
                 const std::string& checkmark="✓",
                 const std::function<bool(void)>& callback=[] {return true ;},
@@ -718,7 +716,7 @@ namespace fluent_tray
             return hwnd_ ;
         }
 
-        bool change_icon(const std::filesystem::path& icon_path) {
+        bool change_icon(const std::string& icon_path) {
             if(icon_data_.cbSize > 0) {
                 if(!Shell_NotifyIconW(NIM_DELETE, &icon_data_)) {
                     return false ;
@@ -732,12 +730,12 @@ namespace fluent_tray
                 return true ;
             }
 
-            if(!exists(icon_path)) {
+            std::wstring icon_path_wide ;
+            if(!util::string2wstring(icon_path, icon_path_wide)) {
                 return false ;
             }
 
-            std::wstring icon_path_wide ;
-            if(!util::string2wstring(icon_path.u8string(), icon_path_wide)) {
+            if(!util::exists(icon_path_wide)) {
                 return false ;
             }
 
