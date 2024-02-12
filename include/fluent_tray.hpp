@@ -385,6 +385,7 @@ namespace fluent_tray
 
         /**
          * @brief Checks the menu if it is toggleable.
+         * @details Update only the current state without calling the callback function.
          */
         void check() noexcept {
             if(toggleable_) {
@@ -394,6 +395,7 @@ namespace fluent_tray
 
         /**
          * @brief Unchecks the menu if it is toggleable.
+         * @details Update only the current state without calling the callback function.
          */
         void uncheck() noexcept {
             if(toggleable_) {
@@ -416,7 +418,7 @@ namespace fluent_tray
          * @brief Check if the menu is toggleable.
          * @return Returns true if the menu is toggleable, false otherwise.
          */
-        bool toggleable() const noexcept {
+        bool is_toggleable() const noexcept {
             return toggleable_ ;
         }
 
@@ -738,7 +740,7 @@ namespace fluent_tray
                 LONG menu_y_margin=5,
                 LONG menu_x_pad=5,
                 LONG menu_y_pad=5, 
-                BYTE opacity=255,
+                unsigned char opacity=255,
                 bool round_corner=true) {
             if(!util::string2wstring(app_name, app_name_)) {
                 return false ;
@@ -846,6 +848,8 @@ namespace fluent_tray
             if(!set_color()) {
                 return false ;
             }
+
+            status_ = TrayStatus::RUNNING ;
 
             return true ;
         }
@@ -1391,7 +1395,7 @@ namespace fluent_tray
                         self->stop() ;
                         return FALSE ;
                     }
-                    if(menu.toggleable()) {
+                    if(menu.is_toggleable()) {
                         // Update the toggle menu for checkmark
                         if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
                             return false ;

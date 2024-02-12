@@ -10,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(ROOT_DIR ${PROJECT_SOURCE_DIR}/..)
+
 add_compile_options(
     /W4
     /std:c11
@@ -31,17 +33,20 @@ set(
 include_directories(../include)
 add_library(doctest STATIC test.cpp)
 
+message(STATUS ${ROOT_DIR})
 function(AddTest TEST_NAME)
         add_executable(${TEST_NAME} ${ARGN})
     target_link_libraries(${TEST_NAME} doctest)
     add_test(
         NAME ${TEST_NAME}
         COMMAND $<TARGET_FILE:${TEST_NAME}>
-        WORKING_DIRECTORY ..
+        WORKING_DIRECTORY ${ROOT_DIR}
     )
 endfunction()
 
 AddTest(string_test string_test.cpp)
+AddTest(menu_test menu_test.cpp)
+AddTest(tray_test tray_test.cpp)
 
 set(
     CMAKE_CTEST_ARGUMENTS

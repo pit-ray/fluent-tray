@@ -2,8 +2,16 @@
 
 #include "fluent_tray.hpp"
 
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+#pragma warning(disable: 4273)
+#pragma warning(disable: 4702)
+#pragma warning(disable: 4996)
+#pragma warning(disable: 4088)
+#pragma warning(disable: 4006)
+#pragma warning(disable: 4075)
+#endif
+
 #include "fff.h"
-#include <string>
 
 DEFINE_FFF_GLOBALS ;
 
@@ -118,3 +126,12 @@ TEST_CASE("string test under Fake Windows API: ") {
         CHECK_FALSE(util::wstring2string(L"Hello", str)) ;
     }
 }
+
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+#pragma warning(default: 4273)
+#pragma warning(default: 4702)
+#pragma warning(default: 4996)
+#pragma warning(default: 4088)
+#pragma warning(default: 4006)
+#pragma warning(default: 4075)
+#endif

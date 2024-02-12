@@ -92,7 +92,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a55a1de08b1e116b71f2225b76fa1a8ff" id="r_a55a1de08b1e116b71f2225b76fa1a8ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a1de08b1e116b71f2225b76fa1a8ff">FluentMenu</a> (bool <a class="el" href="#a5acab85532d54d958eae09437917556a">toggleable</a>=false, const std::function&lt; bool(void)&gt; &amp;callback=[] {return true ;}, const std::function&lt; bool(void)&gt; &amp;unchecked_callback=[] {return true ;})</td></tr>
+<tr class="memitem:a55a1de08b1e116b71f2225b76fa1a8ff" id="r_a55a1de08b1e116b71f2225b76fa1a8ff"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55a1de08b1e116b71f2225b76fa1a8ff">FluentMenu</a> (bool toggleable=false, const std::function&lt; bool(void)&gt; &amp;callback=[] {return true ;}, const std::function&lt; bool(void)&gt; &amp;unchecked_callback=[] {return true ;})</td></tr>
 <tr class="memdesc:a55a1de08b1e116b71f2225b76fa1a8ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create menu object.  <br /></td></tr>
 <tr class="separator:a55a1de08b1e116b71f2225b76fa1a8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae65751fe8b47abcae26e99d2cc092c85" id="r_ae65751fe8b47abcae26e99d2cc092c85"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae65751fe8b47abcae26e99d2cc092c85">FluentMenu</a> (const <a class="el" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a> &amp;)=default</td></tr>
@@ -123,9 +123,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a915915efd6f57fb01fde29a26167802d" id="r_a915915efd6f57fb01fde29a26167802d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a915915efd6f57fb01fde29a26167802d">is_checked</a> () const noexcept</td></tr>
 <tr class="memdesc:a915915efd6f57fb01fde29a26167802d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refer to the check status of the menu.  <br /></td></tr>
 <tr class="separator:a915915efd6f57fb01fde29a26167802d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5acab85532d54d958eae09437917556a" id="r_a5acab85532d54d958eae09437917556a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5acab85532d54d958eae09437917556a">toggleable</a> () const noexcept</td></tr>
-<tr class="memdesc:a5acab85532d54d958eae09437917556a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the menu is toggleable.  <br /></td></tr>
-<tr class="separator:a5acab85532d54d958eae09437917556a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a940f694634b08de638e20b8e9c4477af" id="r_a940f694634b08de638e20b8e9c4477af"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a940f694634b08de638e20b8e9c4477af">is_toggleable</a> () const noexcept</td></tr>
+<tr class="memdesc:a940f694634b08de638e20b8e9c4477af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the menu is toggleable.  <br /></td></tr>
+<tr class="separator:a940f694634b08de638e20b8e9c4477af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabb3e01159c6db5b313381974281c83f" id="r_aabb3e01159c6db5b313381974281c83f"><td class="memItemLeft" align="right" valign="top">HWND&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aabb3e01159c6db5b313381974281c83f">window_handle</a> () const noexcept</td></tr>
 <tr class="memdesc:aabb3e01159c6db5b313381974281c83f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refer to the menu window handle.  <br /></td></tr>
 <tr class="separator:aabb3e01159c6db5b313381974281c83f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -373,6 +373,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Checks the menu if it is toggleable. </p>
+<p>Update only the current state without calling the callback function. </p>
 
 </div>
 </div>
@@ -624,6 +625,34 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a940f694634b08de638e20b8e9c4477af" name="a940f694634b08de638e20b8e9c4477af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a940f694634b08de638e20b8e9c4477af">&#9670;&#160;</a></span>is_toggleable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool fluent_tray::FluentMenu::is_toggleable </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if the menu is toggleable. </p>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the menu is toggleable, false otherwise. </dd></dl>
+
+</div>
+</div>
 <a id="a751e8aa187e98f8ff7669d7613dec75b" name="a751e8aa187e98f8ff7669d7613dec75b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a751e8aa187e98f8ff7669d7613dec75b">&#9670;&#160;</a></span>menu_handle()</h2>
 
@@ -803,34 +832,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a5acab85532d54d958eae09437917556a" name="a5acab85532d54d958eae09437917556a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5acab85532d54d958eae09437917556a">&#9670;&#160;</a></span>toggleable()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool fluent_tray::FluentMenu::toggleable </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"></span></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Check if the menu is toggleable. </p>
-<dl class="section return"><dt>Returns</dt><dd>Returns true if the menu is toggleable, false otherwise. </dd></dl>
-
-</div>
-</div>
 <a id="a9be3011c7471f2028b14c8bc384b37b6" name="a9be3011c7471f2028b14c8bc384b37b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9be3011c7471f2028b14c8bc384b37b6">&#9670;&#160;</a></span>uncheck()</h2>
 
@@ -855,6 +856,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Unchecks the menu if it is toggleable. </p>
+<p>Update only the current state without calling the callback function. </p>
 
 </div>
 </div>

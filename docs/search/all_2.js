@@ -10,5 +10,5 @@ var searchData=
   ['concept_7',['Concept',['../index.html#autotoc_md0',1,'']]],
   ['count_5fmenus_8',['count_menus',['../classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec',1,'fluent_tray::FluentTray']]],
   ['create_5fmenu_9',['create_menu',['../classfluent__tray_1_1_fluent_menu.html#a9626aab1a2407277fc347d97147ca191',1,'fluent_tray::FluentMenu']]],
-  ['create_5ftray_10',['create_tray',['../classfluent__tray_1_1_fluent_tray.html#a317e0bfab8dea66def0cb307541e76f6',1,'fluent_tray::FluentTray']]]
+  ['create_5ftray_10',['create_tray',['../classfluent__tray_1_1_fluent_tray.html#a24733799536bdaa1f8d2f0504d4ba4ac',1,'fluent_tray::FluentTray']]]
 ];
