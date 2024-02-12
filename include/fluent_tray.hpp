@@ -10,6 +10,12 @@
 
 #include <windows.h>
 
+#if defined(_MSC_VER) && _MSC_VER >= 1500
+#pragma warning(disable : 4005)
+#include <ntstatus.h>
+#pragma warning(default : 4005)
+#endif
+
 #include <dwmapi.h>
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -792,12 +798,40 @@ namespace fluent_tray
 
             // Set rounded window for Windows 11 only.
             if(round_corner) {
-                auto pref = DWMWCP_ROUND ;
-                if(DwmSetWindowAttribute(
-                        hwnd_,
-                        DWMWA_WINDOW_CORNER_PREFERENCE,
-                        &pref, sizeof(pref)) != S_OK) {
+               using RtlGetVersionType = NTSTATUS (WINAPI*)(PRTL_OSVERSIONINFOW) ;
+                const auto hmodule = LoadLibraryW(L"ntdll.dll") ;
+                if(!hmodule) {
                     return false ;
+                }
+
+                // cast to void* once to avoid warnings about type conversion.
+                const auto RtlGetVersion = reinterpret_cast<RtlGetVersionType>(
+                        reinterpret_cast<void*>(GetProcAddress(hmodule, "RtlGetVersion"))) ;
+                if(!RtlGetVersion) {
+                    FreeLibrary(hmodule) ;
+                    return false ;
+                }
+
+                OSVERSIONINFOW vinfo ;
+                vinfo.dwOSVersionInfoSize = sizeof(decltype(vinfo)) ;
+                auto result = RtlGetVersion(&vinfo) ;
+                if(!FreeLibrary(hmodule)) {
+                    return false ;
+                }
+
+                if(result != STATUS_SUCCESS) {
+                    return false ;
+                }
+
+                // Check if the OS is Windows11
+                if(vinfo.dwBuildNumber >= 22000) {
+                    auto pref = DWMWCP_ROUND ;
+                    if(DwmSetWindowAttribute(
+                            hwnd_,
+                            DWMWA_WINDOW_CORNER_PREFERENCE,
+                            &pref, sizeof(pref)) != S_OK) {
+                        return false ;
+                    }
                 }
             }
 
