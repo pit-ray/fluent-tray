@@ -504,7 +504,7 @@ namespace fluent_tray
          * @return Returns true on success, false on failure.
          * @details info is the <a href="https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-drawitemstruct">DRAWITEMSTRUCT</a> obtained when the owner window receives a <a href="https://learn.microsoft.com/en-us/windows/win32/controls/wm-drawitem">WM_DRAWITEM</a> message.
          */
-        bool draw_menu(LPDRAWITEMSTRUCT info, HFONT font) {
+        bool draw_menu(LPDRAWITEMSTRUCT info, HFONT font) const {
             if(SetTextColor(info->hDC, text_color_) == CLR_INVALID) {
                 return false ;
             }
@@ -590,7 +590,7 @@ namespace fluent_tray
          * @param [out] size The output width and height dimensions.
          * @return Returns true on success, false on failure.
          */
-        bool calculate_required_dims(HFONT font, SIZE& size) {
+        bool calculate_required_dims(HFONT font, SIZE& size) const {
             auto hdc = GetDC(hwnd_) ;
             if(font) {
                 if(!SelectObject(hdc, font)) {
@@ -622,7 +622,7 @@ namespace fluent_tray
                 LONG& checkmark_size,
                 LONG& label_height,
                 LONG& icon_size,
-                LONG& margin) {
+                LONG& margin) const {
             SIZE size ;
             if(!GetTextExtentPoint32W(hdc, L" ", 1, &size)) {
                 return false ;
@@ -1055,6 +1055,46 @@ namespace fluent_tray
          */
         void stop() noexcept {
             status_ = TrayStatus::SHOULD_STOP ;
+        }
+
+        /**
+         * @brief Returns an iterator to the beginning of menus.
+         * @return Iterator to the first element.
+         */
+        std::vector<FluentMenu>::iterator begin() noexcept {
+            return menus_.begin() ;
+        }
+
+        /**
+         * @brief Returns an iterator to the end of menus.
+         * @return Iterator to the last element.
+         */
+        std::vector<FluentMenu>::iterator end() noexcept {
+            return menus_.end() ;
+        }
+
+        /**
+         * @brief Returns a constant iterator to the beginning of menus.
+         * @return Constant iterator to the first element.
+         */
+        std::vector<FluentMenu>::const_iterator cbegin() const noexcept {
+            return menus_.cbegin() ;
+        }
+
+        /**
+         * @brief Returns a constant iterator to the end of menus.
+         * @return Constant iterator to the last element.
+         */
+        std::vector<FluentMenu>::const_iterator cend() const noexcept {
+            return menus_.cend() ;
+        }
+
+        /**
+         * @brief Returns the number of menus.
+         * @return The number of menus.
+         */
+        std::size_t count_menus() const noexcept {
+            return menus_.size() ;
         }
 
         /**
