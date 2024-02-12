@@ -66,5 +66,5 @@ jobs:
 
     - name: Submit results to Coveralls using cpp-coveralls
       run: |
-        python3 -m pip install --user cpp-coveralls
+        python3 -m pip install cpp-coveralls
         python3 -m coveralls -r ./ -E ".*/tests/.*" -E ".*/build_test/.*" -E ".*/demo/.*" t ${{env.TOKEN}}
