@@ -17,9 +17,8 @@
 </p>
 
 ## Concept
-fluent-tray provides a simple system tray icon and menu to easily create resident applications that do not require complex windows.
-Since only the native API is used, all you have to do is include a single header file.
-
+fluent-tray provides a simple system tray icon and menu to easily create resident applications that do not require complex windows.  
+All you have to do is include a single header file since only the native API is used.  
 Currently, only Windows is supported.
 
 ## Demo
