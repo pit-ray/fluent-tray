@@ -301,12 +301,12 @@ Public Member Functions</h2></td></tr>
 <p>Add a menu in order from the top. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">label_text</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">icon_path</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">toggleable</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">checkmark</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">unchecked_callback</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">label_text</td><td>The UTF-8 encoded string of the button label. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">icon_path</td><td>An icon path to show next to the label. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">toggleable</td><td>Create a switchable menu </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">checkmark</td><td>A checkmark string. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">callback</td><td>Function called when a click on the menu or a check is enabled. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">unchecked_callback</td><td>Function called when a check is disabled. </td></tr>
   </table>
   </dd>
 </dl>
@@ -429,14 +429,14 @@ Public Member Functions</h2></td></tr>
 <p>Initialize tray and create icon on tray. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">app_name</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">icon_path</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">menu_x_margin</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">menu_y_margin</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">menu_x_pad</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">menu_y_pad</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">opacity</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">round_corner</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">app_name</td><td>The application name to be displayed as tooltip text. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">icon_path</td><td>A UTF-8 encoded path to the icon to be displayed in the system tray. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">menu_x_margin</td><td>Horizontal margins outside menus. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">menu_y_margin</td><td>Vertical margins outside menus. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">menu_x_pad</td><td>Horizontal paddings inside menus. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">menu_y_pad</td><td>Vertical paddings inside menus. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opacity</td><td>Menu opacity from 0 to 255. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">round_corner</td><td>Option to round the corners of the menu window (Windows 11 only) </td></tr>
   </table>
   </dd>
 </dl>
@@ -557,9 +557,9 @@ Public Member Functions</h2></td></tr>
 <p>Set colors to draw menus. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">text_color</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">back_color</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">color_decay</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">text_color</td><td>The color for label text. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">back_color</td><td>The color for background. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">color_decay</td><td>Decay value from the background color to determine the background color of the currently selected menu and the color of the separator line. </td></tr>
   </table>
   </dd>
 </dl>
@@ -602,13 +602,14 @@ Public Member Functions</h2></td></tr>
 <p>Set font information to draw menus. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">font_size</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">font_weight</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">font_name</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">font_size</td><td>The height of fonts. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">font_weight</td><td>The value from 0 to 1000 to determine font weight. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">font_name</td><td>The UTF-8 encoded font name for label rendering. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns true on success, false on failure. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true on success, false on failure.</dd></dl>
+<p>For font_weight, you can use the constant value specified for lfWeght in <a href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw">LOGFONT</a>. The default value used is FW_MEDIUM(500). </p>
 
 </div>
 </div>

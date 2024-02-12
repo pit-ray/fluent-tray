@@ -247,7 +247,7 @@ namespace fluent_tray
          * @brief Create menu object.
          * @param [in] toggleable Create a switchable menu
          * @param [in] callback Function called when a click on the menu or a check is enabled.
-         * @param [in] unchecked_callback Function called when a check is distabled.
+         * @param [in] unchecked_callback Function called when a check is disabled.
          * @details The callback function must be a function with a bool return value and no arguments. The tray will exit successfully if the callback function returns false.
          */
         explicit FluentMenu(
@@ -714,15 +714,15 @@ namespace fluent_tray
         }
 
         /**
-         * @brief Initialize tray and create icon on tray
-         * @param [in] app_name
-         * @param [in] icon_path
-         * @param [in] menu_x_margin
-         * @param [in] menu_y_margin
-         * @param [in] menu_x_pad
-         * @param [in] menu_y_pad
-         * @param [in] opacity
-         * @param [in] round_corner
+         * @brief Initialize tray and create icon on tray.
+         * @param [in] app_name The application name to be displayed as tooltip text.
+         * @param [in] icon_path A UTF-8 encoded path to the icon to be displayed in the system tray.
+         * @param [in] menu_x_margin Horizontal margins outside menus.
+         * @param [in] menu_y_margin Vertical margins outside menus.
+         * @param [in] menu_x_pad Horizontal paddings inside menus.
+         * @param [in] menu_y_pad Vertical paddings inside menus.
+         * @param [in] opacity Menu opacity from 0 to 255.
+         * @param [in] round_corner Option to round the corners of the menu window (Windows 11 only)
          * @return Returns true on success, false on failure.
          */
         bool create_tray(
@@ -818,12 +818,12 @@ namespace fluent_tray
 
         /**
          * @brief Add a menu in order from the top.
-         * @param [in] label_text
-         * @param [in] icon_path
-         * @param [in] toggleable
-         * @param [in] checkmark
-         * @param [in] callback
-         * @param [in] unchecked_callback
+         * @param [in] label_text The UTF-8 encoded string of the button label.
+         * @param [in] icon_path An icon path to show next to the label.
+         * @param [in] toggleable Create a switchable menu
+         * @param [in] checkmark A checkmark string.
+         * @param [in] callback Function called when a click on the menu or a check is enabled.
+         * @param [in] unchecked_callback Function called when a check is disabled.
          * @return Returns true on success, false on failure.
          */
         bool add_menu(
@@ -1059,10 +1059,11 @@ namespace fluent_tray
 
         /**
          * @brief Set font information to draw menus.
-         * @param [in] font_size
-         * @param [in] font_weight
-         * @param [in] font_name
+         * @param [in] font_size The height of fonts.
+         * @param [in] font_weight The value from 0 to 1000 to determine font weight.
+         * @param [in] font_name The UTF-8 encoded font name for label rendering.
          * @return Returns true on success, false on failure.
+         * @details For font_weight, you can use the constant value specified for lfWeght in <a href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw">LOGFONT</a>. The default value used is FW_MEDIUM(500).
          */
         bool set_font(
                 LONG font_size=0,
@@ -1120,9 +1121,9 @@ namespace fluent_tray
 
         /**
          * @brief Set colors to draw menus.
-         * @param [in] text_color
-         * @param [in] back_color
-         * @param [in] color_decay
+         * @param [in] text_color The color for label text.
+         * @param [in] back_color The color for background.
+         * @param [in] color_decay Decay value from the background color to determine the background color of the currently selected menu and the color of the separator line.
          * @return Returns true on success, false on failure.
          */
         bool set_color(
