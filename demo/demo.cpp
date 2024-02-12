@@ -7,10 +7,9 @@ int main()
 {
     using namespace fluent_tray ;
     FluentTray tray{} ;
-    BYTE opacity = 240 ;
     if(!tray.create_tray(
             "demo", "demo/assets/icon.ico",
-            5, 5, 10, 5, opacity, true)) {
+            5, 5, 10, 5, 240, true)) {
         return 1 ;
     }
 

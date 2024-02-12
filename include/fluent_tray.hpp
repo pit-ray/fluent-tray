@@ -12,7 +12,11 @@
 
 #if defined(_MSC_VER) && _MSC_VER >= 1500
 #pragma warning(disable : 4005)
+#endif
+
 #include <ntstatus.h>
+
+#if defined(_MSC_VER) && _MSC_VER >= 1500
 #pragma warning(default : 4005)
 #endif
 
@@ -655,9 +659,9 @@ namespace fluent_tray
 
         std::wstring app_name_ ;
 
+        HINSTANCE hinstance_ ;
         HWND hwnd_ ;
         bool visible_ ;
-        HINSTANCE hinstance_ ;
         NOTIFYICONDATAW icon_data_ ;
 
         TrayStatus status_ ;
@@ -686,7 +690,7 @@ namespace fluent_tray
         : menus_(),
           mouse_is_over_(),
           app_name_(),
-          hinstance_(reinterpret_cast<HINSTANCE>(GetModuleHandle(NULL))),
+          hinstance_(GetModuleHandle(NULL)),
           hwnd_(NULL),
           visible_(false),
           icon_data_(),
@@ -800,6 +804,7 @@ namespace fluent_tray
 
             // Set rounded window for Windows 11 only.
             if(round_corner) {
+#if defined(_MSC_VER) && _MSC_VER >= 1500
                using RtlGetVersionType = NTSTATUS (WINAPI*)(PRTL_OSVERSIONINFOW) ;
                 const auto hmodule = LoadLibraryW(L"ntdll.dll") ;
                 if(!hmodule) {
@@ -835,6 +840,7 @@ namespace fluent_tray
                         return false ;
                     }
                 }
+#endif // defined(_MSC_VER) && _MSC_VER >= 1500
             }
 
             if(!change_icon(icon_path)) {
@@ -1040,9 +1046,11 @@ namespace fluent_tray
                 return false ;
             }
 
-            for(LONG i = 0 ; i < menus_.size() ; i ++) {
+            for(std::size_t i = 0 ; i < menus_.size() ; i ++) {
                 auto& menu = menus_[i] ;
-                auto y = menu_y_margin_ + i * (menu_height + menu_y_margin_) ;
+                auto y = \
+                     menu_y_margin_
+                     + static_cast<LONG>(i) * (menu_height + menu_y_margin_) ;
                 if(!SetWindowPos(
                         menu.window_handle(), HWND_TOP,
                         menu_x_margin_, y,
@@ -1178,11 +1186,11 @@ namespace fluent_tray
                 auto dst = logfont.lfFaceName ;
 
                 if(font_name_wide.size() < LF_FACESIZE) {
-                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
+                    std::wmemcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
                     dst[font_name_wide.size()] = L'\0' ;
                 }
                 else {
-                    std::memcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
+                    std::wmemcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
                     dst[LF_FACESIZE - 1] = L'\0' ;
                 }
             }
@@ -1329,15 +1337,15 @@ namespace fluent_tray
                 UINT msg,
                 WPARAM wparam,
                 LPARAM lparam) {
-            auto get_instance = [hwnd]() {
+            auto get_instance = [hwnd]() -> FluentTray* {
                 auto upper_addr = GetWindowLongW(hwnd, 0) ;
                 if(!upper_addr) {
-                    return reinterpret_cast<FluentTray*>(nullptr) ;
+                    return nullptr ;
                 }
 
                 auto lower_addr = GetWindowLongW(hwnd, sizeof(LONG)) ;
                 if(!lower_addr) {
-                    return reinterpret_cast<FluentTray*>(nullptr) ;
+                    return nullptr ;
                 }
 
                 FluentTray* self ;

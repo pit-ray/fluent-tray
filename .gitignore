@@ -1,4 +1,5 @@
 build
 build_test
+build_mingw
 .vscode
 .vimspector.json
