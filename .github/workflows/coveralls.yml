@@ -45,9 +45,6 @@ jobs:
       with:
         arch: x64
 
-    - name: Install cpp-coveralls
-      run: python -m pip install --user cpp-coveralls
-
     - name: Setup Dependencies
       shell: powershell
       run: |
@@ -67,10 +64,7 @@ jobs:
     - name: Test
       run: ctest -C ${{env.BUILD_TYPE}} --test-dir build_test --output-on-failure
 
-    - name: Collect gcov files
+    - name: Submit results to Coveralls using cpp-coveralls
       run: |
-        cmake -B build_test tests -DCOVERAGE=1
-        tar xvf build_test/gcov.tar.gz
-
-    - name: Submit the gcov into the Coveralls
-      run: python -m coveralls -i Testing/CoverageInfo/fluent_tray.hpp.gcov -t ${{env.TOKEN}}
+        python3 -m pip install --user cpp-coveralls
+        python3 -m coveralls -r ./ -E ".*/tests/.*" -E ".*/build_test/.*" -E ".*/demo/.*" t ${{env.TOKEN}}

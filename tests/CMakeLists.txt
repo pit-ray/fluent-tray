@@ -96,14 +96,3 @@ set(
     CMAKE_CTEST_ARGUMENTS
     "${CMAKE_CTEST_ARGUMENTS} --verbose --no-label-summary --parallel ${PROC_N}"
 )
-
-if(${COVERAGE})
-    include(CTestCoverageCollectGCOV)
-    ctest_coverage_collect_gcov(
-        TARBALL gcov.tar.gz
-        TARBALL_COMPRESSION GZIP
-        SOURCE ${PROJECT_SOURCE_DIR}
-        BUILD ${CMAKE_BINARY_DIR}
-        GCOV_COMMAND gcov
-        GCOV_OPTIONS -bc)
-endif()
