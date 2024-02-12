@@ -67,4 +67,4 @@ jobs:
     - name: Submit results to Coveralls using cpp-coveralls
       run: |
         pip install cpp-coveralls
-        coveralls -r ./ -E ".*/tests/.*" -E ".*/build_test/.*" -E ".*/demo/.*"
+        coveralls -r ./ -E ".*/tests/.*" -E ".*/build_test/.*" -E ".*/demo/.*" -E ".*/mingw64/.*"
