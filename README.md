@@ -67,5 +67,13 @@ $ cmake --build build
 $ ./build/Debug/fluent-tray-demo.exe
 ```
 
+## Test
+
+```sh
+$ cmake -B build_test test
+$ cmake --build build_test
+$ ctest -C Debug --test-dir build_test --output-on-failure
+```
+
 ## License
 This library is provided by pit-ray under the [MIT License](./LICENSE.txt).
