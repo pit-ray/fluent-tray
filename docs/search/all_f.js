@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['test_0',['Test',['../index.html#autotoc_md4',1,'']]],
-  ['tray_1',['fluent-tray',['../index.html',1,'']]],
-  ['traystatus_2',['TrayStatus',['../namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9',1,'fluent_tray']]],
-  ['type2bit_3',['type2bit',['../namespacefluent__tray_1_1util.html#ad6a57f613b492369f473746b80c2134a',1,'fluent_tray::util']]]
+  ['uncheck_49',['uncheck',['../classfluent__tray_1_1_fluent_menu.html#a9be3011c7471f2028b14c8bc384b37b6',1,'fluent_tray::FluentMenu']]],
+  ['update_50',['update',['../classfluent__tray_1_1_fluent_tray.html#ae5a734a0b5255bef1bf143e2996d76de',1,'fluent_tray::FluentTray']]],
+  ['update_5fwith_5floop_51',['update_with_loop',['../classfluent__tray_1_1_fluent_tray.html#a75a1e972c3c22bc8874f16cf7465fc53',1,'fluent_tray::FluentTray']]]
 ];
