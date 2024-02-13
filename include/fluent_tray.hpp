@@ -1109,16 +1109,8 @@ namespace fluent_tray
          * @return Returns true on success, false on failure.
          */
         bool hide_menu_window() {
-            if(!visible_) {
-                return true ;
-            }
-            if(GetForegroundWindow() == hwnd_) {
-                if(!ShowWindow(hwnd_, SW_HIDE)) {
-                    return false ;
-                }
-            }
+            ShowWindow(hwnd_, SW_HIDE) ;
             visible_ = false ;
-
             std::fill(mouse_is_over_.begin(), mouse_is_over_.end(), false) ;
             return true ;
         }
