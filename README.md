@@ -1,7 +1,6 @@
 <p align="center"><h1>fluent-tray</h1></p>
 <p align="center"><img src="https://github.com/pit-ray/fluent-tray/blob/main/assets/banner.png?raw=true" width=128/></p>
 <p align="center"><b>Fluent Design-based GUI Library for System Tray Applications</b></p>
-<p align="center"><b>:fire:Warning: This project is still under development. Do not use it in a production environment.:fire:</b></p>
 
 <p align="center">
     <a href="https://coveralls.io/github/pit-ray/fluent-tray"><img alt="Coveralls" src="https://img.shields.io/coverallsCoverage/github/pit-ray/fluent-tray?style=flat-square"></a>
