@@ -1180,10 +1180,10 @@ namespace fluent_tray
                 LONG font_size=0,
                 LONG font_weight=0,
                 const std::string& font_name="") {
-            NONCLIENTMETRICS metrics ;
+            NONCLIENTMETRICSW metrics ;
             metrics.cbSize = sizeof(metrics) ;
 
-            if(!SystemParametersInfo(
+            if(!SystemParametersInfoW(
                     SPI_GETNONCLIENTMETRICS,
                     metrics.cbSize, &metrics, 0)) {
                 return false ;
@@ -1208,14 +1208,16 @@ namespace fluent_tray
                 if(!util::string2wstring(font_name, font_name_wide)) {
                     return false ;
                 }
-                auto dst = logfont.lfFaceName ;
+                auto& dst = logfont.lfFaceName ;
 
                 if(font_name_wide.size() < LF_FACESIZE) {
-                    std::wmemcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * font_name_wide.length()) ;
+                    std::wmemcpy(
+                        dst, font_name_wide.c_str(), font_name_wide.length()) ;
                     dst[font_name_wide.size()] = L'\0' ;
                 }
                 else {
-                    std::wmemcpy(dst, font_name_wide.c_str(), sizeof(WCHAR) * (LF_FACESIZE - 1)) ;
+                    std::wmemcpy(
+                        dst, font_name_wide.c_str(), LF_FACESIZE - 1) ;
                     dst[LF_FACESIZE - 1] = L'\0' ;
                 }
             }
