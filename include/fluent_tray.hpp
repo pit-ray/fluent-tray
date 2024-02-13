@@ -1506,7 +1506,12 @@ namespace fluent_tray
                     if(menu.is_toggleable()) {
                         // Update the toggle menu for checkmark
                         if(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {
-                            return false ;
+                            return FALSE ;
+                        }
+                    }
+                    else {
+                        if(!self->hide_menu_window()) {
+                            return FALSE ;
                         }
                     }
                     return TRUE ;
