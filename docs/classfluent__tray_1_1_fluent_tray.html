@@ -129,6 +129,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aba45a136ce6348aa79da7805624a59c6" id="r_aba45a136ce6348aa79da7805624a59c6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba45a136ce6348aa79da7805624a59c6">hide_menu_window</a> ()</td></tr>
 <tr class="memdesc:aba45a136ce6348aa79da7805624a59c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Hide the menu window above the tray icon.  <br /></td></tr>
 <tr class="separator:aba45a136ce6348aa79da7805624a59c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02abceeae16c5342ae88af29f12cd08a" id="r_a02abceeae16c5342ae88af29f12cd08a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a02abceeae16c5342ae88af29f12cd08a">show_balloon_tip</a> (const std::string &amp;title, const std::string &amp;message)</td></tr>
+<tr class="memdesc:a02abceeae16c5342ae88af29f12cd08a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Shows a balloon tip that is placed in the notification area.  <br /></td></tr>
+<tr class="separator:a02abceeae16c5342ae88af29f12cd08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a599e83a0b01cbbaecf20e8e19c734480" id="r_a599e83a0b01cbbaecf20e8e19c734480"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9">TrayStatus</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a599e83a0b01cbbaecf20e8e19c734480">status</a> () const noexcept</td></tr>
 <tr class="memdesc:a599e83a0b01cbbaecf20e8e19c734480"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current status of tray.  <br /></td></tr>
 <tr class="separator:a599e83a0b01cbbaecf20e8e19c734480"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -889,6 +892,46 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns true on success, false on failure.</dd></dl>
 <p>For font_weight, you can use the constant value specified for lfWeght in <a href="https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-logfontw">LOGFONT</a>. The default value used is FW_MEDIUM(500). </p>
+
+</div>
+</div>
+<a id="a02abceeae16c5342ae88af29f12cd08a" name="a02abceeae16c5342ae88af29f12cd08a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02abceeae16c5342ae88af29f12cd08a">&#9670;&#160;</a></span>show_balloon_tip()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool fluent_tray::FluentTray::show_balloon_tip </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>title</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>message</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Shows a balloon tip that is placed in the notification area. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">title</td><td>The UTF-8 string of title. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">message</td><td>The UTF-8 string of message. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Returns true on success, false on failure.</dd></dl>
+<p>Titles longer than 48 characters and messages longer than 200 characters will be trimmed. </p>
 
 </div>
 </div>

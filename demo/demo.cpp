@@ -80,5 +80,9 @@ int main()
         return 1 ;
     }
 
+    if(!tray.show_balloon_tip("Balloon Tips", "Successfully Exited!")) {
+        return 1 ;
+    }
+
     return 0 ;
 }

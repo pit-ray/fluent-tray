@@ -1116,6 +1116,45 @@ namespace fluent_tray
         }
 
         /**
+         * @brief Shows a balloon tip that is placed in the notification area.
+         * @param [in] title The UTF-8 string of title.
+         * @param [in] message The UTF-8 string of message.
+         * @return Returns true on success, false on failure.
+         * @details  Titles longer than 48 characters and messages longer than 200 characters will be trimmed.
+         */
+        bool show_balloon_tip(const std::string& title, const std::string& message) {
+            NOTIFYICONDATAW notify_data = {} ;
+            notify_data.cbSize = sizeof(notify_data) ;
+            notify_data.hWnd = hwnd_ ;
+            notify_data.uFlags = NIF_INFO ;
+
+            std::wstring title_wide ;
+            if(!util::string2wstring(title, title_wide)) {
+                return false ;
+            }
+
+            std::wstring message_wide ;
+            if(!util::string2wstring(message, message_wide)) {
+                return false ;
+            }
+
+            auto title_len = title_wide.length() > 47 ? 47 : title_wide.length() ;
+            std::wmemcpy(
+                notify_data.szInfoTitle, title_wide.c_str(), title_len) ;
+            notify_data.szInfoTitle[title_len] = L'\0' ;
+
+            auto message_len = message_wide.length() > 199 ? 199 : message_wide.length() ;
+            std::wmemcpy(
+                notify_data.szInfo, message_wide.c_str(), message_len) ;
+            notify_data.szInfo[message_len] = L'\0' ;
+
+            if(!Shell_NotifyIconW(NIM_MODIFY, &notify_data)) {
+                return false ;
+            }
+            return true ;
+        }
+
+        /**
          * @brief Get the current status of tray.
          * @return The status.
          */

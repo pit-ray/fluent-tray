@@ -1063,390 +1063,424 @@ $(function() { codefold.init(0); });
 <div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>        }</div>
 </div>
 <div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span> </div>
-<div class="foldopen" id="foldopen01122" data-start="{" data-end="}">
-<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480"> 1122</a></span>        <a class="code hl_enumeration" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9">TrayStatus</a> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480">status</a>() const noexcept {</div>
-<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>            <span class="keywordflow">return</span> status_ ;</div>
-<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>        }</div>
-</div>
-<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span> </div>
-<div class="foldopen" id="foldopen01129" data-start="{" data-end="}">
-<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54"> 1129</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54">stop</a>() noexcept {</div>
-<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>            status_ = <a class="code hl_enumvalue" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9aa6e1bf62fac48fd2812be19930b1e369">TrayStatus::SHOULD_STOP</a> ;</div>
-<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>        }</div>
-</div>
-<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span> </div>
-<div class="foldopen" id="foldopen01137" data-start="{" data-end="}">
-<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598"> 1137</a></span>        std::vector&lt;FluentMenu&gt;::iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598">begin</a>() noexcept {</div>
-<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>            <span class="keywordflow">return</span> menus_.begin() ;</div>
-<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>        }</div>
-</div>
+<div class="foldopen" id="foldopen01125" data-start="{" data-end="}">
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a02abceeae16c5342ae88af29f12cd08a"> 1125</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a02abceeae16c5342ae88af29f12cd08a">show_balloon_tip</a>(<span class="keyword">const</span> std::string&amp; title, <span class="keyword">const</span> std::string&amp; message) {</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>            NOTIFYICONDATAW notify_data = {} ;</div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>            notify_data.cbSize = <span class="keyword">sizeof</span>(notify_data) ;</div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>            notify_data.hWnd = hwnd_ ;</div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>            notify_data.uFlags = NIF_INFO ;</div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span> </div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>            std::wstring title_wide ;</div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(title, title_wide)) {</div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>            }</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span> </div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>            std::wstring message_wide ;</div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(message, message_wide)) {</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>            }</div>
 <div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span> </div>
-<div class="foldopen" id="foldopen01145" data-start="{" data-end="}">
-<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346"> 1145</a></span>        std::vector&lt;FluentMenu&gt;::iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346">end</a>() noexcept {</div>
-<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>            <span class="keywordflow">return</span> menus_.end() ;</div>
-<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>        }</div>
-</div>
-<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span> </div>
-<div class="foldopen" id="foldopen01153" data-start="{" data-end="}">
-<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472"> 1153</a></span>        std::vector&lt;FluentMenu&gt;::const_iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472">cbegin</a>() const noexcept {</div>
-<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>            <span class="keywordflow">return</span> menus_.cbegin() ;</div>
+<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>            <span class="keyword">auto</span> title_len = title_wide.length() &gt; 47 ? 47 : title_wide.length() ;</div>
+<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>            std::wmemcpy(</div>
+<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>                notify_data.szInfoTitle, title_wide.c_str(), title_len) ;</div>
+<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>            notify_data.szInfoTitle[title_len] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
+<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span> </div>
+<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>            <span class="keyword">auto</span> message_len = message_wide.length() &gt; 199 ? 199 : message_wide.length() ;</div>
+<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>            std::wmemcpy(</div>
+<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>                notify_data.szInfo, message_wide.c_str(), message_len) ;</div>
+<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span>            notify_data.szInfo[message_len] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
+<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span> </div>
+<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>            <span class="keywordflow">if</span>(!Shell_NotifyIconW(NIM_MODIFY, &amp;notify_data)) {</div>
+<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>            }</div>
+<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>            <span class="keywordflow">return</span> true ;</div>
 <div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>        }</div>
 </div>
 <div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span> </div>
 <div class="foldopen" id="foldopen01161" data-start="{" data-end="}">
-<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553"> 1161</a></span>        std::vector&lt;FluentMenu&gt;::const_iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553">cend</a>() const noexcept {</div>
-<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>            <span class="keywordflow">return</span> menus_.cend() ;</div>
+<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480"> 1161</a></span>        <a class="code hl_enumeration" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9">TrayStatus</a> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480">status</a>() const noexcept {</div>
+<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>            <span class="keywordflow">return</span> status_ ;</div>
 <div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>        }</div>
 </div>
 <div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span> </div>
-<div class="foldopen" id="foldopen01169" data-start="{" data-end="}">
-<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90"> 1169</a></span>        <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90">front</a>() {</div>
-<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>            <span class="keywordflow">return</span> menus_.front() ;</div>
-<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>        }</div>
+<div class="foldopen" id="foldopen01168" data-start="{" data-end="}">
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54"> 1168</a></span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54">stop</a>() noexcept {</div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>            status_ = <a class="code hl_enumvalue" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9aa6e1bf62fac48fd2812be19930b1e369">TrayStatus::SHOULD_STOP</a> ;</div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>        }</div>
 </div>
-<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span> </div>
-<div class="foldopen" id="foldopen01177" data-start="{" data-end="}">
-<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3"> 1177</a></span>        <span class="keyword">const</span> <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3">front</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>            <span class="keywordflow">return</span> menus_.front() ;</div>
-<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span>        }</div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span> </div>
+<div class="foldopen" id="foldopen01176" data-start="{" data-end="}">
+<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598"> 1176</a></span>        std::vector&lt;FluentMenu&gt;::iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598">begin</a>() noexcept {</div>
+<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span>            <span class="keywordflow">return</span> menus_.begin() ;</div>
+<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>        }</div>
 </div>
-<div class="line"><a id="l01180" name="l01180"></a><span class="lineno"> 1180</span> </div>
-<div class="foldopen" id="foldopen01185" data-start="{" data-end="}">
-<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f"> 1185</a></span>        <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f">back</a>() {</div>
-<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>            <span class="keywordflow">return</span> menus_.back() ;</div>
-<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>        }</div>
+<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span> </div>
+<div class="foldopen" id="foldopen01184" data-start="{" data-end="}">
+<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346"> 1184</a></span>        std::vector&lt;FluentMenu&gt;::iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346">end</a>() noexcept {</div>
+<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>            <span class="keywordflow">return</span> menus_.end() ;</div>
+<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>        }</div>
 </div>
-<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span> </div>
-<div class="foldopen" id="foldopen01193" data-start="{" data-end="}">
-<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1"> 1193</a></span>        <span class="keyword">const</span> <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1">back</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>            <span class="keywordflow">return</span> menus_.back() ;</div>
-<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>        }</div>
+<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span> </div>
+<div class="foldopen" id="foldopen01192" data-start="{" data-end="}">
+<div class="line"><a id="l01192" name="l01192"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472"> 1192</a></span>        std::vector&lt;FluentMenu&gt;::const_iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472">cbegin</a>() const noexcept {</div>
+<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>            <span class="keywordflow">return</span> menus_.cbegin() ;</div>
+<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>        }</div>
 </div>
-<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span> </div>
-<div class="foldopen" id="foldopen01201" data-start="{" data-end="}">
-<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec"> 1201</a></span>        std::size_t <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec">count_menus</a>() const noexcept {</div>
-<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>            <span class="keywordflow">return</span> menus_.size() ;</div>
-<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>        }</div>
+<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span> </div>
+<div class="foldopen" id="foldopen01200" data-start="{" data-end="}">
+<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553"> 1200</a></span>        std::vector&lt;FluentMenu&gt;::const_iterator <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553">cend</a>() const noexcept {</div>
+<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>            <span class="keywordflow">return</span> menus_.cend() ;</div>
+<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>        }</div>
 </div>
-<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span> </div>
-<div class="foldopen" id="foldopen01213" data-start="{" data-end="}">
-<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726"> 1213</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726">set_font</a>(</div>
-<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>                LONG font_size=0,</div>
-<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>                LONG font_weight=0,</div>
-<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span>                <span class="keyword">const</span> std::string&amp; font_name=<span class="stringliteral">&quot;&quot;</span>) {</div>
-<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>            NONCLIENTMETRICSW metrics ;</div>
-<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span>            metrics.cbSize = <span class="keyword">sizeof</span>(metrics) ;</div>
+<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span> </div>
+<div class="foldopen" id="foldopen01208" data-start="{" data-end="}">
+<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90"> 1208</a></span>        <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90">front</a>() {</div>
+<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>            <span class="keywordflow">return</span> menus_.front() ;</div>
+<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>        }</div>
+</div>
+<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span> </div>
+<div class="foldopen" id="foldopen01216" data-start="{" data-end="}">
+<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3"> 1216</a></span>        <span class="keyword">const</span> <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3">front</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>            <span class="keywordflow">return</span> menus_.front() ;</div>
+<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span>        }</div>
+</div>
 <div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span> </div>
-<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span>            <span class="keywordflow">if</span>(!SystemParametersInfoW(</div>
-<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>                    SPI_GETNONCLIENTMETRICS,</div>
-<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>                    metrics.cbSize, &amp;metrics, 0)) {</div>
-<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>            }</div>
-<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span> </div>
-<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>            <span class="keyword">auto</span>&amp; logfont = metrics.lfCaptionFont ;</div>
-<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>            <span class="keywordflow">if</span>(font_size != 0) {</div>
-<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>                logfont.lfHeight = font_size ;</div>
-<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>            }</div>
-<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>                logfont.lfHeight = 20 ;</div>
-<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>            }</div>
-<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>            <span class="keywordflow">if</span>(font_weight != 0) {</div>
-<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>                logfont.lfWeight = font_weight ;</div>
-<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>            }</div>
-<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>                logfont.lfWeight = FW_MEDIUM ;</div>
-<div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span>            }</div>
-<div class="line"><a id="l01239" name="l01239"></a><span class="lineno"> 1239</span> </div>
-<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"> 1240</span>            <span class="keywordflow">if</span>(!font_name.empty()) {</div>
-<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>                std::wstring font_name_wide ;</div>
-<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>                <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(font_name, font_name_wide)) {</div>
-<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span>                    <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01244" name="l01244"></a><span class="lineno"> 1244</span>                }</div>
-<div class="line"><a id="l01245" name="l01245"></a><span class="lineno"> 1245</span>                <span class="keyword">auto</span>&amp; dst = logfont.lfFaceName ;</div>
-<div class="line"><a id="l01246" name="l01246"></a><span class="lineno"> 1246</span> </div>
-<div class="line"><a id="l01247" name="l01247"></a><span class="lineno"> 1247</span>                <span class="keywordflow">if</span>(font_name_wide.size() &lt; LF_FACESIZE) {</div>
-<div class="line"><a id="l01248" name="l01248"></a><span class="lineno"> 1248</span>                    std::wmemcpy(</div>
-<div class="line"><a id="l01249" name="l01249"></a><span class="lineno"> 1249</span>                        dst, font_name_wide.c_str(), font_name_wide.length()) ;</div>
-<div class="line"><a id="l01250" name="l01250"></a><span class="lineno"> 1250</span>                    dst[font_name_wide.size()] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
-<div class="line"><a id="l01251" name="l01251"></a><span class="lineno"> 1251</span>                }</div>
-<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"> 1252</span>                <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"> 1253</span>                    std::wmemcpy(</div>
-<div class="line"><a id="l01254" name="l01254"></a><span class="lineno"> 1254</span>                        dst, font_name_wide.c_str(), LF_FACESIZE - 1) ;</div>
-<div class="line"><a id="l01255" name="l01255"></a><span class="lineno"> 1255</span>                    dst[LF_FACESIZE - 1] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
-<div class="line"><a id="l01256" name="l01256"></a><span class="lineno"> 1256</span>                }</div>
-<div class="line"><a id="l01257" name="l01257"></a><span class="lineno"> 1257</span>            }</div>
+<div class="foldopen" id="foldopen01224" data-start="{" data-end="}">
+<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f"> 1224</a></span>        <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f">back</a>() {</div>
+<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>            <span class="keywordflow">return</span> menus_.back() ;</div>
+<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>        }</div>
+</div>
+<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span> </div>
+<div class="foldopen" id="foldopen01232" data-start="{" data-end="}">
+<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1"> 1232</a></span>        <span class="keyword">const</span> <a class="code hl_class" href="classfluent__tray_1_1_fluent_menu.html">FluentMenu</a>&amp; <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1">back</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>            <span class="keywordflow">return</span> menus_.back() ;</div>
+<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>        }</div>
+</div>
+<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span> </div>
+<div class="foldopen" id="foldopen01240" data-start="{" data-end="}">
+<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec"> 1240</a></span>        std::size_t <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec">count_menus</a>() const noexcept {</div>
+<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>            <span class="keywordflow">return</span> menus_.size() ;</div>
+<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>        }</div>
+</div>
+<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span> </div>
+<div class="foldopen" id="foldopen01252" data-start="{" data-end="}">
+<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726"> 1252</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726">set_font</a>(</div>
+<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"> 1253</span>                LONG font_size=0,</div>
+<div class="line"><a id="l01254" name="l01254"></a><span class="lineno"> 1254</span>                LONG font_weight=0,</div>
+<div class="line"><a id="l01255" name="l01255"></a><span class="lineno"> 1255</span>                <span class="keyword">const</span> std::string&amp; font_name=<span class="stringliteral">&quot;&quot;</span>) {</div>
+<div class="line"><a id="l01256" name="l01256"></a><span class="lineno"> 1256</span>            NONCLIENTMETRICSW metrics ;</div>
+<div class="line"><a id="l01257" name="l01257"></a><span class="lineno"> 1257</span>            metrics.cbSize = <span class="keyword">sizeof</span>(metrics) ;</div>
 <div class="line"><a id="l01258" name="l01258"></a><span class="lineno"> 1258</span> </div>
-<div class="line"><a id="l01259" name="l01259"></a><span class="lineno"> 1259</span>            <span class="keyword">auto</span> font = CreateFontIndirectW(&amp;logfont) ;</div>
-<div class="line"><a id="l01260" name="l01260"></a><span class="lineno"> 1260</span>            <span class="keywordflow">if</span>(!font) {</div>
-<div class="line"><a id="l01261" name="l01261"></a><span class="lineno"> 1261</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01262" name="l01262"></a><span class="lineno"> 1262</span>            }</div>
-<div class="line"><a id="l01263" name="l01263"></a><span class="lineno"> 1263</span>            font_ = font ;</div>
-<div class="line"><a id="l01264" name="l01264"></a><span class="lineno"> 1264</span>            menu_font_size_ = std::abs(logfont.lfHeight) ;</div>
-<div class="line"><a id="l01265" name="l01265"></a><span class="lineno"> 1265</span> </div>
-<div class="line"><a id="l01266" name="l01266"></a><span class="lineno"> 1266</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a id="l01267" name="l01267"></a><span class="lineno"> 1267</span>        }</div>
+<div class="line"><a id="l01259" name="l01259"></a><span class="lineno"> 1259</span>            <span class="keywordflow">if</span>(!SystemParametersInfoW(</div>
+<div class="line"><a id="l01260" name="l01260"></a><span class="lineno"> 1260</span>                    SPI_GETNONCLIENTMETRICS,</div>
+<div class="line"><a id="l01261" name="l01261"></a><span class="lineno"> 1261</span>                    metrics.cbSize, &amp;metrics, 0)) {</div>
+<div class="line"><a id="l01262" name="l01262"></a><span class="lineno"> 1262</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01263" name="l01263"></a><span class="lineno"> 1263</span>            }</div>
+<div class="line"><a id="l01264" name="l01264"></a><span class="lineno"> 1264</span> </div>
+<div class="line"><a id="l01265" name="l01265"></a><span class="lineno"> 1265</span>            <span class="keyword">auto</span>&amp; logfont = metrics.lfCaptionFont ;</div>
+<div class="line"><a id="l01266" name="l01266"></a><span class="lineno"> 1266</span>            <span class="keywordflow">if</span>(font_size != 0) {</div>
+<div class="line"><a id="l01267" name="l01267"></a><span class="lineno"> 1267</span>                logfont.lfHeight = font_size ;</div>
+<div class="line"><a id="l01268" name="l01268"></a><span class="lineno"> 1268</span>            }</div>
+<div class="line"><a id="l01269" name="l01269"></a><span class="lineno"> 1269</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01270" name="l01270"></a><span class="lineno"> 1270</span>                logfont.lfHeight = 20 ;</div>
+<div class="line"><a id="l01271" name="l01271"></a><span class="lineno"> 1271</span>            }</div>
+<div class="line"><a id="l01272" name="l01272"></a><span class="lineno"> 1272</span>            <span class="keywordflow">if</span>(font_weight != 0) {</div>
+<div class="line"><a id="l01273" name="l01273"></a><span class="lineno"> 1273</span>                logfont.lfWeight = font_weight ;</div>
+<div class="line"><a id="l01274" name="l01274"></a><span class="lineno"> 1274</span>            }</div>
+<div class="line"><a id="l01275" name="l01275"></a><span class="lineno"> 1275</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01276" name="l01276"></a><span class="lineno"> 1276</span>                logfont.lfWeight = FW_MEDIUM ;</div>
+<div class="line"><a id="l01277" name="l01277"></a><span class="lineno"> 1277</span>            }</div>
+<div class="line"><a id="l01278" name="l01278"></a><span class="lineno"> 1278</span> </div>
+<div class="line"><a id="l01279" name="l01279"></a><span class="lineno"> 1279</span>            <span class="keywordflow">if</span>(!font_name.empty()) {</div>
+<div class="line"><a id="l01280" name="l01280"></a><span class="lineno"> 1280</span>                std::wstring font_name_wide ;</div>
+<div class="line"><a id="l01281" name="l01281"></a><span class="lineno"> 1281</span>                <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(font_name, font_name_wide)) {</div>
+<div class="line"><a id="l01282" name="l01282"></a><span class="lineno"> 1282</span>                    <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>                }</div>
+<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"> 1284</span>                <span class="keyword">auto</span>&amp; dst = logfont.lfFaceName ;</div>
+<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span> </div>
+<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>                <span class="keywordflow">if</span>(font_name_wide.size() &lt; LF_FACESIZE) {</div>
+<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span>                    std::wmemcpy(</div>
+<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span>                        dst, font_name_wide.c_str(), font_name_wide.length()) ;</div>
+<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span>                    dst[font_name_wide.size()] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
+<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span>                }</div>
+<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>                <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span>                    std::wmemcpy(</div>
+<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>                        dst, font_name_wide.c_str(), LF_FACESIZE - 1) ;</div>
+<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>                    dst[LF_FACESIZE - 1] = L<span class="charliteral">&#39;\0&#39;</span> ;</div>
+<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>                }</div>
+<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>            }</div>
+<div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span> </div>
+<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span>            <span class="keyword">auto</span> font = CreateFontIndirectW(&amp;logfont) ;</div>
+<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>            <span class="keywordflow">if</span>(!font) {</div>
+<div class="line"><a id="l01300" name="l01300"></a><span class="lineno"> 1300</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>            }</div>
+<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>            font_ = font ;</div>
+<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span>            menu_font_size_ = std::abs(logfont.lfHeight) ;</div>
+<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span> </div>
+<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span>        }</div>
 </div>
-<div class="line"><a id="l01268" name="l01268"></a><span class="lineno"> 1268</span> </div>
-<div class="foldopen" id="foldopen01276" data-start="{" data-end="}">
-<div class="line"><a id="l01276" name="l01276"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c"> 1276</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c">set_color</a>(</div>
-<div class="line"><a id="l01277" name="l01277"></a><span class="lineno"> 1277</span>                <span class="keyword">const</span> COLORREF&amp; text_color=CLR_INVALID,</div>
-<div class="line"><a id="l01278" name="l01278"></a><span class="lineno"> 1278</span>                <span class="keyword">const</span> COLORREF&amp; back_color=CLR_INVALID,</div>
-<div class="line"><a id="l01279" name="l01279"></a><span class="lineno"> 1279</span>                <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> color_decay=10) {</div>
-<div class="line"><a id="l01280" name="l01280"></a><span class="lineno"> 1280</span>            <span class="keywordflow">if</span>(back_color == CLR_INVALID) {</div>
-<div class="line"><a id="l01281" name="l01281"></a><span class="lineno"> 1281</span>                <span class="comment">// Get Taskbar color</span></div>
-<div class="line"><a id="l01282" name="l01282"></a><span class="lineno"> 1282</span>                APPBARDATA abd ;</div>
-<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>                abd.cbSize = <span class="keyword">sizeof</span>(abd) ;</div>
-<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"> 1284</span>                <span class="keywordflow">if</span>(!SHAppBarMessage(ABM_GETTASKBARPOS, &amp;abd)) {</div>
-<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span>                    <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>                }</div>
-<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span> </div>
-<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> dc = GetDC(NULL)) {</div>
-<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span>                    <span class="comment">// Get Taskbar color</span></div>
-<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span>                    back_color_ = GetPixel(dc, abd.rc.left + 1, abd.rc.top + 1) ;</div>
-<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>                    <span class="keywordflow">if</span>(back_color_ == CLR_INVALID) {</div>
-<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span>                        <span class="comment">// if failed, use COLOR_WINDOW color.</span></div>
-<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>                        back_color_ = GetSysColor(COLOR_WINDOW) ;</div>
-<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>                    }</div>
-<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>                    <span class="keywordflow">if</span>(!ReleaseDC(NULL, dc)) {</div>
-<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>                        <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span>                    }</div>
-<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span>                }</div>
-<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>            }</div>
-<div class="line"><a id="l01300" name="l01300"></a><span class="lineno"> 1300</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>                back_color_ = back_color ;</div>
-<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>            }</div>
-<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span> </div>
-<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span>            <span class="keyword">auto</span> back_gray_color_ = <a class="code hl_function" href="namespacefluent__tray_1_1util.html#ae27f77f25d417d904181fa0895abfc46">util::rgb2gray</a>(back_color_) ;</div>
-<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span> </div>
-<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span>            <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> ash_value = back_gray_color_ ;</div>
-<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span>            <span class="keywordflow">if</span>(back_gray_color_ &lt; 128) {</div>
-<div class="line"><a id="l01308" name="l01308"></a><span class="lineno"> 1308</span>                ash_value = <span class="keyword">static_cast&lt;</span>decltype(ash_value)<span class="keyword">&gt;</span>(</div>
-<div class="line"><a id="l01309" name="l01309"></a><span class="lineno"> 1309</span>                    (std::min)(ash_value + color_decay, 255)) ;</div>
-<div class="line"><a id="l01310" name="l01310"></a><span class="lineno"> 1310</span>            }</div>
-<div class="line"><a id="l01311" name="l01311"></a><span class="lineno"> 1311</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01312" name="l01312"></a><span class="lineno"> 1312</span>                ash_value = <span class="keyword">static_cast&lt;</span>decltype(ash_value)<span class="keyword">&gt;</span>(</div>
-<div class="line"><a id="l01313" name="l01313"></a><span class="lineno"> 1313</span>                    (std::max)(ash_value - color_decay, 0)) ;</div>
-<div class="line"><a id="l01314" name="l01314"></a><span class="lineno"> 1314</span>            }</div>
-<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"> 1315</span>            ash_color_ = RGB(ash_value, ash_value, ash_value) ;</div>
-<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span> </div>
-<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span>            <span class="keywordflow">if</span>(text_color == CLR_INVALID) {</div>
-<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>                text_color_ = GetSysColor(COLOR_WINDOWTEXT) ;</div>
-<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>                <span class="keywordflow">if</span>(back_gray_color_ &lt; 128) {</div>
-<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>                    <span class="comment">// if dark background, use light text color.</span></div>
-<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>                    text_color_ = 0x00FFFFFF &amp; ~text_color_ ;</div>
-<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>                }</div>
-<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>            }</div>
-<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span>                text_color_ = text_color ;</div>
-<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>            }</div>
-<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span> </div>
-<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span>            <span class="keywordflow">if</span>(back_brush_) {</div>
-<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span>                <span class="comment">// Release old handle.</span></div>
-<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>                <span class="keywordflow">if</span>(!DeleteObject(back_brush_)) {</div>
-<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>                    <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>                }</div>
-<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>            }</div>
-<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>            back_brush_ = CreateSolidBrush(back_color_) ;</div>
-<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>            <span class="keywordflow">if</span>(back_brush_ == NULL) {</div>
-<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span>            }</div>
-<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span> </div>
-<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span>            <span class="keywordflow">if</span>(!SetClassLongPtr(</div>
-<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span>                    hwnd_, GCLP_HBRBACKGROUND,</div>
-<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>                    <span class="keyword">reinterpret_cast&lt;</span>LONG_PTR<span class="keyword">&gt;</span>(back_brush_))) {</div>
-<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span>            }</div>
+<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span> </div>
+<div class="foldopen" id="foldopen01315" data-start="{" data-end="}">
+<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c"> 1315</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c">set_color</a>(</div>
+<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span>                <span class="keyword">const</span> COLORREF&amp; text_color=CLR_INVALID,</div>
+<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span>                <span class="keyword">const</span> COLORREF&amp; back_color=CLR_INVALID,</div>
+<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>                <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> color_decay=10) {</div>
+<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>            <span class="keywordflow">if</span>(back_color == CLR_INVALID) {</div>
+<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>                <span class="comment">// Get Taskbar color</span></div>
+<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>                APPBARDATA abd ;</div>
+<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>                abd.cbSize = <span class="keyword">sizeof</span>(abd) ;</div>
+<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>                <span class="keywordflow">if</span>(!SHAppBarMessage(ABM_GETTASKBARPOS, &amp;abd)) {</div>
+<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>                    <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span>                }</div>
+<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span> </div>
+<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> dc = GetDC(NULL)) {</div>
+<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span>                    <span class="comment">// Get Taskbar color</span></div>
+<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span>                    back_color_ = GetPixel(dc, abd.rc.left + 1, abd.rc.top + 1) ;</div>
+<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>                    <span class="keywordflow">if</span>(back_color_ == CLR_INVALID) {</div>
+<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>                        <span class="comment">// if failed, use COLOR_WINDOW color.</span></div>
+<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>                        back_color_ = GetSysColor(COLOR_WINDOW) ;</div>
+<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>                    }</div>
+<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>                    <span class="keywordflow">if</span>(!ReleaseDC(NULL, dc)) {</div>
+<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>                        <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>                    }</div>
+<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span>                }</div>
+<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span>            }</div>
+<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span>                back_color_ = back_color ;</div>
+<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>            }</div>
+<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span> </div>
+<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span>            <span class="keyword">auto</span> back_gray_color_ = <a class="code hl_function" href="namespacefluent__tray_1_1util.html#ae27f77f25d417d904181fa0895abfc46">util::rgb2gray</a>(back_color_) ;</div>
 <div class="line"><a id="l01344" name="l01344"></a><span class="lineno"> 1344</span> </div>
-<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>            <span class="keywordflow">return</span> true ;</div>
-<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>        }</div>
+<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>            <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> ash_value = back_gray_color_ ;</div>
+<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>            <span class="keywordflow">if</span>(back_gray_color_ &lt; 128) {</div>
+<div class="line"><a id="l01347" name="l01347"></a><span class="lineno"> 1347</span>                ash_value = <span class="keyword">static_cast&lt;</span>decltype(ash_value)<span class="keyword">&gt;</span>(</div>
+<div class="line"><a id="l01348" name="l01348"></a><span class="lineno"> 1348</span>                    (std::min)(ash_value + color_decay, 255)) ;</div>
+<div class="line"><a id="l01349" name="l01349"></a><span class="lineno"> 1349</span>            }</div>
+<div class="line"><a id="l01350" name="l01350"></a><span class="lineno"> 1350</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01351" name="l01351"></a><span class="lineno"> 1351</span>                ash_value = <span class="keyword">static_cast&lt;</span>decltype(ash_value)<span class="keyword">&gt;</span>(</div>
+<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"> 1352</span>                    (std::max)(ash_value - color_decay, 0)) ;</div>
+<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span>            }</div>
+<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>            ash_color_ = RGB(ash_value, ash_value, ash_value) ;</div>
+<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span> </div>
+<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>            <span class="keywordflow">if</span>(text_color == CLR_INVALID) {</div>
+<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>                text_color_ = GetSysColor(COLOR_WINDOWTEXT) ;</div>
+<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span>                <span class="keywordflow">if</span>(back_gray_color_ &lt; 128) {</div>
+<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>                    <span class="comment">// if dark background, use light text color.</span></div>
+<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span>                    text_color_ = 0x00FFFFFF &amp; ~text_color_ ;</div>
+<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span>                }</div>
+<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span>            }</div>
+<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span>                text_color_ = text_color ;</div>
+<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span>            }</div>
+<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span> </div>
+<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>            <span class="keywordflow">if</span>(back_brush_) {</div>
+<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span>                <span class="comment">// Release old handle.</span></div>
+<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span>                <span class="keywordflow">if</span>(!DeleteObject(back_brush_)) {</div>
+<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span>                    <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>                }</div>
+<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span>            }</div>
+<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span>            back_brush_ = CreateSolidBrush(back_color_) ;</div>
+<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span>            <span class="keywordflow">if</span>(back_brush_ == NULL) {</div>
+<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>            }</div>
+<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span> </div>
+<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span>            <span class="keywordflow">if</span>(!SetClassLongPtr(</div>
+<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span>                    hwnd_, GCLP_HBRBACKGROUND,</div>
+<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span>                    <span class="keyword">reinterpret_cast&lt;</span>LONG_PTR<span class="keyword">&gt;</span>(back_brush_))) {</div>
+<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span>            }</div>
+<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span> </div>
+<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>            <span class="keywordflow">return</span> true ;</div>
+<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>        }</div>
 </div>
-<div class="line"><a id="l01347" name="l01347"></a><span class="lineno"> 1347</span> </div>
-<div class="foldopen" id="foldopen01352" data-start="{" data-end="}">
-<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157"> 1352</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157">change_icon</a>(<span class="keyword">const</span> std::string&amp; icon_path) {</div>
-<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span>            <span class="keywordflow">if</span>(icon_data_.cbSize &gt; 0) {</div>
-<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>                <span class="keywordflow">if</span>(!Shell_NotifyIconW(NIM_DELETE, &amp;icon_data_)) {</div>
-<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span>                    <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>                }</div>
-<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>            }</div>
-<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span> </div>
-<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>            ZeroMemory(&amp;icon_data_, <span class="keyword">sizeof</span>(icon_data_)) ;</div>
-<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span> </div>
-<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span>            <span class="keywordflow">if</span>(icon_path.empty()) {</div>
-<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span>                icon_data_.cbSize = 0 ;</div>
-<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>                <span class="keywordflow">return</span> true ;</div>
-<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span>            }</div>
-<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span> </div>
-<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span>            std::wstring icon_path_wide ;</div>
-<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(icon_path, icon_path_wide)) {</div>
-<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span>            }</div>
-<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span> </div>
-<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#a2f257499f348efef6365fd557a67268c">util::exists</a>(icon_path_wide)) {</div>
-<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span>            }</div>
-<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span> </div>
-<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span>            icon_data_.cbSize = <span class="keyword">sizeof</span>(icon_data_) ;</div>
-<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>            icon_data_.hWnd = hwnd_ ;</div>
-<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span>            icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;</div>
-<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span>            icon_data_.uCallbackMessage = MESSAGE_ID ;</div>
-<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span>            icon_data_.hIcon = <span class="keyword">static_cast&lt;</span>HICON<span class="keyword">&gt;</span>(</div>
-<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span>                LoadImageW(</div>
-<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span>                    NULL, icon_path_wide.c_str(),</div>
-<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span>                    IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;</div>
-<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span>            wcscpy_s(icon_data_.szTip, app_name_.c_str()) ;</div>
-<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>            icon_data_.dwState = NIS_SHAREDICON ;</div>
-<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>            icon_data_.dwStateMask = NIS_SHAREDICON ;</div>
 <div class="line"><a id="l01386" name="l01386"></a><span class="lineno"> 1386</span> </div>
-<div class="line"><a id="l01387" name="l01387"></a><span class="lineno"> 1387</span>            <span class="keywordflow">if</span>(!Shell_NotifyIconW(NIM_ADD, &amp;icon_data_)) {</div>
-<div class="line"><a id="l01388" name="l01388"></a><span class="lineno"> 1388</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01389" name="l01389"></a><span class="lineno"> 1389</span>            }</div>
-<div class="line"><a id="l01390" name="l01390"></a><span class="lineno"> 1390</span>            <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#aba45a136ce6348aa79da7805624a59c6">hide_menu_window</a>() ;</div>
-<div class="line"><a id="l01391" name="l01391"></a><span class="lineno"> 1391</span> </div>
-<div class="line"><a id="l01392" name="l01392"></a><span class="lineno"> 1392</span>            <span class="keywordflow">return</span> true ;</div>
-<div class="line"><a id="l01393" name="l01393"></a><span class="lineno"> 1393</span>        }</div>
+<div class="foldopen" id="foldopen01391" data-start="{" data-end="}">
+<div class="line"><a id="l01391" name="l01391"></a><span class="lineno"><a class="line" href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157"> 1391</a></span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157">change_icon</a>(<span class="keyword">const</span> std::string&amp; icon_path) {</div>
+<div class="line"><a id="l01392" name="l01392"></a><span class="lineno"> 1392</span>            <span class="keywordflow">if</span>(icon_data_.cbSize &gt; 0) {</div>
+<div class="line"><a id="l01393" name="l01393"></a><span class="lineno"> 1393</span>                <span class="keywordflow">if</span>(!Shell_NotifyIconW(NIM_DELETE, &amp;icon_data_)) {</div>
+<div class="line"><a id="l01394" name="l01394"></a><span class="lineno"> 1394</span>                    <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>                }</div>
+<div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span>            }</div>
+<div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span> </div>
+<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span>            ZeroMemory(&amp;icon_data_, <span class="keyword">sizeof</span>(icon_data_)) ;</div>
+<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span> </div>
+<div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>            <span class="keywordflow">if</span>(icon_path.empty()) {</div>
+<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>                icon_data_.cbSize = 0 ;</div>
+<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>                <span class="keywordflow">return</span> true ;</div>
+<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>            }</div>
+<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span> </div>
+<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>            std::wstring icon_path_wide ;</div>
+<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"> 1406</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#ab0d843e97ec384341852be5d1dcf3fba">util::string2wstring</a>(icon_path, icon_path_wide)) {</div>
+<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>            }</div>
+<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span> </div>
+<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>            <span class="keywordflow">if</span>(!<a class="code hl_function" href="namespacefluent__tray_1_1util.html#a2f257499f348efef6365fd557a67268c">util::exists</a>(icon_path_wide)) {</div>
+<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>            }</div>
+<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span> </div>
+<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>            icon_data_.cbSize = <span class="keyword">sizeof</span>(icon_data_) ;</div>
+<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>            icon_data_.hWnd = hwnd_ ;</div>
+<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>            icon_data_.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP ;</div>
+<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>            icon_data_.uCallbackMessage = MESSAGE_ID ;</div>
+<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>            icon_data_.hIcon = <span class="keyword">static_cast&lt;</span>HICON<span class="keyword">&gt;</span>(</div>
+<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>                LoadImageW(</div>
+<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>                    NULL, icon_path_wide.c_str(),</div>
+<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>                    IMAGE_ICON, 0, 0, LR_LOADFROMFILE)) ;</div>
+<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>            wcscpy_s(icon_data_.szTip, app_name_.c_str()) ;</div>
+<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>            icon_data_.dwState = NIS_SHAREDICON ;</div>
+<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>            icon_data_.dwStateMask = NIS_SHAREDICON ;</div>
+<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span> </div>
+<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>            <span class="keywordflow">if</span>(!Shell_NotifyIconW(NIM_ADD, &amp;icon_data_)) {</div>
+<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>            }</div>
+<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>            <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#aba45a136ce6348aa79da7805624a59c6">hide_menu_window</a>() ;</div>
+<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span> </div>
+<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>            <span class="keywordflow">return</span> true ;</div>
+<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>        }</div>
 </div>
-<div class="line"><a id="l01394" name="l01394"></a><span class="lineno"> 1394</span> </div>
-<div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span>        <span class="keyword">static</span> LRESULT CALLBACK callback(</div>
-<div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span>                HWND hwnd,</div>
-<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span>                UINT msg,</div>
-<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span>                WPARAM wparam,</div>
-<div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>                LPARAM lparam) {</div>
-<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>            <span class="keyword">auto</span> get_instance = [hwnd]() -&gt; <a class="code hl_class" href="classfluent__tray_1_1_fluent_tray.html">FluentTray</a>* {</div>
-<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>                <span class="keyword">auto</span> upper_addr = GetWindowLongW(hwnd, 0) ;</div>
-<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>                <span class="keywordflow">if</span>(!upper_addr) {</div>
-<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span>                    <span class="keywordflow">return</span> nullptr ;</div>
-<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>                }</div>
-<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"> 1406</span> </div>
-<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>                <span class="keyword">auto</span> lower_addr = GetWindowLongW(hwnd, <span class="keyword">sizeof</span>(LONG)) ;</div>
-<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>                <span class="keywordflow">if</span>(!lower_addr) {</div>
-<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>                    <span class="keywordflow">return</span> nullptr ;</div>
-<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>                }</div>
-<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span> </div>
-<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>                <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6a6631acc765ddc89ba36976bbe0175f">FluentTray</a>* self ;</div>
-<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>                <a class="code hl_function" href="namespacefluent__tray_1_1util.html#a7c27457aa89604dc7f6d7ecbb17a0fc4">util::concatenate_bits</a>(upper_addr, lower_addr, self) ;</div>
-<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>                <span class="keywordflow">return</span> self ;</div>
-<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>            } ;</div>
-<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span> </div>
-<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>            <span class="keywordflow">if</span>(msg == WM_DESTROY || msg == WM_QUIT || msg == WM_CLOSE) {</div>
-<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>                    self-&gt;stop() ;</div>
-<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>                    <span class="keywordflow">return</span> 0 ;</div>
-<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>                }</div>
-<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>            }</div>
-<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_ACTIVATE &amp;&amp; wparam == WA_INACTIVE) {</div>
-<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>                    <span class="keywordflow">if</span>(!self-&gt;hide_menu_window()) {</div>
-<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>                        self-&gt;fail() ;</div>
-<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span>                    }</div>
-<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>                    <span class="keywordflow">return</span> 0 ;</div>
-<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>                }</div>
-<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>            }</div>
-<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_DRAWITEM) {</div>
-<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span>                    <span class="keyword">auto</span> item = <span class="keyword">reinterpret_cast&lt;</span>LPDRAWITEMSTRUCT<span class="keyword">&gt;</span>(lparam) ;</div>
-<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_window(item-&gt;hwndItem) ;</div>
-<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
-<div class="line"><a id="l01436" name="l01436"></a><span class="lineno"> 1436</span>                        <span class="keywordflow">return</span> FALSE ;</div>
-<div class="line"><a id="l01437" name="l01437"></a><span class="lineno"> 1437</span>                    }</div>
-<div class="line"><a id="l01438" name="l01438"></a><span class="lineno"> 1438</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
-<div class="line"><a id="l01439" name="l01439"></a><span class="lineno"> 1439</span>                    <span class="keywordflow">if</span>(!menu.draw_menu(item, self-&gt;font_)) {</div>
-<div class="line"><a id="l01440" name="l01440"></a><span class="lineno"> 1440</span>                        self-&gt;fail() ;</div>
-<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"> 1441</span>                        <span class="keywordflow">return</span> FALSE ;</div>
-<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"> 1442</span>                    }</div>
-<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>                    <span class="keywordflow">return</span> TRUE ;</div>
+<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span> </div>
+<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span>        <span class="keyword">static</span> LRESULT CALLBACK callback(</div>
+<div class="line"><a id="l01436" name="l01436"></a><span class="lineno"> 1436</span>                HWND hwnd,</div>
+<div class="line"><a id="l01437" name="l01437"></a><span class="lineno"> 1437</span>                UINT msg,</div>
+<div class="line"><a id="l01438" name="l01438"></a><span class="lineno"> 1438</span>                WPARAM wparam,</div>
+<div class="line"><a id="l01439" name="l01439"></a><span class="lineno"> 1439</span>                LPARAM lparam) {</div>
+<div class="line"><a id="l01440" name="l01440"></a><span class="lineno"> 1440</span>            <span class="keyword">auto</span> get_instance = [hwnd]() -&gt; <a class="code hl_class" href="classfluent__tray_1_1_fluent_tray.html">FluentTray</a>* {</div>
+<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"> 1441</span>                <span class="keyword">auto</span> upper_addr = GetWindowLongW(hwnd, 0) ;</div>
+<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"> 1442</span>                <span class="keywordflow">if</span>(!upper_addr) {</div>
+<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>                    <span class="keywordflow">return</span> nullptr ;</div>
 <div class="line"><a id="l01444" name="l01444"></a><span class="lineno"> 1444</span>                }</div>
-<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span>            }</div>
-<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_CTLCOLORBTN) {</div>
-<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"> 1448</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_window(<span class="keyword">reinterpret_cast&lt;</span>HWND<span class="keyword">&gt;</span>(lparam)) ;</div>
-<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
-<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span>                        <span class="keywordflow">return</span> DefWindowProc(hwnd, msg, wparam, lparam) ;</div>
-<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>                    }</div>
-<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
-<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span>                    <span class="keywordflow">return</span> <span class="keyword">reinterpret_cast&lt;</span>LRESULT<span class="keyword">&gt;</span>(menu.background_brush()) ;</div>
-<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>                }</div>
-<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span>            }</div>
-<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_COMMAND) {</div>
+<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span> </div>
+<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>                <span class="keyword">auto</span> lower_addr = GetWindowLongW(hwnd, <span class="keyword">sizeof</span>(LONG)) ;</div>
+<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span>                <span class="keywordflow">if</span>(!lower_addr) {</div>
+<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"> 1448</span>                    <span class="keywordflow">return</span> nullptr ;</div>
+<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>                }</div>
+<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span> </div>
+<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>                <a class="code hl_function" href="classfluent__tray_1_1_fluent_tray.html#a6a6631acc765ddc89ba36976bbe0175f">FluentTray</a>* self ;</div>
+<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>                <a class="code hl_function" href="namespacefluent__tray_1_1util.html#a7c27457aa89604dc7f6d7ecbb17a0fc4">util::concatenate_bits</a>(upper_addr, lower_addr, self) ;</div>
+<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span>                <span class="keywordflow">return</span> self ;</div>
+<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>            } ;</div>
+<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span> </div>
+<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span>            <span class="keywordflow">if</span>(msg == WM_DESTROY || msg == WM_QUIT || msg == WM_CLOSE) {</div>
 <div class="line"><a id="l01457" name="l01457"></a><span class="lineno"> 1457</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01458" name="l01458"></a><span class="lineno"> 1458</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_id(LOWORD(wparam)) ;</div>
-<div class="line"><a id="l01459" name="l01459"></a><span class="lineno"> 1459</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
-<div class="line"><a id="l01460" name="l01460"></a><span class="lineno"> 1460</span>                        <span class="keywordflow">return</span> FALSE ;</div>
-<div class="line"><a id="l01461" name="l01461"></a><span class="lineno"> 1461</span>                    }</div>
-<div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
-<div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>                    <span class="keywordflow">if</span>(!menu.process_click_event()) {</div>
-<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>                        self-&gt;stop() ;</div>
-<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>                        <span class="keywordflow">return</span> FALSE ;</div>
+<div class="line"><a id="l01458" name="l01458"></a><span class="lineno"> 1458</span>                    self-&gt;stop() ;</div>
+<div class="line"><a id="l01459" name="l01459"></a><span class="lineno"> 1459</span>                    <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a id="l01460" name="l01460"></a><span class="lineno"> 1460</span>                }</div>
+<div class="line"><a id="l01461" name="l01461"></a><span class="lineno"> 1461</span>            }</div>
+<div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_ACTIVATE &amp;&amp; wparam == WA_INACTIVE) {</div>
+<div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
+<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>                    <span class="keywordflow">if</span>(!self-&gt;hide_menu_window()) {</div>
+<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>                        self-&gt;fail() ;</div>
 <div class="line"><a id="l01466" name="l01466"></a><span class="lineno"> 1466</span>                    }</div>
-<div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>                    <span class="keywordflow">if</span>(menu.is_toggleable()) {</div>
-<div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span>                        <span class="comment">// Update the toggle menu for checkmark</span></div>
-<div class="line"><a id="l01469" name="l01469"></a><span class="lineno"> 1469</span>                        <span class="keywordflow">if</span>(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {</div>
-<div class="line"><a id="l01470" name="l01470"></a><span class="lineno"> 1470</span>                            <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01471" name="l01471"></a><span class="lineno"> 1471</span>                        }</div>
-<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>                    }</div>
-<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"> 1473</span>                    <span class="keywordflow">return</span> TRUE ;</div>
-<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>                }</div>
-<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>            }</div>
-<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == MESSAGE_ID) {  <span class="comment">//On NotifyIcon</span></div>
-<div class="line"><a id="l01477" name="l01477"></a><span class="lineno"> 1477</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
-<div class="line"><a id="l01478" name="l01478"></a><span class="lineno"> 1478</span>                    <span class="keywordflow">if</span>(lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {</div>
-<div class="line"><a id="l01479" name="l01479"></a><span class="lineno"> 1479</span>                        self-&gt;show_menu_window() ;</div>
-<div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span>                        <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>                    <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span>                }</div>
+<div class="line"><a id="l01469" name="l01469"></a><span class="lineno"> 1469</span>            }</div>
+<div class="line"><a id="l01470" name="l01470"></a><span class="lineno"> 1470</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_DRAWITEM) {</div>
+<div class="line"><a id="l01471" name="l01471"></a><span class="lineno"> 1471</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
+<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>                    <span class="keyword">auto</span> item = <span class="keyword">reinterpret_cast&lt;</span>LPDRAWITEMSTRUCT<span class="keyword">&gt;</span>(lparam) ;</div>
+<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"> 1473</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_window(item-&gt;hwndItem) ;</div>
+<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
+<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>                        <span class="keywordflow">return</span> FALSE ;</div>
+<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>                    }</div>
+<div class="line"><a id="l01477" name="l01477"></a><span class="lineno"> 1477</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
+<div class="line"><a id="l01478" name="l01478"></a><span class="lineno"> 1478</span>                    <span class="keywordflow">if</span>(!menu.draw_menu(item, self-&gt;font_)) {</div>
+<div class="line"><a id="l01479" name="l01479"></a><span class="lineno"> 1479</span>                        self-&gt;fail() ;</div>
+<div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span>                        <span class="keywordflow">return</span> FALSE ;</div>
 <div class="line"><a id="l01481" name="l01481"></a><span class="lineno"> 1481</span>                    }</div>
-<div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>                }</div>
-<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>            }</div>
-<div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span> </div>
-<div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>            <span class="keywordflow">return</span> DefWindowProc(hwnd, msg, wparam, lparam) ;</div>
-<div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>        }</div>
-<div class="line"><a id="l01487" name="l01487"></a><span class="lineno"> 1487</span> </div>
-<div class="line"><a id="l01488" name="l01488"></a><span class="lineno"> 1488</span>        <span class="keywordtype">int</span> get_menu_index_from_window(HWND hwnd) {</div>
-<div class="line"><a id="l01489" name="l01489"></a><span class="lineno"> 1489</span>            <span class="keywordtype">int</span> i = 0 ;</div>
-<div class="line"><a id="l01490" name="l01490"></a><span class="lineno"> 1490</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; m : menus_) {</div>
-<div class="line"><a id="l01491" name="l01491"></a><span class="lineno"> 1491</span>                <span class="keywordflow">if</span>(m.window_handle() == hwnd) {</div>
-<div class="line"><a id="l01492" name="l01492"></a><span class="lineno"> 1492</span>                    <span class="keywordflow">return</span> i ;</div>
+<div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>                    <span class="keywordflow">return</span> TRUE ;</div>
+<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>                }</div>
+<div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span>            }</div>
+<div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_CTLCOLORBTN) {</div>
+<div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
+<div class="line"><a id="l01487" name="l01487"></a><span class="lineno"> 1487</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_window(<span class="keyword">reinterpret_cast&lt;</span>HWND<span class="keyword">&gt;</span>(lparam)) ;</div>
+<div class="line"><a id="l01488" name="l01488"></a><span class="lineno"> 1488</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
+<div class="line"><a id="l01489" name="l01489"></a><span class="lineno"> 1489</span>                        <span class="keywordflow">return</span> DefWindowProc(hwnd, msg, wparam, lparam) ;</div>
+<div class="line"><a id="l01490" name="l01490"></a><span class="lineno"> 1490</span>                    }</div>
+<div class="line"><a id="l01491" name="l01491"></a><span class="lineno"> 1491</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
+<div class="line"><a id="l01492" name="l01492"></a><span class="lineno"> 1492</span>                    <span class="keywordflow">return</span> <span class="keyword">reinterpret_cast&lt;</span>LRESULT<span class="keyword">&gt;</span>(menu.background_brush()) ;</div>
 <div class="line"><a id="l01493" name="l01493"></a><span class="lineno"> 1493</span>                }</div>
-<div class="line"><a id="l01494" name="l01494"></a><span class="lineno"> 1494</span>                i ++ ;</div>
-<div class="line"><a id="l01495" name="l01495"></a><span class="lineno"> 1495</span>            }</div>
-<div class="line"><a id="l01496" name="l01496"></a><span class="lineno"> 1496</span>            <span class="keywordflow">return</span> -1 ;</div>
-<div class="line"><a id="l01497" name="l01497"></a><span class="lineno"> 1497</span>        }</div>
-<div class="line"><a id="l01498" name="l01498"></a><span class="lineno"> 1498</span> </div>
-<div class="line"><a id="l01499" name="l01499"></a><span class="lineno"> 1499</span>        <span class="keywordtype">int</span> get_menu_index_from_id(WORD <span class="keywordtype">id</span>) {</div>
-<div class="line"><a id="l01500" name="l01500"></a><span class="lineno"> 1500</span>            <span class="keywordtype">int</span> i = 0 ;</div>
-<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; m : menus_) {</div>
-<div class="line"><a id="l01502" name="l01502"></a><span class="lineno"> 1502</span>                <span class="keywordflow">if</span>(m.id() == <span class="keyword">static_cast&lt;</span>std::size_t<span class="keyword">&gt;</span>(<span class="keywordtype">id</span>)) {</div>
-<div class="line"><a id="l01503" name="l01503"></a><span class="lineno"> 1503</span>                    <span class="keywordflow">return</span> i ;</div>
-<div class="line"><a id="l01504" name="l01504"></a><span class="lineno"> 1504</span>                }</div>
-<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>                i ++ ;</div>
-<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>            }</div>
-<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>            <span class="keywordflow">return</span> -1 ;</div>
-<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>        }</div>
-<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span> </div>
-<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span>        <span class="keywordtype">void</span> get_message(MSG&amp; message) {</div>
-<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>            <span class="keywordflow">if</span>(PeekMessage(&amp;message, hwnd_, 0, 0, PM_REMOVE)) {</div>
-<div class="line"><a id="l01512" name="l01512"></a><span class="lineno"> 1512</span>                DispatchMessage(&amp;message) ;</div>
-<div class="line"><a id="l01513" name="l01513"></a><span class="lineno"> 1513</span>            }</div>
-<div class="line"><a id="l01514" name="l01514"></a><span class="lineno"> 1514</span>        }</div>
-<div class="line"><a id="l01515" name="l01515"></a><span class="lineno"> 1515</span> </div>
-<div class="line"><a id="l01516" name="l01516"></a><span class="lineno"> 1516</span>        <span class="keywordtype">void</span> fail() noexcept {</div>
-<div class="line"><a id="l01517" name="l01517"></a><span class="lineno"> 1517</span>            status_ = <a class="code hl_enumvalue" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9ab9e14d9b2886bcff408b85aefa780419">TrayStatus::FAILED</a> ;</div>
-<div class="line"><a id="l01518" name="l01518"></a><span class="lineno"> 1518</span>        }</div>
-<div class="line"><a id="l01519" name="l01519"></a><span class="lineno"> 1519</span> </div>
-<div class="line"><a id="l01520" name="l01520"></a><span class="lineno"> 1520</span>        <span class="keywordtype">bool</span> change_menu_back_color(FluentMenu&amp; menu, COLORREF new_color) {</div>
-<div class="line"><a id="l01521" name="l01521"></a><span class="lineno"> 1521</span>            <span class="keywordflow">if</span>(!menu.set_color(</div>
-<div class="line"><a id="l01522" name="l01522"></a><span class="lineno"> 1522</span>                    text_color_, new_color, ash_color_)) {</div>
-<div class="line"><a id="l01523" name="l01523"></a><span class="lineno"> 1523</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>            }</div>
-<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>            <span class="comment">// Redraw</span></div>
-<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span>            <span class="keywordflow">if</span>(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {</div>
-<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span>                <span class="keywordflow">return</span> false ;</div>
-<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>            }</div>
-<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>            <span class="keywordflow">return</span> true ;</div>
-<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>        }</div>
-<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>    } ;</div>
+<div class="line"><a id="l01494" name="l01494"></a><span class="lineno"> 1494</span>            }</div>
+<div class="line"><a id="l01495" name="l01495"></a><span class="lineno"> 1495</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == WM_COMMAND) {</div>
+<div class="line"><a id="l01496" name="l01496"></a><span class="lineno"> 1496</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
+<div class="line"><a id="l01497" name="l01497"></a><span class="lineno"> 1497</span>                    <span class="keyword">auto</span> menu_idx = self-&gt;get_menu_index_from_id(LOWORD(wparam)) ;</div>
+<div class="line"><a id="l01498" name="l01498"></a><span class="lineno"> 1498</span>                    <span class="keywordflow">if</span>(menu_idx &lt; 0) {</div>
+<div class="line"><a id="l01499" name="l01499"></a><span class="lineno"> 1499</span>                        <span class="keywordflow">return</span> FALSE ;</div>
+<div class="line"><a id="l01500" name="l01500"></a><span class="lineno"> 1500</span>                    }</div>
+<div class="line"><a id="l01501" name="l01501"></a><span class="lineno"> 1501</span>                    <span class="keyword">auto</span>&amp; menu = self-&gt;menus_[menu_idx] ;</div>
+<div class="line"><a id="l01502" name="l01502"></a><span class="lineno"> 1502</span>                    <span class="keywordflow">if</span>(!menu.process_click_event()) {</div>
+<div class="line"><a id="l01503" name="l01503"></a><span class="lineno"> 1503</span>                        self-&gt;stop() ;</div>
+<div class="line"><a id="l01504" name="l01504"></a><span class="lineno"> 1504</span>                        <span class="keywordflow">return</span> FALSE ;</div>
+<div class="line"><a id="l01505" name="l01505"></a><span class="lineno"> 1505</span>                    }</div>
+<div class="line"><a id="l01506" name="l01506"></a><span class="lineno"> 1506</span>                    <span class="keywordflow">if</span>(menu.is_toggleable()) {</div>
+<div class="line"><a id="l01507" name="l01507"></a><span class="lineno"> 1507</span>                        <span class="comment">// Update the toggle menu for checkmark</span></div>
+<div class="line"><a id="l01508" name="l01508"></a><span class="lineno"> 1508</span>                        <span class="keywordflow">if</span>(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {</div>
+<div class="line"><a id="l01509" name="l01509"></a><span class="lineno"> 1509</span>                            <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01510" name="l01510"></a><span class="lineno"> 1510</span>                        }</div>
+<div class="line"><a id="l01511" name="l01511"></a><span class="lineno"> 1511</span>                    }</div>
+<div class="line"><a id="l01512" name="l01512"></a><span class="lineno"> 1512</span>                    <span class="keywordflow">return</span> TRUE ;</div>
+<div class="line"><a id="l01513" name="l01513"></a><span class="lineno"> 1513</span>                }</div>
+<div class="line"><a id="l01514" name="l01514"></a><span class="lineno"> 1514</span>            }</div>
+<div class="line"><a id="l01515" name="l01515"></a><span class="lineno"> 1515</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span>(msg == MESSAGE_ID) {  <span class="comment">//On NotifyIcon</span></div>
+<div class="line"><a id="l01516" name="l01516"></a><span class="lineno"> 1516</span>                <span class="keywordflow">if</span>(<span class="keyword">auto</span> self = get_instance()) {</div>
+<div class="line"><a id="l01517" name="l01517"></a><span class="lineno"> 1517</span>                    <span class="keywordflow">if</span>(lparam == WM_LBUTTONUP || lparam == WM_RBUTTONUP) {</div>
+<div class="line"><a id="l01518" name="l01518"></a><span class="lineno"> 1518</span>                        self-&gt;show_menu_window() ;</div>
+<div class="line"><a id="l01519" name="l01519"></a><span class="lineno"> 1519</span>                        <span class="keywordflow">return</span> 0 ;</div>
+<div class="line"><a id="l01520" name="l01520"></a><span class="lineno"> 1520</span>                    }</div>
+<div class="line"><a id="l01521" name="l01521"></a><span class="lineno"> 1521</span>                }</div>
+<div class="line"><a id="l01522" name="l01522"></a><span class="lineno"> 1522</span>            }</div>
+<div class="line"><a id="l01523" name="l01523"></a><span class="lineno"> 1523</span> </div>
+<div class="line"><a id="l01524" name="l01524"></a><span class="lineno"> 1524</span>            <span class="keywordflow">return</span> DefWindowProc(hwnd, msg, wparam, lparam) ;</div>
+<div class="line"><a id="l01525" name="l01525"></a><span class="lineno"> 1525</span>        }</div>
+<div class="line"><a id="l01526" name="l01526"></a><span class="lineno"> 1526</span> </div>
+<div class="line"><a id="l01527" name="l01527"></a><span class="lineno"> 1527</span>        <span class="keywordtype">int</span> get_menu_index_from_window(HWND hwnd) {</div>
+<div class="line"><a id="l01528" name="l01528"></a><span class="lineno"> 1528</span>            <span class="keywordtype">int</span> i = 0 ;</div>
+<div class="line"><a id="l01529" name="l01529"></a><span class="lineno"> 1529</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; m : menus_) {</div>
+<div class="line"><a id="l01530" name="l01530"></a><span class="lineno"> 1530</span>                <span class="keywordflow">if</span>(m.window_handle() == hwnd) {</div>
+<div class="line"><a id="l01531" name="l01531"></a><span class="lineno"> 1531</span>                    <span class="keywordflow">return</span> i ;</div>
+<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span>                }</div>
+<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span>                i ++ ;</div>
+<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span>            }</div>
+<div class="line"><a id="l01535" name="l01535"></a><span class="lineno"> 1535</span>            <span class="keywordflow">return</span> -1 ;</div>
+<div class="line"><a id="l01536" name="l01536"></a><span class="lineno"> 1536</span>        }</div>
+<div class="line"><a id="l01537" name="l01537"></a><span class="lineno"> 1537</span> </div>
+<div class="line"><a id="l01538" name="l01538"></a><span class="lineno"> 1538</span>        <span class="keywordtype">int</span> get_menu_index_from_id(WORD <span class="keywordtype">id</span>) {</div>
+<div class="line"><a id="l01539" name="l01539"></a><span class="lineno"> 1539</span>            <span class="keywordtype">int</span> i = 0 ;</div>
+<div class="line"><a id="l01540" name="l01540"></a><span class="lineno"> 1540</span>            <span class="keywordflow">for</span>(<span class="keyword">auto</span>&amp; m : menus_) {</div>
+<div class="line"><a id="l01541" name="l01541"></a><span class="lineno"> 1541</span>                <span class="keywordflow">if</span>(m.id() == <span class="keyword">static_cast&lt;</span>std::size_t<span class="keyword">&gt;</span>(<span class="keywordtype">id</span>)) {</div>
+<div class="line"><a id="l01542" name="l01542"></a><span class="lineno"> 1542</span>                    <span class="keywordflow">return</span> i ;</div>
+<div class="line"><a id="l01543" name="l01543"></a><span class="lineno"> 1543</span>                }</div>
+<div class="line"><a id="l01544" name="l01544"></a><span class="lineno"> 1544</span>                i ++ ;</div>
+<div class="line"><a id="l01545" name="l01545"></a><span class="lineno"> 1545</span>            }</div>
+<div class="line"><a id="l01546" name="l01546"></a><span class="lineno"> 1546</span>            <span class="keywordflow">return</span> -1 ;</div>
+<div class="line"><a id="l01547" name="l01547"></a><span class="lineno"> 1547</span>        }</div>
+<div class="line"><a id="l01548" name="l01548"></a><span class="lineno"> 1548</span> </div>
+<div class="line"><a id="l01549" name="l01549"></a><span class="lineno"> 1549</span>        <span class="keywordtype">void</span> get_message(MSG&amp; message) {</div>
+<div class="line"><a id="l01550" name="l01550"></a><span class="lineno"> 1550</span>            <span class="keywordflow">if</span>(PeekMessage(&amp;message, hwnd_, 0, 0, PM_REMOVE)) {</div>
+<div class="line"><a id="l01551" name="l01551"></a><span class="lineno"> 1551</span>                DispatchMessage(&amp;message) ;</div>
+<div class="line"><a id="l01552" name="l01552"></a><span class="lineno"> 1552</span>            }</div>
+<div class="line"><a id="l01553" name="l01553"></a><span class="lineno"> 1553</span>        }</div>
+<div class="line"><a id="l01554" name="l01554"></a><span class="lineno"> 1554</span> </div>
+<div class="line"><a id="l01555" name="l01555"></a><span class="lineno"> 1555</span>        <span class="keywordtype">void</span> fail() noexcept {</div>
+<div class="line"><a id="l01556" name="l01556"></a><span class="lineno"> 1556</span>            status_ = <a class="code hl_enumvalue" href="namespacefluent__tray.html#aa636c02ce33a7170c008cd007f4831f9ab9e14d9b2886bcff408b85aefa780419">TrayStatus::FAILED</a> ;</div>
+<div class="line"><a id="l01557" name="l01557"></a><span class="lineno"> 1557</span>        }</div>
+<div class="line"><a id="l01558" name="l01558"></a><span class="lineno"> 1558</span> </div>
+<div class="line"><a id="l01559" name="l01559"></a><span class="lineno"> 1559</span>        <span class="keywordtype">bool</span> change_menu_back_color(FluentMenu&amp; menu, COLORREF new_color) {</div>
+<div class="line"><a id="l01560" name="l01560"></a><span class="lineno"> 1560</span>            <span class="keywordflow">if</span>(!menu.set_color(</div>
+<div class="line"><a id="l01561" name="l01561"></a><span class="lineno"> 1561</span>                    text_color_, new_color, ash_color_)) {</div>
+<div class="line"><a id="l01562" name="l01562"></a><span class="lineno"> 1562</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01563" name="l01563"></a><span class="lineno"> 1563</span>            }</div>
+<div class="line"><a id="l01564" name="l01564"></a><span class="lineno"> 1564</span>            <span class="comment">// Redraw</span></div>
+<div class="line"><a id="l01565" name="l01565"></a><span class="lineno"> 1565</span>            <span class="keywordflow">if</span>(!InvalidateRect(menu.window_handle(), NULL, TRUE)) {</div>
+<div class="line"><a id="l01566" name="l01566"></a><span class="lineno"> 1566</span>                <span class="keywordflow">return</span> false ;</div>
+<div class="line"><a id="l01567" name="l01567"></a><span class="lineno"> 1567</span>            }</div>
+<div class="line"><a id="l01568" name="l01568"></a><span class="lineno"> 1568</span>            <span class="keywordflow">return</span> true ;</div>
+<div class="line"><a id="l01569" name="l01569"></a><span class="lineno"> 1569</span>        }</div>
+<div class="line"><a id="l01570" name="l01570"></a><span class="lineno"> 1570</span>    } ;</div>
 </div>
-<div class="line"><a id="l01532" name="l01532"></a><span class="lineno"> 1532</span>}</div>
-<div class="line"><a id="l01533" name="l01533"></a><span class="lineno"> 1533</span> </div>
-<div class="line"><a id="l01534" name="l01534"></a><span class="lineno"> 1534</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l01571" name="l01571"></a><span class="lineno"> 1571</span>}</div>
+<div class="line"><a id="l01572" name="l01572"></a><span class="lineno"> 1572</span> </div>
+<div class="line"><a id="l01573" name="l01573"></a><span class="lineno"> 1573</span><span class="preprocessor">#endif</span></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_menu_html"><div class="ttname"><a href="classfluent__tray_1_1_fluent_menu.html">fluent_tray::FluentMenu</a></div><div class="ttdoc">Class with information on each menu.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:258</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_menu_html_a2bc0f8cecbad31b84a4576b54cdb6f5e"><div class="ttname"><a href="classfluent__tray_1_1_fluent_menu.html#a2bc0f8cecbad31b84a4576b54cdb6f5e">fluent_tray::FluentMenu::is_mouse_over</a></div><div class="ttdeci">bool is_mouse_over() const</div><div class="ttdoc">Checks whether the mouse cursor is over the menu or not.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:403</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_menu_html_a3ac09df2b11379cb9c7bc1ca5e33df44"><div class="ttname"><a href="classfluent__tray_1_1_fluent_menu.html#a3ac09df2b11379cb9c7bc1ca5e33df44">fluent_tray::FluentMenu::set_color</a></div><div class="ttdeci">bool set_color(const COLORREF &amp;text_color=CLR_INVALID, const COLORREF &amp;back_color=CLR_INVALID, const COLORREF &amp;border_color=CLR_INVALID) noexcept</div><div class="ttdoc">Set the menu color.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:508</div></div>
@@ -1472,34 +1506,35 @@ $(function() { codefold.init(0); });
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_menu_html_ad822c8a3bed795638e96948fa225d116"><div class="ttname"><a href="classfluent__tray_1_1_fluent_menu.html#ad822c8a3bed795638e96948fa225d116">fluent_tray::FluentMenu::check</a></div><div class="ttdeci">void check() noexcept</div><div class="ttdoc">Checks the menu if it is toggleable.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:419</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_menu_html_ae65751fe8b47abcae26e99d2cc092c85"><div class="ttname"><a href="classfluent__tray_1_1_fluent_menu.html#ae65751fe8b47abcae26e99d2cc092c85">fluent_tray::FluentMenu::FluentMenu</a></div><div class="ttdeci">FluentMenu(const FluentMenu &amp;)=default</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html">fluent_tray::FluentTray</a></div><div class="ttdoc">Class with information on the entire tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:680</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a02abceeae16c5342ae88af29f12cd08a"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a02abceeae16c5342ae88af29f12cd08a">fluent_tray::FluentTray::show_balloon_tip</a></div><div class="ttdeci">bool show_balloon_tip(const std::string &amp;title, const std::string &amp;message)</div><div class="ttdoc">Shows a balloon tip that is placed in the notification area.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1125</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a08af8b2acf71cea22983b2e45151046b"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a08af8b2acf71cea22983b2e45151046b">fluent_tray::FluentTray::~FluentTray</a></div><div class="ttdeci">virtual ~FluentTray() noexcept</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:744</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a0e64e2f5bea8af804f3c38502fb20346"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346">fluent_tray::FluentTray::end</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::iterator end() noexcept</div><div class="ttdoc">Returns an iterator to the end of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1145</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a0e64e2f5bea8af804f3c38502fb20346"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a0e64e2f5bea8af804f3c38502fb20346">fluent_tray::FluentTray::end</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::iterator end() noexcept</div><div class="ttdoc">Returns an iterator to the end of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1184</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a1b6b94997f7fe0161e52adc583411b24"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a1b6b94997f7fe0161e52adc583411b24">fluent_tray::FluentTray::operator=</a></div><div class="ttdeci">FluentTray &amp; operator=(const FluentTray &amp;)=delete</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a2287afaa97f4f41c4346c5f2f939857c"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a2287afaa97f4f41c4346c5f2f939857c">fluent_tray::FluentTray::show_menu_window</a></div><div class="ttdeci">bool show_menu_window()</div><div class="ttdoc">Show the menu window above the tray icon.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1006</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a24733799536bdaa1f8d2f0504d4ba4ac"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a24733799536bdaa1f8d2f0504d4ba4ac">fluent_tray::FluentTray::create_tray</a></div><div class="ttdeci">bool create_tray(const std::string &amp;app_name, const std::string &amp;icon_path=&quot;&quot;, LONG menu_x_margin=5, LONG menu_y_margin=5, LONG menu_x_pad=5, LONG menu_y_pad=5, unsigned char opacity=255, bool round_corner=true)</div><div class="ttdoc">Initialize tray and create icon on tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:765</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a25d65dcfec83f0ea7de8055530000e54"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54">fluent_tray::FluentTray::stop</a></div><div class="ttdeci">void stop() noexcept</div><div class="ttdoc">Exit the tray successfully.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1129</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a25d65dcfec83f0ea7de8055530000e54"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a25d65dcfec83f0ea7de8055530000e54">fluent_tray::FluentTray::stop</a></div><div class="ttdeci">void stop() noexcept</div><div class="ttdoc">Exit the tray successfully.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1168</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a2c09e0d56e7b0a2100dfd1330405c449"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a2c09e0d56e7b0a2100dfd1330405c449">fluent_tray::FluentTray::operator=</a></div><div class="ttdeci">FluentTray &amp; operator=(FluentTray &amp;&amp;)=default</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a32afb7010725031f3242e0c51c56a4ad"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a32afb7010725031f3242e0c51c56a4ad">fluent_tray::FluentTray::add_menu</a></div><div class="ttdeci">bool add_menu(const std::string &amp;label_text=&quot;&quot;, const std::string &amp;icon_path=&quot;&quot;, bool toggleable=false, const std::string &amp;checkmark=&quot;✓&quot;, const std::function&lt; bool(void)&gt; &amp;callback=[] {return true ;}, const std::function&lt; bool(void)&gt; &amp;unchecked_callback=[] {return true ;})</div><div class="ttdoc">Add a menu in order from the top.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:898</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a435a8474b6d141044cd324bb45e6d726"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726">fluent_tray::FluentTray::set_font</a></div><div class="ttdeci">bool set_font(LONG font_size=0, LONG font_weight=0, const std::string &amp;font_name=&quot;&quot;)</div><div class="ttdoc">Set font information to draw menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1213</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a599e83a0b01cbbaecf20e8e19c734480"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480">fluent_tray::FluentTray::status</a></div><div class="ttdeci">TrayStatus status() const noexcept</div><div class="ttdoc">Get the current status of tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1122</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a63dfc8e752b444100a525f27b1b96db1"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1">fluent_tray::FluentTray::back</a></div><div class="ttdeci">const FluentMenu &amp; back() const</div><div class="ttdoc">Returns the const reference to the last of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1193</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a6833da7c8fb8bb3d27470aa45af6b157"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157">fluent_tray::FluentTray::change_icon</a></div><div class="ttdeci">bool change_icon(const std::string &amp;icon_path)</div><div class="ttdoc">Load the image file and change the icon.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1352</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a435a8474b6d141044cd324bb45e6d726"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726">fluent_tray::FluentTray::set_font</a></div><div class="ttdeci">bool set_font(LONG font_size=0, LONG font_weight=0, const std::string &amp;font_name=&quot;&quot;)</div><div class="ttdoc">Set font information to draw menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1252</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a599e83a0b01cbbaecf20e8e19c734480"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a599e83a0b01cbbaecf20e8e19c734480">fluent_tray::FluentTray::status</a></div><div class="ttdeci">TrayStatus status() const noexcept</div><div class="ttdoc">Get the current status of tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1161</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a63dfc8e752b444100a525f27b1b96db1"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a63dfc8e752b444100a525f27b1b96db1">fluent_tray::FluentTray::back</a></div><div class="ttdeci">const FluentMenu &amp; back() const</div><div class="ttdoc">Returns the const reference to the last of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1232</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a6833da7c8fb8bb3d27470aa45af6b157"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a6833da7c8fb8bb3d27470aa45af6b157">fluent_tray::FluentTray::change_icon</a></div><div class="ttdeci">bool change_icon(const std::string &amp;icon_path)</div><div class="ttdoc">Load the image file and change the icon.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1391</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a6a6631acc765ddc89ba36976bbe0175f"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a6a6631acc765ddc89ba36976bbe0175f">fluent_tray::FluentTray::FluentTray</a></div><div class="ttdeci">FluentTray()</div><div class="ttdoc">Create tray object.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:714</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a6e7ec8d9589d3b1fdb14885349f8daec"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec">fluent_tray::FluentTray::count_menus</a></div><div class="ttdeci">std::size_t count_menus() const noexcept</div><div class="ttdoc">Returns the number of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1201</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a6e7ec8d9589d3b1fdb14885349f8daec"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a6e7ec8d9589d3b1fdb14885349f8daec">fluent_tray::FluentTray::count_menus</a></div><div class="ttdeci">std::size_t count_menus() const noexcept</div><div class="ttdoc">Returns the number of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1240</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a75a1e972c3c22bc8874f16cf7465fc53"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a75a1e972c3c22bc8874f16cf7465fc53">fluent_tray::FluentTray::update_with_loop</a></div><div class="ttdeci">bool update_with_loop(std::chrono::milliseconds sleep_time=std::chrono::milliseconds(1))</div><div class="ttdoc">Create a message loop to update the tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:976</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a77cdbb20660d47cc09cf80d4b7300472"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472">fluent_tray::FluentTray::cbegin</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::const_iterator cbegin() const noexcept</div><div class="ttdoc">Returns a constant iterator to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1153</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a9374619a46a4084eb0101648e039f553"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553">fluent_tray::FluentTray::cend</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::const_iterator cend() const noexcept</div><div class="ttdoc">Returns a constant iterator to the end of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1161</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a974f39be7c66bf61750de98331b063c3"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3">fluent_tray::FluentTray::front</a></div><div class="ttdeci">const FluentMenu &amp; front() const</div><div class="ttdoc">Returns the const reference to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1177</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ab2c7402a216a5ecfd6e3b886a524418c"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c">fluent_tray::FluentTray::set_color</a></div><div class="ttdeci">bool set_color(const COLORREF &amp;text_color=CLR_INVALID, const COLORREF &amp;back_color=CLR_INVALID, unsigned char color_decay=10)</div><div class="ttdoc">Set colors to draw menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1276</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a77cdbb20660d47cc09cf80d4b7300472"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a77cdbb20660d47cc09cf80d4b7300472">fluent_tray::FluentTray::cbegin</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::const_iterator cbegin() const noexcept</div><div class="ttdoc">Returns a constant iterator to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1192</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a9374619a46a4084eb0101648e039f553"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a9374619a46a4084eb0101648e039f553">fluent_tray::FluentTray::cend</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::const_iterator cend() const noexcept</div><div class="ttdoc">Returns a constant iterator to the end of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1200</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_a974f39be7c66bf61750de98331b063c3"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#a974f39be7c66bf61750de98331b063c3">fluent_tray::FluentTray::front</a></div><div class="ttdeci">const FluentMenu &amp; front() const</div><div class="ttdoc">Returns the const reference to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1216</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ab2c7402a216a5ecfd6e3b886a524418c"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c">fluent_tray::FluentTray::set_color</a></div><div class="ttdeci">bool set_color(const COLORREF &amp;text_color=CLR_INVALID, const COLORREF &amp;back_color=CLR_INVALID, unsigned char color_decay=10)</div><div class="ttdoc">Set colors to draw menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1315</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ab973402f688be96e578b4b269f192728"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ab973402f688be96e578b4b269f192728">fluent_tray::FluentTray::add_separator</a></div><div class="ttdeci">void add_separator()</div><div class="ttdoc">Add a separator line under the last menu item added.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:921</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_aba45a136ce6348aa79da7805624a59c6"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#aba45a136ce6348aa79da7805624a59c6">fluent_tray::FluentTray::hide_menu_window</a></div><div class="ttdeci">bool hide_menu_window()</div><div class="ttdoc">Hide the menu window above the tray icon.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1111</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ac538f9a69ab74ead314a5004f717080f"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ac538f9a69ab74ead314a5004f717080f">fluent_tray::FluentTray::FluentTray</a></div><div class="ttdeci">FluentTray(const FluentTray &amp;)=delete</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_acd10bcf8769e9851026dd1302323cc90"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90">fluent_tray::FluentTray::front</a></div><div class="ttdeci">FluentMenu &amp; front()</div><div class="ttdoc">Returns the reference to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1169</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_acd10bcf8769e9851026dd1302323cc90"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#acd10bcf8769e9851026dd1302323cc90">fluent_tray::FluentTray::front</a></div><div class="ttdeci">FluentMenu &amp; front()</div><div class="ttdoc">Returns the reference to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1208</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_adc5d4b971a378080dea22225c0a8e3a1"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#adc5d4b971a378080dea22225c0a8e3a1">fluent_tray::FluentTray::FluentTray</a></div><div class="ttdeci">FluentTray(FluentTray &amp;&amp;)=default</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_add43b02d24c2934deaa755124c2930a7"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#add43b02d24c2934deaa755124c2930a7">fluent_tray::FluentTray::window_handle</a></div><div class="ttdeci">HWND window_handle() const noexcept</div><div class="ttdoc">Refer to the handle of menu window.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:998</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ae125994bac6b48aa54e0276829983598"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598">fluent_tray::FluentTray::begin</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::iterator begin() noexcept</div><div class="ttdoc">Returns an iterator to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1137</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ae125994bac6b48aa54e0276829983598"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ae125994bac6b48aa54e0276829983598">fluent_tray::FluentTray::begin</a></div><div class="ttdeci">std::vector&lt; FluentMenu &gt;::iterator begin() noexcept</div><div class="ttdoc">Returns an iterator to the beginning of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1176</div></div>
 <div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_ae5a734a0b5255bef1bf143e2996d76de"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#ae5a734a0b5255bef1bf143e2996d76de">fluent_tray::FluentTray::update</a></div><div class="ttdeci">bool update()</div><div class="ttdoc">Get window message and update tray.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:931</div></div>
-<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_afce8252232da76937872e263d5fe925f"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f">fluent_tray::FluentTray::back</a></div><div class="ttdeci">FluentMenu &amp; back()</div><div class="ttdoc">Returns the reference to the last of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1185</div></div>
+<div class="ttc" id="aclassfluent__tray_1_1_fluent_tray_html_afce8252232da76937872e263d5fe925f"><div class="ttname"><a href="classfluent__tray_1_1_fluent_tray.html#afce8252232da76937872e263d5fe925f">fluent_tray::FluentTray::back</a></div><div class="ttdeci">FluentMenu &amp; back()</div><div class="ttdoc">Returns the reference to the last of menus.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:1224</div></div>
 <div class="ttc" id="afluent__tray_8hpp_html_a5f249b81cc5c7fbeee48724fbc1ede20"><div class="ttname"><a href="fluent__tray_8hpp.html#a5f249b81cc5c7fbeee48724fbc1ede20">FLUENT_TRAY_MESSAGE_ID_OFFSET</a></div><div class="ttdeci">#define FLUENT_TRAY_MESSAGE_ID_OFFSET</div><div class="ttdoc">Unique message identifier.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:82</div></div>
 <div class="ttc" id="anamespacefluent__tray_1_1util_html_a2f257499f348efef6365fd557a67268c"><div class="ttname"><a href="namespacefluent__tray_1_1util.html#a2f257499f348efef6365fd557a67268c">fluent_tray::util::exists</a></div><div class="ttdeci">bool exists(const std::wstring &amp;path)</div><div class="ttdoc">Checks if the file exists.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:231</div></div>
 <div class="ttc" id="anamespacefluent__tray_1_1util_html_a342a1de166e89ef94dfd171c84fd2cfe"><div class="ttname"><a href="namespacefluent__tray_1_1util.html#a342a1de166e89ef94dfd171c84fd2cfe">fluent_tray::util::bit2mask</a></div><div class="ttdeci">constexpr std::size_t bit2mask(std::size_t bits) noexcept</div><div class="ttdoc">Generates a mask with the specified number of lower bits set to 1.</div><div class="ttdef"><b>Definition</b> fluent_tray.hpp:168</div></div>
