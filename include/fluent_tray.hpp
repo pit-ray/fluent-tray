@@ -1163,6 +1163,38 @@ namespace fluent_tray
         }
 
         /**
+         * @brief Returns the reference to the beginning of menus.
+         * @return Reference to the first element.
+         */
+        FluentMenu& front() {
+            return menus_.front() ;
+        }
+
+        /**
+         * @brief Returns the const reference to the beginning of menus.
+         * @return Const reference to the first element.
+         */
+        const FluentMenu& front() const {
+            return menus_.front() ;
+        }
+
+        /**
+         * @brief Returns the reference to the last of menus.
+         * @return Reference to the first element.
+         */
+        FluentMenu& back() {
+            return menus_.back() ;
+        }
+
+        /**
+         * @brief Returns the const reference to the last of menus.
+         * @return Const reference to the first element.
+         */
+        const FluentMenu& back() const {
+            return menus_.back() ;
+        }
+
+        /**
          * @brief Returns the number of menus.
          * @return The number of menus.
          */
