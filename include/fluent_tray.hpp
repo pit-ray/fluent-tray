@@ -938,7 +938,7 @@ namespace fluent_tray
 
             if(GetForegroundWindow() != hwnd_ && visible_) {
                 if(!hide_menu_window()) {
-                    status_ = TrayStatus::FAILED ;
+                    fail() ;
                     return false ;
                 }
             }
@@ -948,7 +948,7 @@ namespace fluent_tray
                 if(menu.is_mouse_over()) {
                     if(!mouse_is_over_[i]) {
                         if(!change_menu_back_color(menu, ash_color_)) {
-                            status_ = TrayStatus::FAILED ;
+                            fail() ;
                             return false ;
                         }
                     }
@@ -957,7 +957,7 @@ namespace fluent_tray
                 else {
                     if(mouse_is_over_[i]) {
                         if(!change_menu_back_color(menu, back_color_)) {
-                            status_ = TrayStatus::FAILED ;
+                            fail() ;
                             return false ;
                         }
                     }
@@ -1109,8 +1109,13 @@ namespace fluent_tray
          * @return Returns true on success, false on failure.
          */
         bool hide_menu_window() {
-            if(!ShowWindow(hwnd_, SW_HIDE)) {
-                return false ;
+            if(!visible_) {
+                return true ;
+            }
+            if(GetForegroundWindow() == hwnd_) {
+                if(!ShowWindow(hwnd_, SW_HIDE)) {
+                    return false ;
+                }
             }
             visible_ = false ;
 
