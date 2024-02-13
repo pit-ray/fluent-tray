@@ -939,6 +939,7 @@ namespace fluent_tray
             if(GetForegroundWindow() != hwnd_ && visible_) {
                 if(!hide_menu_window()) {
                     status_ = TrayStatus::FAILED ;
+                    return false ;
                 }
             }
 
