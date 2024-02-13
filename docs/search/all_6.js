@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['get_5flabel_24',['get_label',['../classfluent__tray_1_1_fluent_menu.html#ad7293e5476b7137ec738ddad3013d0a1',1,'fluent_tray::FluentMenu']]]
+  ['get_5flabel_0',['get_label',['../classfluent__tray_1_1_fluent_menu.html#ad7293e5476b7137ec738ddad3013d0a1',1,'fluent_tray::FluentMenu']]]
 ];
