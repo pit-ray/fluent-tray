@@ -937,7 +937,9 @@ namespace fluent_tray
             get_message(msg) ;
 
             if(GetForegroundWindow() != hwnd_ && visible_) {
-                hide_menu_window() ;
+                if(!hide_menu_window()) {
+                    status_ = TrayStatus::FAILED ;
+                }
             }
 
             for(std::size_t i = 0 ; i < menus_.size() ; i ++) {
@@ -945,6 +947,7 @@ namespace fluent_tray
                 if(menu.is_mouse_over()) {
                     if(!mouse_is_over_[i]) {
                         if(!change_menu_back_color(menu, ash_color_)) {
+                            status_ = TrayStatus::FAILED ;
                             return false ;
                         }
                     }
@@ -953,6 +956,7 @@ namespace fluent_tray
                 else {
                     if(mouse_is_over_[i]) {
                         if(!change_menu_back_color(menu, back_color_)) {
+                            status_ = TrayStatus::FAILED ;
                             return false ;
                         }
                     }
