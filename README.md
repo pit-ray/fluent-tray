@@ -1,4 +1,4 @@
-<p align="center"><h1>fluent-tray</h1></p>
+<h1><p align="center">fluent-tray</p></h1>
 <p align="center"><img src="https://github.com/pit-ray/fluent-tray/blob/main/assets/banner.png?raw=true" width=128/></p>
 <p align="center"><b>Fluent Design-based GUI Library for System Tray Applications</b></p>
 
