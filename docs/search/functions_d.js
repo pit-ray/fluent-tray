@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['set_5fcolor_0',['set_color',['../classfluent__tray_1_1_fluent_menu.html#a3ac09df2b11379cb9c7bc1ca5e33df44',1,'fluent_tray::FluentMenu::set_color()'],['../classfluent__tray_1_1_fluent_tray.html#ab2c7402a216a5ecfd6e3b886a524418c',1,'fluent_tray::FluentTray::set_color(const COLORREF &amp;text_color=CLR_INVALID, const COLORREF &amp;back_color=CLR_INVALID, unsigned char color_decay=10)']]],
+  ['set_5fcolor_0',['set_color',['../classfluent__tray_1_1_fluent_menu.html#a3ac09df2b11379cb9c7bc1ca5e33df44',1,'fluent_tray::FluentMenu::set_color()'],['../classfluent__tray_1_1_fluent_tray.html#a0bc296682f55360e71ac8fb9743f46e8',1,'fluent_tray::FluentTray::set_color(COLORREF text_color=CLR_INVALID, COLORREF back_color=CLR_INVALID, COLORREF border_color=CLR_INVALID)']]],
   ['set_5ffont_1',['set_font',['../classfluent__tray_1_1_fluent_tray.html#a435a8474b6d141044cd324bb45e6d726',1,'fluent_tray::FluentTray']]],
   ['show_5fballoon_5ftip_2',['show_balloon_tip',['../classfluent__tray_1_1_fluent_tray.html#a02abceeae16c5342ae88af29f12cd08a',1,'fluent_tray::FluentTray']]],
   ['show_5fmenu_5fwindow_3',['show_menu_window',['../classfluent__tray_1_1_fluent_tray.html#a2287afaa97f4f41c4346c5f2f939857c',1,'fluent_tray::FluentTray']]],
