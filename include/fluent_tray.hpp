@@ -196,7 +196,7 @@ namespace fluent_tray
          */
         template <typename InType, typename OutType>
         inline void split_bits(InType input, OutType& upper, OutType& lower) noexcept {
-            constexpr auto bits = type2bit<OutType>() ;
+            static constexpr auto bits = type2bit<OutType>() ;
             static const auto lower_mask = util::bit2mask(bits) ;
 
             upper = static_cast<OutType>(reinterpret_cast<std::size_t>(input) >> bits) ;
@@ -212,7 +212,7 @@ namespace fluent_tray
          */
         template <typename InType, typename OutType>
         inline void concatenate_bits(InType upper, InType lower, OutType& out) noexcept {
-            constexpr auto bits = type2bit<InType>() ;
+            static constexpr auto bits = type2bit<InType>() ;
             static const auto lower_mask = util::bit2mask(bits) ;
 
             auto out_upper = static_cast<std::size_t>(upper) << bits ;
@@ -775,8 +775,8 @@ namespace fluent_tray
                 const std::string& icon_path="",
                 LONG menu_x_margin=5,
                 LONG menu_y_margin=5,
-                LONG menu_x_pad=5,
-                LONG menu_y_pad=5, 
+                LONG menu_x_pad=10,
+                LONG menu_y_pad=5,
                 unsigned char opacity=255,
                 bool round_corner=true) {
             if(!util::string2wstring(app_name, app_name_)) {
