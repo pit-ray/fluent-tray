@@ -6,10 +6,9 @@
 int main()
 {
     using namespace fluent_tray ;
-    FluentTray tray{} ;
+    FluentTray tray(5, 5, 10, 5) ;
     if(!tray.create_tray(
-            "demo", "demo/assets/icon.ico",
-            5, 5, 10, 5, 240, true)) {
+            "demo", "demo/assets/icon.ico", 240, true)) {
         return 1 ;
     }
 
