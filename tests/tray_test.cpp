@@ -86,4 +86,53 @@ TEST_CASE("FluentTray Test: ") {
         CHECK(tray.update_with_loop()) ;
         CHECK_EQ(tray.status(), TrayStatus::STOPPED) ;
     }
+
+    SUBCASE("iterator") {
+        FluentTray tray ;
+        CHECK(tray.create_tray("test_iterator", "")) ;
+
+        CHECK(tray.add_menu("menu1")) ;
+        CHECK(tray.add_menu("menu2")) ;
+        CHECK(tray.add_menu("menu3")) ;
+
+        std::string label11 ;
+        CHECK(tray.front().get_label(label11)) ;
+        CHECK_EQ(label11, "menu1") ;
+
+        std::string label12 ;
+        CHECK(tray.begin()->get_label(label12)) ;
+        CHECK_EQ(label12, "menu1") ;
+
+        std::string label13 ;
+        CHECK(tray.cbegin()->get_label(label13)) ;
+        CHECK_EQ(label13, "menu1") ;
+
+        std::string label21 ;
+        CHECK((tray.begin() + 1)->get_label(label21)) ;
+        CHECK_EQ(label21, "menu2") ;
+
+        std::string label22 ;
+        CHECK((tray.cbegin() + 1)->get_label(label22)) ;
+        CHECK_EQ(label22, "menu2") ;
+
+        std::string label23 ;
+        CHECK((tray.cend() - 2)->get_label(label23)) ;
+        CHECK_EQ(label23, "menu2") ;
+
+        std::string label31 ;
+        CHECK(tray.back().get_label(label31)) ;
+        CHECK_EQ(label31, "menu3") ;
+
+        std::string label32 ;
+        CHECK((tray.cbegin() + 2)->get_label(label32)) ;
+        CHECK_EQ(label32, "menu3") ;
+
+        std::string label33 ;
+        CHECK((tray.cend() - 1)->get_label(label33)) ;
+        CHECK_EQ(label33, "menu3") ;
+
+        std::string label34 ;
+        CHECK((tray.end() - 1)->get_label(label34)) ;
+        CHECK_EQ(label34, "menu3") ;
+    }
 }
