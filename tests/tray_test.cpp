@@ -1,6 +1,4 @@
-#include "doctest.h"
-
-#include "fluent_tray.hpp"
+#include "test.hpp"
 
 #include <string.h>
 

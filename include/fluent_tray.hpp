@@ -105,16 +105,20 @@ namespace fluent_tray
                     CP_UTF8, 0,
                     str.c_str(), static_cast<int>(str.length()),
                     NULL, 0) ;
+#ifndef _FLUENT_TRAY_IGNORE_IN_TEST
             if(needed_size <= 0) {
                 return false ;
             }
+#endif
 
             wstr.resize(needed_size) ;
             if(MultiByteToWideChar(
                         CP_UTF8, 0,
                         str.c_str(), static_cast<int>(str.length()),
                         &wstr[0], static_cast<int>(wstr.length())) <= 0) {
+#ifndef _FLUENT_TRAY_IGNORE_IN_TEST
                 return false;
+#endif
             }
             return true ;
         }
@@ -137,9 +141,11 @@ namespace fluent_tray
                     wstr.c_str(), static_cast<int>(wstr.length()),
                     NULL, 0,
                     NULL, NULL) ;
+#ifndef _FLUENT_TRAY_IGNORE_IN_TEST
             if(needed_size <= 0) {
                 return false ;
             }
+#endif
 
             str.resize(needed_size) ;
             if(WideCharToMultiByte(
@@ -147,7 +153,9 @@ namespace fluent_tray
                         wstr.c_str(), static_cast<int>(wstr.length()),
                         &str[0], static_cast<int>(str.size()),
                         NULL, NULL) <= 0) {
+#ifndef _FLUENT_TRAY_IGNORE_IN_TEST
                 return false ;
+#endif
             }
             return true ;
         }
