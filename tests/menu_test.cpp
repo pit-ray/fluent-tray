@@ -16,6 +16,8 @@ TEST_CASE("FluentMenu Test: ") {
         std::string str{} ;
         CHECK(menu.get_label(str)) ;
         CHECK(str.empty()) ;
+
+        CHECK_FALSE(menu.is_mouse_over()) ;
     }
 
     SUBCASE("Error Check: create_menu") {
