@@ -135,4 +135,16 @@ TEST_CASE("FluentTray Test: ") {
         CHECK((tray.end() - 1)->get_label(label34)) ;
         CHECK_EQ(label34, "menu3") ;
     }
+
+    SUBCASE("update") {
+        FluentTray tray ;
+        CHECK(tray.create_tray("test_update", "")) ;
+
+        CHECK(tray.add_menu("menu1")) ;
+        CHECK(tray.add_menu("menu2")) ;
+        CHECK(tray.add_menu("menu3")) ;
+
+        CHECK(tray.update()) ;
+        tray.stop() ;
+    }
 }
