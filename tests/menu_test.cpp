@@ -48,5 +48,9 @@ TEST_CASE("FluentMenu Test: ") {
         CHECK(menu1.set_color(
             RGB(255, 0, 255), RGB(0, 255, 255), RGB(0, 0, 255))) ;
 
+        // Re-set the color
+        CHECK(menu1.set_color(
+            RGB(255, 0, 255), RGB(0, 255, 255), RGB(0, 0, 255))) ;
+
     }
 }
