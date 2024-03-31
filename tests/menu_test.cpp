@@ -42,4 +42,11 @@ TEST_CASE("FluentMenu Test: ") {
         menu2.uncheck() ;
         CHECK_FALSE(menu2.is_checked()) ;
     }
+
+    SUBCASE("set_color") {
+        FluentMenu menu1 ;
+        CHECK(menu1.set_color(
+            RGB(255, 0, 255), RGB(0, 255, 255), RGB(0, 0, 255))) ;
+
+    }
 }
