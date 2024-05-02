@@ -1422,7 +1422,10 @@ namespace fluent_tray
             if(!Shell_NotifyIconW(NIM_ADD, &icon_data_)) {
                 return false ;
             }
-            hide_menu_window() ;
+
+            if(!hide_menu_window()) {
+                return false ;
+            }
 
             return true ;
         }
