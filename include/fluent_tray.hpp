@@ -943,7 +943,7 @@ namespace fluent_tray
 
             if(pos.x != previous_mouse_pos_.x || pos.y != previous_mouse_pos_.y) {
                 // The mouse cursor is moved, so switch to the mouse-mode.
-                for(int i = 0 ; i < menus_.size() ; i ++) {
+                for(int i = 0 ; i < static_cast<int>(menus_.size()) ; i ++) {
                     auto& menu = menus_[i] ;
                     auto detected_hwnd = WindowFromPoint(pos) ;
                     if(!detected_hwnd) {
@@ -964,7 +964,7 @@ namespace fluent_tray
             }
 
             // Update the color of only changed menu.
-            for(int i = 0 ; i < menus_.size() ; i ++) {
+            for(int i = 0 ; i < static_cast<int>(menus_.size()) ; i ++) {
                 if(i == select_index_) {
                     if(!status_if_focus[i]) {
                         // OFF -> ON
