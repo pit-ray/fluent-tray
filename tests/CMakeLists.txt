@@ -88,9 +88,11 @@ function(AddTest TEST_NAME)
     )
 endfunction()
 
-AddTest(string_test string_test.cpp)
-AddTest(menu_test menu_test.cpp)
-AddTest(tray_test tray_test.cpp)
+AddTest(test_string test_string.cpp)
+AddTest(test_menu test_menu.cpp)
+AddTest(test_tray test_tray.cpp)
+AddTest(test_bits test_bits.cpp)
+AddTest(test_color test_color.cpp)
 
 set(
     CMAKE_CTEST_ARGUMENTS

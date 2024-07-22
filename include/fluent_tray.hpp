@@ -75,6 +75,10 @@ typedef enum {
 #include <string>
 #include <vector>
 
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+
 
 /**
  * @namespace fluent_tray
@@ -191,8 +195,8 @@ namespace fluent_tray
             static constexpr auto bits = type2bit<OutType>() ;
             static const auto lower_mask = util::bit2mask(bits) ;
 
-            upper = static_cast<OutType>(reinterpret_cast<std::size_t>(input) >> bits) ;
-            lower = static_cast<OutType>(reinterpret_cast<std::size_t>(input) & lower_mask) ;
+            upper = static_cast<OutType>((std::size_t)(input) >> bits) ;
+            lower = static_cast<OutType>((std::size_t)(input) & lower_mask) ;
         }
 
         /**
@@ -209,7 +213,7 @@ namespace fluent_tray
 
             auto out_upper = static_cast<std::size_t>(upper) << bits ;
             auto out_lower = static_cast<std::size_t>(lower) & lower_mask ;
-            out = reinterpret_cast<OutType>(out_upper | out_lower) ;
+            out = (OutType)(out_upper | out_lower) ;
         }
         /**
          * @brief Calculate grayscale value from RGB
@@ -1684,5 +1688,9 @@ namespace fluent_tray
 
     unsigned int FluentTray::message_id_ ;
 }
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic warning "-Wold-style-cast"
+#endif
 
 #endif
