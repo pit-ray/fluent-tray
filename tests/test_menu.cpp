@@ -5,6 +5,7 @@ using namespace fluent_tray ;
 TEST_CASE("FluentMenu Test: ") {
     SUBCASE("Constructor") {
         CHECK_NOTHROW(FluentMenu{}) ;
+        CHECK_NOTHROW(FluentMenu{false, [] {return true;}, [] {return true}) ;
 
         FluentMenu menu ;
         CHECK_EQ(menu.window_handle(), static_cast<HWND>(NULL)) ;
@@ -50,5 +51,18 @@ TEST_CASE("FluentMenu Test: ") {
         CHECK(menu1.set_color(
             RGB(255, 0, 255), RGB(0, 255, 255), RGB(0, 0, 255))) ;
 
+    }
+
+    SUBCASE("Callback") {
+        CHECK_NOTHROW(FluentMenu{}) ;
+
+        FluentMenu menu ;
+        CHECK_EQ(menu.window_handle(), static_cast<HWND>(NULL)) ;
+        CHECK_EQ(menu.menu_handle(), static_cast<HMENU>(NULL)) ;
+        CHECK_EQ(menu.id(), 0) ;
+
+        std::string str{} ;
+        CHECK(menu.get_label(str)) ;
+        CHECK(str.empty()) ;
     }
 }
