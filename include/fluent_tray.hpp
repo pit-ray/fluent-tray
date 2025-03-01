@@ -1199,7 +1199,7 @@ namespace fluent_tray
                 notify_data.szInfo, message_wide.c_str(), message_len) ;
             notify_data.szInfo[message_len] = L'\0' ;
 
-            if(!Shell_NotifyIconW(NIM_MODIFY, &notify_data)) {
+            if(Shell_NotifyIconW(NIM_MODIFY, &notify_data) == FALSE) {
                 return false ;
             }
             return true ;

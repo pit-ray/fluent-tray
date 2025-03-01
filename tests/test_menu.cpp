@@ -20,6 +20,8 @@ TEST_CASE("FluentMenu Test: ") {
     SUBCASE("Error Check: create_menu") {
         FluentMenu menu ;
         CHECK_FALSE(menu.create_menu(NULL, NULL, 1)) ;
+
+        CHECK_FALSE(menu.create_menu(NULL, NULL, 1, "test", "foo/bar/hoge.ico")) ;
     }
 
     SUBCASE("toggle") {

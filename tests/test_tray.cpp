@@ -145,4 +145,10 @@ TEST_CASE("FluentTray Test: ") {
         CHECK(tray.update()) ;
         tray.stop() ;
     }
+
+    SUBCASE("balloon_tip") {
+        FluentTray tray ;
+        CHECK(tray.create_tray("test_balloon_tip")) ;
+        CHECK_NOTHROW(tray.show_balloon_tip("Balloon Tips", "Done!")) ;
+    }
 }
