@@ -2,6 +2,7 @@
 
 using namespace fluent_tray ;
 
+
 TEST_CASE("string test under Fake Windows API: ") {
     SUBCASE("Empty String") {
         std::wstring wstr ;
